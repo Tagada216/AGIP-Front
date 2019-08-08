@@ -1,34 +1,44 @@
 <template>
-    <div style="100vh">
-        <base-header title="Main Courante"></base-header>
-        <splitpanes class="default-theme" horizontal>
-            <div splitpanes-size="0" splitpanes-max="0"></div>
-            <grid splitpanes-size="50" splitpanes-min="15" splitpanes-max="100"></grid>
-            <div splitpanes-size="50" splitpanes-min="20" splitpanes-max="100">
-                
-            </div>
-        </splitpanes>
-        
-        
-        <!-- <div class="file-drop-area">
+  <div style="100vh">
+    <base-header title="Main Courante"></base-header>
+    <splitpanes class="default-theme" horizontal>
+      <div splitpanes-size="0" splitpanes-max="0"></div>
+      <grid splitpanes-size="50" splitpanes-min="15" splitpanes-max="100" style="height: 100%"></grid>
+
+      <incident-form splitpanes-size="50" splitpanes-min="20" splitpanes-max="100" v-bind:id-incident="curID"></incident-form>
+    </splitpanes>
+
+    <!-- <div class="file-drop-area">
             <span class="fake-btn">Choose files</span>
             <span class="file-msg js-set-number">or drag and drop files here</span>
             <input class="file-input" type="file" multiple>
-        </div> -->
-    </div>
+    </div>-->
+  </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import Grid from '@/components/Grid.vue';
-import Splitpanes from 'splitpanes'
-import 'splitpanes/dist/splitpanes.css'
+import Splitpanes from 'splitpanes';
+//import formSchema from '@/assets/form-newincident'
+import IncidentForm from '@/components/IncidentForm.vue';
+import 'splitpanes/dist/splitpanes.css';
 
 export default {
+    created() {
+        this.$root.$on('incidentSelected', id => {
+			this.curID = id
+            //console.log(this);
+        });
+	},
+	data() {
+		return {curID: -1}
+	},
     components: {
         Grid,
         Splitpanes,
-    },
+        IncidentForm,
+	}
 };
 </script>
 
@@ -37,11 +47,30 @@ export default {
 div.splitpanes
   height: calc(100vh - 71px)
 
+div.splitpanes__pane
+  overflow: auto
+
+#pane_1
+  &div
+    height: 100%
+
+#pane_2
+    background-color: white
+
+div.default-theme.splitpanes--horizontal
+    >div.splitpanes__splitter
+        background-color: #2a2a2e
+        border: none
+        height: 12px
+        &::before
+            background-color: white
+        &::after
+            background-color: white
+
 </style>
 
 
 <style>
-
 /* .file-drop-area {
   border: 1px dashed #7c7db3;
   border-radius: 3px;
@@ -88,6 +117,4 @@ div.splitpanes
 .file-input:focus {
   outline: none;
 } */
-
-
 </style>

@@ -31,6 +31,14 @@ $iconWidth: 50px
             font-size: 5em
         height: 70px
 
+    .vsm-arrow
+        &:after
+            content: ">"
+            font-size: 2em
+
+    .vsm-item.first-item.open-item > .vsm-link
+        background-color: #888888
+
 </style>
 
 <script>
@@ -59,69 +67,50 @@ export default {
                     // attributes: {}
                 },
                 {
-                    // item
-                    href: '/main-courante',
-                    title: 'Main courante',
+                    href: '/new-incident',
+                    title: 'Nouvel incident',
                     icon: 'fas fa-pen',
-                    // disabled: true
-                    // class: ''
-                    // attributes: {}
-                    // alias: '/path'
                 },
                 {
-                    // item
+                    href: '/main-courante',
+                    title: 'Main courante',
+                    icon: 'fas fa-book-open',
+                },
+                {
                     href: '/fichier-rouge',
                     title: 'Fichier Rouge',
                     icon: 'fas fa-file',
-                    // disabled: true
-                    // class: ''
-                    // attributes: {}
-                    // alias: '/path'
                 },
                 {
-                    // item
                     href: '/post-mortem',
                     title: 'Post-Mortem',
                     icon: 'fas fa-archive',
-                    // disabled: true
-                    // class: ''
-                    // attributes: {}
-                    // alias: '/path'
                 },
                 {
                     header: true,
                     title: 'Problemes',
-                    // component: componentName
-                    // visibleOnCollapse: true
-                    // class:''
-                    // attributes: {}
                 },
                 {
                     href: '/problemes',
                     title: 'Problemes',
                     icon: 'fas fa-hands-helping',
-                    // component: componentName
-                    // visibleOnCollapse: true
-                    // class:''
-                    // attributes: {}
                 },
                 {
                     href: '/statistique',
                     title: 'Statistiques',
                     icon: 'fas fa-chart-bar',
-                    // component: componentName
-                    // visibleOnCollapse: true
-                    // class:''
-                    // attributes: {}
                 },
             ],
             props: {
-                
                 widthCollapsed: {
                     type: String,
-                    default: '50px'
-                }
-            }
+                    default: '50px',
+                },
+                collapsed: {
+                    type: Boolean,
+                    default: true,
+                },
+            },
         };
     },
     components: {

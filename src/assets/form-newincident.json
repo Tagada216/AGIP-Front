@@ -1,0 +1,338 @@
+{
+	"type": "object",
+	"properties": {
+
+		"infosIncident": {
+			"type": "object",
+			"properties": {
+				"priorite": {
+					"type": "number",
+					"ui": {
+						"widget": "select",
+						"label": "Priorité",
+						"widgetConfig": {
+							"itemLabelField": "priorite",
+							"itemValueField": "id",
+							"enumSourceRemote": {
+								"remoteUrl": "http://localhost:5000/api/incidents/priorite"
+							}
+						},
+						"columns": 6
+					},
+					"rules": {
+						"required": true
+					}
+				},
+				"statut": {
+					"type": "number",
+					"ui": {
+						"widget": "select",
+						"label": "Statut",
+						"widgetConfig": {
+							"itemLabelField": "nom",
+							"itemValueField": "id",
+							"enumSourceRemote": {
+								"remoteUrl": "http://localhost:5000/api/incidents/status"
+							}
+						},
+						"columns": 6
+					},
+					"rules": {
+						"required": true
+					}
+				},
+				"description": {
+					"type": "string",
+					"ui": {
+						"widget": "textarea",
+						"widgetConfig": {
+							"rows": 4
+						},
+						"label": "Description"
+					},
+					"rules": {
+						"required": true
+					}
+				},
+				"impact": {
+					"type": "string",
+					"ui": {
+						"widget": "textarea",
+						"widgetConfig": {
+							"rows": 4
+						},
+						"label": "Impacts"
+					},
+					"rules": {
+						"required": true
+					}
+				},
+				"contournement": {
+					"type": "string",
+					"ui": {
+						"widget": "textarea",
+						"widgetConfig": {
+							"rows": 4
+						},
+						"label": "Contournement"
+					},
+					"rules": {
+						"required": true
+					}
+				}
+
+			},
+			"ui": {
+				"noLabelSpace": true,
+				"legend": "Informations générales incident",
+				"columns": 8,
+				"widgetConfig": {
+					"disableCollapse": true
+				}
+			}
+
+		},
+
+		"infoDetailees": {
+			"type": "object",
+			"properties": {
+				"references": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"reference": {
+								"type": "string",
+								"ui": {
+									"label": "Référence"
+								},
+								"rules": {
+									"required": true
+								}
+							}
+						}
+					},
+					"ui": {
+						"showLegend": true,
+						"legend": "Références Incident",
+						"noLabelSpace": true,
+						"widget": "array-table",
+						"widgetConfig": {
+							"disableCollapse": true,
+							"requiredDelConfirm": true,
+							"disableReorder": true,
+							"addTxt": "Ajouter",
+							"delAllTxt": "Supprimer tout",
+							"delConfirmText": {
+								"item": "Êtes vous sûr de vouloir le supprimer ?",
+								"all": "Êtes vous sûr de vouloir tout supprimer ?"
+							}
+						}
+					}
+				},
+
+				"horodatages": {
+					"type": "object",
+					"properties": {
+						"debutIncident": {
+							"type": "string",
+							"ui": {
+								"widget": "date-picker",
+								"label": "Début de l'incident",
+								"widgetConfig": {
+									"type": "datetime",
+									"valueFormat": "yyyy-MM-dd HH:mm",
+									"format": "dd/MM/yyyy HH:mm"
+								}
+							},
+							"rules": {
+								"required": true
+							}
+						},
+						"fauxIncident": {
+							"type": "boolean",
+							"ui": {
+								"label": "Faux incident",
+								"widgetConfig": {
+									"type": "button"
+								},
+								"linkFields": [{
+									"fieldPath": "finIncident",
+									"rules": [
+										"required"
+									]
+								}]
+							}
+						},
+						"finIncident": {
+							"type": "string",
+							"ui": {
+								"widget": "date-picker",
+								"label": "Fin de l'incident",
+								"widgetConfig": {
+									"type": "datetime"
+								},
+								"disabled": "dx: {{$root.infoDetailees.horodatages.fauxIncident}}"
+							}
+						}
+					},
+					"ui": {
+						"noLabelSpace": true,
+						"legend": "Horodatages",
+						"widgetConfig": {
+							"disableCollapse": true
+						}
+					}
+				}
+			},
+			"ui": {
+				"columns": 4,
+				"noLabelSpace": true,
+				"legend": "Informations détaillées",
+				"widgetConfig": {
+					"disableCollapse": true
+				}
+			}
+		},
+
+		"impactsEnseignes": {
+			"type": "object",
+			"properties": {
+				"bddf": {
+					"type": "object",
+					"properties": {
+						"estImpactee": {
+							"type": "boolean",
+							"ui": {
+								"label": "Est elle impactée ?",
+								"widgetConfig": {
+									"type": "button"
+								},
+								"linkFields": [{
+									"fieldPath": "finIncident",
+									"rules": [
+										"required"
+									]
+								}]
+							}
+						},
+						"id": {
+							"type": "number",
+							"value": 1,
+							"ui": {
+								"hidden": true
+							}
+						}
+					},
+					"ui": {
+						"noLabelSpace": true,
+						"legend": "BDDF",
+						"widgetConfig": {
+							"disableCollapse": true
+						}
+					}
+				},
+
+				"cdn": {
+					"type": "object",
+					"properties": {
+						"estImpactee": {
+							"type": "boolean",
+							"ui": {
+								"label": "Est elle impactée ?",
+								"widgetConfig": {
+									"type": "button"
+								},
+								"linkFields": [{
+									"fieldPath": "finIncident",
+									"rules": [
+										"required"
+									]
+								}]
+							}
+						},
+						"id": {
+							"type": "number",
+							"value": 2,
+							"ui": {
+								"hidden": true
+							}
+						}
+					},
+					"ui": {
+						"noLabelSpace": true,
+						"legend": "CDN",
+						"widgetConfig": {
+							"disableCollapse": true
+						}
+					}
+				},
+
+				"bpf": {
+					"type": "object",
+					"properties": {
+						"estImpactee": {
+							"type": "boolean",
+							"ui": {
+								"label": "Est elle impactée ?",
+								"widgetConfig": {
+									"type": "button"
+								},
+								"linkFields": [{
+									"fieldPath": "finIncident",
+									"rules": [
+										"required"
+									]
+								}]
+							}
+						},
+						"id": {
+							"type": "number",
+							"value": 3,
+							"ui": {
+								"hidden": true
+							}
+						}
+					},
+					"ui": {
+						"noLabelSpace": true,
+						"legend": "BPF",
+						"widgetConfig": {
+							"disableCollapse": true
+						}
+					}
+				}
+
+
+			},
+			"ui": {
+				"noLabelSpace": true,
+				"legend": "Impacts sur les enseignes",
+				"columns": 4,
+				"widgetConfig": {
+					"disableCollapse": true
+				}
+			}
+		},
+
+		"applicationImpactee": {
+			"type": "string",
+			"ui": {
+				"widgetConfig": {
+					"autocomplete": {
+						"itemValueField": "keyword",
+						"itemTemplate": "",
+						"enumSourceRemote": {
+							"remoteUrl": "http://localhost:5000/api/applications",
+							"paramName": "keyword",
+							"resField": "data"
+						}
+					}
+				},
+				"columns":8,
+				"label":"Application impactée"
+			}
+		}
+
+	}
+}

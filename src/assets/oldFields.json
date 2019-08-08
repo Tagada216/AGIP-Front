@@ -1,0 +1,42 @@
+{
+	"enseignempacteee": {
+		"type": "array",
+		"ui": {
+			"widget": "checkbox",
+			"widgetConfig": {
+
+				"itemLabelField": "nom",
+				"itemValueField": "id",
+				"enumSourceRemote": {
+					"remoteUrl": "http://localhost:5000/api/enseignes"
+				}
+			},
+			"label": "Enseignes inpactées"
+		}
+	},
+	"enseignempactee": {
+		"type": "object",
+		"properties": {
+			"enseigne": {
+				"type": "array",
+				"items": {
+					"type": "string"
+				},
+				"ui": {
+					"showLegend": false,
+					"noLabelSpace": true,
+					"widget": "nc-demo",
+					"widgetConfig": {
+
+						"itemLabelField": "nom",
+						"itemValueField": "id",
+						"enumSourceRemote": {
+							"remoteUrl": "http://localhost:5000/api/enseignes"
+						}
+					}
+				}
+			}
+
+		}
+	}
+}

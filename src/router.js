@@ -20,5 +20,13 @@ export default new Router({
             path: '/main-courante',
             component: () => import('./views/MainCourante.vue'),
         },
+        {
+            path: '/new-incident',
+            component: () => import('./views/NewIncident.vue'),
+        },
+        {
+            path: '/fichier-rouge',
+            component: () => import('./views/demo.vue'),
+        },
     ],
 });

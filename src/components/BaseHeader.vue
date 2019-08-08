@@ -13,9 +13,11 @@ export default {
 
 <style lang="sass" scoped>
     h1
-        height: 51px
+        height: 71px
         margin: 0
         background-color: #ed1a3a
-        padding: 10px
+        padding: 19px
         color: white
+        font-size: 2em
+        font-weight: 700
 </style>

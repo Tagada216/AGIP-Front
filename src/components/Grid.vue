@@ -1,7 +1,11 @@
 <template>
-    <div>
+    <div style="height: 100%;">
+		<!-- <div class="grid-search">
+			<i class="vsm-icon fas fa-search"></i>
+			<input type="text" ref="filter-text-box" placeholder="Recherchez ..." @input="onFilterTextBoxChanged"/>
+		</div> -->
         <ag-grid-vue
-        style="width: 100%; height: 75vh; min-height: 100%"
+        style="width: 100%; height: 100%; min-height: 85%"
         class="ag-theme-balham"
         :rowData="rowData"
         :columnDefs="columnDefs"
@@ -49,33 +53,55 @@ export default {
     // },
     mounted () {
         axios
-            .get('http://localhost:5000/api/incident')
+            .get('http://localhost:5000/api/main-courante')
             .then(response => this.setGridData(response.data))
     },
     methods: {
         setGridData(data){
+			//console.log(data);
+			
             this.setColDef(Object.keys(data[0]))
             this.rowData = data
         },
         setColDef(colNames){
             this.columnDefs = []
             for (const colName of colNames) {
-                this.columnDefs.push({field:""+colName, width:(1/colNames.length)*1000})
+                this.columnDefs.push({field:""+colName, width:(1/colNames.length)*2000, sortable:true, filter:true})
             }
         },
         onRowSelected(event) {
             if (event.node.selected){
-                window.alert(event.data.id)
-                console.log(event);
+                //window.alert(event.data.id)
+				//console.log(event.data.id);
+				this.$root.$emit('incidentSelected', event.data.id)
             }
             
         },
         onSelectionChanged(event) {
             //console.log(event);
-        },
+		},
+		onFilterTextBoxChanged(event){
+			// console.log(this.$refs["filter-text-box"].value);
+			this.quickFilter = this.$refs["filter-text-box"].value
+		},
     },
 };
 </script>
 
-<style>
+<style lang="sass" scoped>
+	.grid-search
+		height: 15%
+		font-size : 1.8em
+
+		& svg
+			font-size : 2em
+			color: #5f5f5f
+
+	input
+		height: 100%
+		width: 95%
+		border: none
+		font-size : 2em
+		background-color: transparent
+
 </style>
