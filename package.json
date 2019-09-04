@@ -21,6 +21,7 @@
     "element-ui": "^2.10.1",
     "splitpanes": "^1.14.2",
     "sqlite3": "^4.0.8",
+    "ssf": "^0.10.2",
     "vee-validate": "^2.2.13",
     "vue": "^2.6.10",
     "vue-form-json": "^1.1.1",

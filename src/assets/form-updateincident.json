@@ -5,6 +5,14 @@
 		"infosIncident": {
 			"type": "object",
 			"properties": {
+				"id": {
+					"type": "number",
+					"ui": {
+						"label": "Identifiant",
+						"columns": 4,
+						"disabled": true
+					}
+				},
 				"priorite": {
 					"type": "number",
 					"ui": {
@@ -17,7 +25,7 @@
 								"remoteUrl": "http://localhost:5000/api/incidents/priorite"
 							}
 						},
-						"columns": 6
+						"columns": 4
 					},
 					"rules": {
 						"required": true
@@ -35,7 +43,7 @@
 								"remoteUrl": "http://localhost:5000/api/incidents/status"
 							}
 						},
-						"columns": 6
+						"columns": 4
 					},
 					"rules": {
 						"required": true
@@ -94,10 +102,9 @@
 							},
 							"trim": false
 						},
-						"label":"Application impactée"
+						"label": "Application impactée"
 					}
 				}
-
 			},
 			"ui": {
 				"noLabelSpace": true,
@@ -323,6 +330,6 @@
 			}
 		}
 
-		
+
 	}
 }

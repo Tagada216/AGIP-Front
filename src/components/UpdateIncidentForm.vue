@@ -1,25 +1,34 @@
 <template>
-  <div style="100vh">
-    <base-header title="Saisie d'un nouvel incident"></base-header>
-    <create-incident-form></create-incident-form>
+  <div>
+	<span>TEST</span>
+    <ncform
+      :form-schema="formSchema"
+      form-name="your-form-name"
+      v-model="formSchema.value"
+      style="max-width: 100%"
+      :msg="msg"
+      @submit="submit()"
+    ></ncform>
+
+    <el-button @click="submit()">Enregistrer</el-button>
   </div>
 </template>
 
 <script>
-import CreateIncidentForm from '@/components/CreateIncidentForm';
-
-import formSchema from '@/assets/form-newincident';
+import formSchema from '@/assets/form-updateincident';
 import axios from 'axios';
-//import NcDemo from "@/components/myCustomComp.vue";
 
 export default {
-    created() {
-        //this.$ncformAddWidget({name:"nc-demo", widget: NcDemo})
+    mounted() {
+        console.log(this);
     },
 
-    components: {
-        CreateIncidentForm,
+    props: {
+        msg: {
+            type: String,
+        },
     },
+
     data() {
         return {
             formSchema,
@@ -27,6 +36,7 @@ export default {
     },
     methods: {
         submit() {
+			console.log(this.msg);
             this.$ncformValidate('your-form-name').then(data => {
                 if (data.result) {
                     console.log(this.$data.formSchema);
@@ -37,6 +47,13 @@ export default {
                     // do what you like to do
                 }
             });
+        },
+    },
+
+    watch: {
+        msg: function() {
+			console.log(this.msg);
+			this.$data.formSchema.value
         },
     },
 };

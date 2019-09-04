@@ -28,5 +28,9 @@ export default new Router({
             path: '/fichier-rouge',
             component: () => import('./views/demo.vue'),
         },
+        {
+            path: '/statistique',
+            component: () => import('./views/Stats.vue'),
+        },
     ],
 });

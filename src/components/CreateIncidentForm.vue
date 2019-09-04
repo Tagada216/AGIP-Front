@@ -1,25 +1,28 @@
 <template>
-  <div style="100vh">
-    <base-header title="Saisie d'un nouvel incident"></base-header>
-    <create-incident-form></create-incident-form>
+  <div>
+    <ncform
+      :form-schema="formSchema"
+      form-name="your-form-name"
+      v-model="formSchema.value"
+      style="max-width: 100%"
+      @submit="submit()"
+    ></ncform>
+
+    <el-button @click="submit()">Enregistrer</el-button>
   </div>
 </template>
 
 <script>
-import CreateIncidentForm from '@/components/CreateIncidentForm';
-
 import formSchema from '@/assets/form-newincident';
 import axios from 'axios';
-//import NcDemo from "@/components/myCustomComp.vue";
 
 export default {
-    created() {
-        //this.$ncformAddWidget({name:"nc-demo", widget: NcDemo})
-    },
+    created() {},
 
-    components: {
-        CreateIncidentForm,
-    },
+    components: {},
+
+    props: {},
+
     data() {
         return {
             formSchema,

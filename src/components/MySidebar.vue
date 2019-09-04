@@ -76,25 +76,25 @@ export default {
                     title: 'Main courante',
                     icon: 'fas fa-book-open',
                 },
-                {
-                    href: '/fichier-rouge',
-                    title: 'Fichier Rouge',
-                    icon: 'fas fa-file',
-                },
-                {
-                    href: '/post-mortem',
-                    title: 'Post-Mortem',
-                    icon: 'fas fa-archive',
-                },
-                {
-                    header: true,
-                    title: 'Problemes',
-                },
-                {
-                    href: '/problemes',
-                    title: 'Problemes',
-                    icon: 'fas fa-hands-helping',
-                },
+                // {
+                //     href: '/fichier-rouge',
+                //     title: 'Fichier Rouge',
+                //     icon: 'fas fa-file',
+                // },
+                // {
+                //     href: '/post-mortem',
+                //     title: 'Post-Mortem',
+                //     icon: 'fas fa-archive',
+                // },
+                // {
+                //     header: true,
+                //     title: 'Problemes',
+                // },
+                // {
+                //     href: '/problemes',
+                //     title: 'Problemes',
+                //     icon: 'fas fa-hands-helping',
+                // },
                 {
                     href: '/statistique',
                     title: 'Statistiques',
