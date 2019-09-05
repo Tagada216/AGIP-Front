@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <base-header title="Accueil"/>
-    <img alt="Vue logo" src="../assets/Logo AGIPRO et subtitle.png">
+    <img alt="Vue logo" src="../assets/Logo AGIPRO et subtitle.svg">
 	<h1 class="welcomeHeader">Bienvenu dans AGIPRO</h1>
 	<p>
 		AGIPRO pour Applicatif de Gestion des Incidents et PROblèmes, <br>
