@@ -1,6 +1,223 @@
 {
 	"type": "object",
 	"properties": {
+		"references": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"reference": {
+						"type": "string",
+						"ui": {
+							"label": "Référence"
+						},
+						"rules": {
+							"required": true
+						}
+					}
+				}
+			},
+			"ui": {
+				"showLegend": true,
+				"legend": "Références de l'incident",
+				"noLabelSpace": true,
+				"widget": "array-table",
+				"widgetConfig": {
+					"disableCollapse": true,
+					"requiredDelConfirm": true,
+					"disableReorder": true,
+					"addTxt": "Ajouter",
+					"delAllTxt": "Supprimer tout",
+					"delConfirmText": {
+						"item": "Êtes vous sûr de vouloir le supprimer ?",
+						"all": "Êtes vous sûr de vouloir tout supprimer ?"
+					}
+				},
+				"columns": 4
+			}
+		},
+
+		"horodatages": {
+			"type": "object",
+			"properties": {
+				"debutIncident": {
+					"type": "string",
+					"ui": {
+						"widget": "date-picker",
+						"label": "Début de l'incident",
+						"widgetConfig": {
+							"type": "datetime",
+							"valueFormat": "yyyy-MM-dd HH:mm",
+							"format": "dd/MM/yyyy HH:mm",
+							"placeholder":"Choisir la date"
+						}
+					},
+					"rules": {
+						"required": true
+					}
+				},
+				"fauxIncident": {
+					"type": "boolean",
+					"ui": {
+						"label": "Faux incident",
+						"widgetConfig": {
+							"type": "button"
+						},
+						"linkFields": [{
+							"fieldPath": "finIncident",
+							"rules": [
+								"required"
+							]
+						}]
+					}
+				},
+				"finIncident": {
+					"type": "string",
+					"ui": {
+						"widget": "date-picker",
+						"label": "Fin de l'incident",
+						"widgetConfig": {
+							"type": "datetime",
+							"valueFormat": "yyyy-MM-dd HH:mm",
+							"format": "dd/MM/yyyy HH:mm",
+							"placeholder":"Choisir la date"
+						},
+						"disabled": "dx: {{$root.horodatages.fauxIncident}}"
+					}
+				}
+			},
+			"ui": {
+				"noLabelSpace": true,
+				"legend": "Horodatages",
+				"widgetConfig": {
+					"disableCollapse": true
+				},
+				"columns": 4
+			}
+		},
+		
+		"impactsEnseignes": {
+			"type": "object",
+			"properties": {
+				"bddf": {
+					"type": "object",
+					"properties": {
+						"estImpactee": {
+							"type": "boolean",
+							"ui": {
+								"label": "Est-elle impactée ?",
+								"widgetConfig": {
+									"type": "button"
+								},
+								"linkFields": [{
+									"fieldPath": "finIncident",
+									"rules": [
+										"required"
+									]
+								}]
+							}
+						},
+						"id": {
+							"type": "number",
+							"value": 1,
+							"ui": {
+								"hidden": true
+							}
+						}
+					},
+					"ui": {
+						"noLabelSpace": true,
+						"legend": "BDDF",
+						"widgetConfig": {
+							"disableCollapse": true
+						},
+						"columns":4
+					}
+				},
+
+				"cdn": {
+					"type": "object",
+					"properties": {
+						"estImpactee": {
+							"type": "boolean",
+							"ui": {
+								"label": "Est-elle impactée ?",
+								"widgetConfig": {
+									"type": "button"
+								},
+								"linkFields": [{
+									"fieldPath": "finIncident",
+									"rules": [
+										"required"
+									]
+								}]
+							}
+						},
+						"id": {
+							"type": "number",
+							"value": 2,
+							"ui": {
+								"hidden": true
+							}
+						}
+					},
+					"ui": {
+						"noLabelSpace": true,
+						"legend": "CDN",
+						"widgetConfig": {
+							"disableCollapse": true
+						},
+						"columns":4
+					}
+				},
+
+				"bpf": {
+					"type": "object",
+					"properties": {
+						"estImpactee": {
+							"type": "boolean",
+							"ui": {
+								"label": "Est-elle impactée ?",
+								"widgetConfig": {
+									"type": "button"
+								},
+								"linkFields": [{
+									"fieldPath": "finIncident",
+									"rules": [
+										"required"
+									]
+								}]
+							}
+						},
+						"id": {
+							"type": "number",
+							"value": 3,
+							"ui": {
+								"hidden": true
+							}
+						}
+					},
+					"ui": {
+						"noLabelSpace": true,
+						"legend": "BPF",
+						"widgetConfig": {
+							"disableCollapse": true
+						},
+						"columns":4
+					}
+				}
+
+
+			},
+			"ui": {
+				"noLabelSpace": true,
+				"legend": "Impacts sur les enseignes",
+				"columns": 4,
+				"widgetConfig": {
+					"disableCollapse": true
+				}
+			}
+		},
 
 		"infosIncident": {
 			"type": "object",
@@ -23,7 +240,8 @@
 							"itemValueField": "id",
 							"enumSourceRemote": {
 								"remoteUrl": "http://localhost:5000/api/incidents/priorite"
-							}
+							},
+							"placeholder":"Choisir la priorité"
 						},
 						"columns": 4
 					},
@@ -41,7 +259,8 @@
 							"itemValueField": "id",
 							"enumSourceRemote": {
 								"remoteUrl": "http://localhost:5000/api/incidents/status"
-							}
+							},
+							"placeholder":"Choisir le statut"
 						},
 						"columns": 4
 					},
@@ -108,228 +327,13 @@
 			},
 			"ui": {
 				"noLabelSpace": true,
-				"legend": "Informations générales incident",
-				"columns": 8,
+				"legend": "Informations générales de l'incident",
+				"columns": 12,
 				"widgetConfig": {
 					"disableCollapse": true
 				}
 			}
 
-		},
-
-		"impactsEnseignes": {
-			"type": "object",
-			"properties": {
-				"bddf": {
-					"type": "object",
-					"properties": {
-						"estImpactee": {
-							"type": "boolean",
-							"ui": {
-								"label": "Est elle impactée ?",
-								"widgetConfig": {
-									"type": "button"
-								},
-								"linkFields": [{
-									"fieldPath": "finIncident",
-									"rules": [
-										"required"
-									]
-								}]
-							}
-						},
-						"id": {
-							"type": "number",
-							"value": 1,
-							"ui": {
-								"hidden": true
-							}
-						}
-					},
-					"ui": {
-						"noLabelSpace": true,
-						"legend": "BDDF",
-						"widgetConfig": {
-							"disableCollapse": true
-						}
-					}
-				},
-
-				"cdn": {
-					"type": "object",
-					"properties": {
-						"estImpactee": {
-							"type": "boolean",
-							"ui": {
-								"label": "Est elle impactée ?",
-								"widgetConfig": {
-									"type": "button"
-								},
-								"linkFields": [{
-									"fieldPath": "finIncident",
-									"rules": [
-										"required"
-									]
-								}]
-							}
-						},
-						"id": {
-							"type": "number",
-							"value": 2,
-							"ui": {
-								"hidden": true
-							}
-						}
-					},
-					"ui": {
-						"noLabelSpace": true,
-						"legend": "CDN",
-						"widgetConfig": {
-							"disableCollapse": true
-						}
-					}
-				},
-
-				"bpf": {
-					"type": "object",
-					"properties": {
-						"estImpactee": {
-							"type": "boolean",
-							"ui": {
-								"label": "Est elle impactée ?",
-								"widgetConfig": {
-									"type": "button"
-								},
-								"linkFields": [{
-									"fieldPath": "finIncident",
-									"rules": [
-										"required"
-									]
-								}]
-							}
-						},
-						"id": {
-							"type": "number",
-							"value": 3,
-							"ui": {
-								"hidden": true
-							}
-						}
-					},
-					"ui": {
-						"noLabelSpace": true,
-						"legend": "BPF",
-						"widgetConfig": {
-							"disableCollapse": true
-						}
-					}
-				}
-
-
-			},
-			"ui": {
-				"noLabelSpace": true,
-				"legend": "Impacts sur les enseignes",
-				"columns": 4,
-				"widgetConfig": {
-					"disableCollapse": true
-				}
-			}
-		},
-
-		"references": {
-			"type": "array",
-			"items": {
-				"type": "object",
-				"properties": {
-					"reference": {
-						"type": "string",
-						"ui": {
-							"label": "Référence"
-						},
-						"rules": {
-							"required": true
-						}
-					}
-				}
-			},
-			"ui": {
-				"showLegend": true,
-				"legend": "Références Incident",
-				"noLabelSpace": true,
-				"widget": "array-table",
-				"widgetConfig": {
-					"disableCollapse": true,
-					"requiredDelConfirm": true,
-					"disableReorder": true,
-					"addTxt": "Ajouter",
-					"delAllTxt": "Supprimer tout",
-					"delConfirmText": {
-						"item": "Êtes vous sûr de vouloir le supprimer ?",
-						"all": "Êtes vous sûr de vouloir tout supprimer ?"
-					}
-				},
-				"columns": 4
-			}
-		},
-
-		"horodatages": {
-			"type": "object",
-			"properties": {
-				"debutIncident": {
-					"type": "string",
-					"ui": {
-						"widget": "date-picker",
-						"label": "Début de l'incident",
-						"widgetConfig": {
-							"type": "datetime",
-							"valueFormat": "yyyy-MM-dd HH:mm",
-							"format": "dd/MM/yyyy HH:mm"
-						}
-					},
-					"rules": {
-						"required": true
-					}
-				},
-				"fauxIncident": {
-					"type": "boolean",
-					"ui": {
-						"label": "Faux incident",
-						"widgetConfig": {
-							"type": "button"
-						},
-						"linkFields": [{
-							"fieldPath": "finIncident",
-							"rules": [
-								"required"
-							]
-						}]
-					}
-				},
-				"finIncident": {
-					"type": "string",
-					"ui": {
-						"widget": "date-picker",
-						"label": "Fin de l'incident",
-						"widgetConfig": {
-							"type": "datetime",
-							"valueFormat": "yyyy-MM-dd HH:mm",
-							"format": "dd/MM/yyyy HH:mm"
-						},
-						"disabled": "dx: {{$root.horodatages.fauxIncident}}"
-					}
-				}
-			},
-			"ui": {
-				"noLabelSpace": true,
-				"legend": "Horodatages",
-				"widgetConfig": {
-					"disableCollapse": true
-				},
-				"columns": 4
-			}
 		}
-
-
 	}
 }

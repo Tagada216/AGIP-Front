@@ -2,9 +2,9 @@
   <div class="home">
     <base-header title="Accueil"/>
     <img alt="Vue logo" src="../assets/Logo AGIPRO et subtitle.svg">
-	<h1 class="welcomeHeader">Bienvenu dans AGIPRO</h1>
+	<h1 class="welcomeHeader">Bienvenue dans AGIPRO</h1>
 	<p>
-		AGIPRO pour Applicatif de Gestion des Incidents et PROblèmes, <br>
+		AGIPRO pour Applicatif de Gestion des Incidents et des PROblèmes, <br>
 		est une plateforme destinée à simplifier et fiabiliser les proccessus <br>
 		de gestion d'incidents et de problèmes
 	</p>
