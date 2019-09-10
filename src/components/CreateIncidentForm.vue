@@ -6,6 +6,7 @@
       v-model="formSchema.value"
       style="max-width: 100%"
       @submit="submit()"
+      @redirige="redirige()"
     ></ncform>
 
     <el-button @click="submit()">Enregistrer</el-button>
