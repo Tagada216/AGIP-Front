@@ -1,24 +1,25 @@
 <template>
-  <div style="100vh">
-    <base-header title="Main Courante"></base-header>
-    <splitpanes class="default-theme" horizontal>
-      <div splitpanes-size="0" splitpanes-max="0"></div>
-      <grid
-        splitpanes-size="50"
-        splitpanes-min="15"
-        splitpanes-max="100"
-        style="height: 100%"
-        @incidentSelected="updateID"
-      ></grid>
+    <div style="100vh">
+        <base-header title="Main Courante"></base-header>
+        <splitpanes watch-slots  class="default-theme" horizontal>
+            <div splitpanes-size="0" splitpanes-max="0"></div>
 
-      <update-incident-form
-        splitpanes-size="50"
-        splitpanes-min="20"
-        splitpanes-max="100"
-        :msg="curID"
-      ></update-incident-form>
-    </splitpanes>
-  </div>
+            <grid
+                splitpanes-size="50"
+                splitpanes-min="15"
+                splitpanes-max="100"
+                style="height: 100%"
+                @incidentSelected="updateID"
+            />
+
+            <update-incident-form
+                :incident_id="curID"
+                splitpanes-size="50"
+                splitpanes-min="20"
+                splitpanes-max="100"
+            />
+        </splitpanes>
+    </div>
 </template>
 
 
@@ -27,13 +28,12 @@
 // @ is an alias to /src
 import Grid from '@/components/Grid.vue';
 import Splitpanes from 'splitpanes';
-import UpdateIncidentForm from '@/components/UpdateIncidentForm.vue';
+import UpdateIncidentForm from '@/components/MyUpdateIncidentForm';
 import 'splitpanes/dist/splitpanes.css';
 
 export default {
-
     data() {
-        return { curID: "-1" };
+        return { curID: 1 };
     },
 
     components: {
@@ -44,9 +44,7 @@ export default {
 
     methods: {
         updateID(id) {
-			console.log('old MC : ' + this.curID);
-			this.curID = ""+id;
-            console.log('new MC : ' + this.curID);
+			this.curID = id;
         },
     },
 };

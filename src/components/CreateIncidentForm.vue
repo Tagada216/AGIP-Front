@@ -1,15 +1,15 @@
 <template>
-  <div>
-    <ncform
-      :form-schema="formSchema"
-      form-name="your-form-name"
-      v-model="formSchema.value"
-      style="max-width: 100%"
-      @submit="submit()"
-    ></ncform>
+    <div>
+        <ncform
+            :form-schema="formSchema"
+            form-name="your-form-name"
+            v-model="formSchema.value"
+            style="max-width: 100%"
+            @submit="submit()"
+        ></ncform>
 
-    <el-button @click="submit()">Enregistrer</el-button>
-  </div>
+        <el-button @click="submit()">Enregistrer</el-button>
+    </div>
 </template>
 
 <script>

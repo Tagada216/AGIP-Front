@@ -2,40 +2,40 @@
 
 <template>
   <div>
-    
+    <base-header title="TEST"></base-header>
+    <update-incident-form :incident_id="1"></update-incident-form>
   </div>
 </template>
-<script>
 
-import formSchema from '@/assets/form-newincident'
+<script>
+//import formSchema from '@/assets/form-newincident'
+import UpdateIncidentForm from '@/components/MyUpdateIncidentForm';
 
 export default {
     data() {
         return {
-            formSchema
         };
     },
-    methods: {
-        submit() {
-            this.$ncformValidate('your-form-name').then(data => {
-                if (data.result) {
-                    console.log(this.$data.formSchema.value);
-                    // do what you like to do
-                }
-            });
-        },
+
+    components: {
+        UpdateIncidentForm,
     },
+
+    // methods: {
+    //     submit() {
+    //         this.$ncformValidate('your-form-name').then(data => {
+    //             if (data.result) {
+    //                 console.log(this.$data.formSchema.value);
+    //                 // do what you like to do
+    //             }
+    //         });
+    //     },
+    // },
 };
 </script>
 
 
 <style lang="sass" scoped>
-	div.ncform
-		& form
-			max-width: 100%
-	div form
-		max-width: 100%
-	ncform
-		max-width: 100%
+
 
 </style>

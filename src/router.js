@@ -32,5 +32,9 @@ export default new Router({
             path: '/statistique',
             component: () => import('./views/Stats.vue'),
         },
+        {
+            path: '/testistique',
+            component: () => import('./views/demo.vue'),
+        },
     ],
 });

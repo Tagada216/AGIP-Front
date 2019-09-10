@@ -20,7 +20,9 @@ import axios from 'axios';
 
 export default {
     mounted() {
-        console.log(this);
+		//this.formSchema.value.impactsEnseignes.bddf.estImpactee = true
+		console.log(this.formSchema.value.impactsEnseignes.bddf.estImpactee);
+		this.$forceUpdate();
     },
 
     props: {
