@@ -83,7 +83,7 @@ export default {
         },
         zh_cn: {
             delItemTips: '确定要删除该项吗？',
-        },
+        }
     },
 
     props: {
@@ -173,11 +173,11 @@ export default {
                         this.$data.options = [
                             {
                                 value: 1,
-                                label: 'true',
+                                label: 'true'
                             },
                             {
                                 value: 0,
-                                label: 'false',
+                                label: 'false'
                             },
                         ];
                         this._keepSelectedItem();
