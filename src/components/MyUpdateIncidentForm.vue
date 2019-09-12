@@ -72,6 +72,42 @@
                             :disabled="fauxIncident"
                         />
                     </el-form-item>
+                    <el-form-item label="Détection" required>
+                        <el-date-picker
+                            v-model="dateDetection"
+                            type="datetime"
+                            placeholder="Sélectionnez l'horodatage"
+                            format="dd/MM/yyyy HH:mm:ss"
+                            value-format="yyyy/MM/dd HH:mm:ss"
+                        />
+                    </el-form-item>
+                    <el-form-item label="Communication à la Tour De Contrôle" required>
+                        <el-date-picker
+                            v-model="dateCommunicationTDC"
+                            type="datetime"
+                            placeholder="Sélectionnez l'horodatage"
+                            format="dd/MM/yyyy HH:mm:ss"
+                            value-format="yyyy/MM/dd HH:mm:ss"
+                        />
+                    </el-form-item>
+                    <el-form-item label="Qualification P0 P1" required>
+                        <el-date-picker
+                            v-model="dateQualificationP01"
+                            type="datetime"
+                            placeholder="Sélectionnez l'horodatage"
+                            format="dd/MM/yyyy HH:mm:ss"
+                            value-format="yyyy/MM/dd HH:mm:ss"
+                        />
+                    </el-form-item>
+                    <el-form-item label="Première communication à l'enseigne" required>
+                        <el-date-picker
+                            v-model="datePremiereCom"
+                            type="datetime"
+                            placeholder="Sélectionnez l'horodatage"
+                            format="dd/MM/yyyy HH:mm:ss"
+                            value-format="yyyy/MM/dd HH:mm:ss"
+                        />
+                    </el-form-item>
                 </el-card>
                 <!-- Fin Horodatage -->
             </el-col>
@@ -173,6 +209,7 @@
                 </el-card>
                 <!-- Fin Infos générales incident -->
             </el-col>
+            <el-button type="submit" @click="envoyerMail()">Envoyer un mail</el-button>
         </el-row>
 
         <!-- Modal de confirmation de suppression d'une reférence problème -->
@@ -200,6 +237,7 @@
 
 <script>
 import Axios from 'axios';
+import { scrypt } from 'crypto';
 export default {
     created() {
         this.getFieldsOptions();
@@ -226,6 +264,10 @@ export default {
             status: '',
             enseigne_impactee: [],
             applicationImpactee: '',
+            dateDetection:'',
+            dateCommunicationTDC:'',
+            dateQualificationP01:'',
+            datePremiereCom:'',
 
             remoteEnum: {
                 priorites: [],
@@ -268,7 +310,9 @@ export default {
         handleCreate() {
             this.references.push({ reference: '' });
         },
-
+        envoyerMail(to, body, sub){
+            //window.open("mailto:lucie-varlet@hotmail.fr?subject=objet&body=Description")
+        },
         getFieldsOptions() {
             // Obtention des prioritées
             Axios.get('http://localhost:5000/api/incidents/priorite').then(
@@ -331,40 +375,45 @@ export default {
             Axios.get(
                 'http://localhost:5000/api/main-courante/' + idIncident
             ).then(response => {
-                console.log(response.data[0]);
+				console.log(response.data[0]);
+				
+                this.description = response.data[0].description
+                this.dateDebut = response.data[0].date_debut
+                this.dateFin = response.data[0].date_fin
+				this.impact = response.data[0].impact
+                this.status = response.data[0].status
+                this.priorite = response.data[0].priorite
+                this.dateDetection=response.data[0].date_detection
+                this.dateCommunicationTDC=response.data[0].date_communication_tdc
+                this.dateQualificationP01=response.data[0].date_qualif_p01
+                this.datePremiereCom=response.data[0].date_premier_com
 
-                this.description = response.data[0].description;
-                this.dateDebut = response.data[0].date_debut;
-                this.dateFin = response.data[0].date_fin;
-                this.impact = response.data[0].impact;
-                this.status = response.data[0].status;
-                this.priorite = response.data[0].priorite;
+				this.enseigne_impactee = []
+				this.references = []
 
-                this.enseigne_impactee = [];
-                this.references = [];
+				for (const ens_id of response.data[0].id_enseigne.split('/')) {
+					this.enseigne_impactee.push(parseInt(ens_id))
+				}
 
-                for (const ens_id of response.data[0].id_enseigne.split('/')) {
-                    this.enseigne_impactee.push(parseInt(ens_id));
-                }
-
-                for (
-                    let index = 0;
-                    index < response.data[0].reference_id.split('/').length;
-                    index++
-                ) {
-                    const id = response.data[0].reference_id.split('/')[index];
-                    const ref = response.data[0].reference.split('/')[index];
-                    this.references.push({ reference_id: id, reference: ref });
-                }
+				for (let index = 0; index < response.data[0].reference_id.split('/').length; index++) {
+					const id = response.data[0].reference_id.split('/')[index];
+					const ref = response.data[0].reference.split('/')[index];
+					this.references.push({reference_id: id, reference: ref})
+				}
             });
-        },
-    },
-
-    watch: {
-        incident_id: function() {
-            this.getIncident(this.incident_id);
-        },
-    },
+		},
+		
+		test(){
+			console.log(this.incident_id);
+			
+		},
+	},
+	
+	watch:{
+		incident_id: function(){
+			this.getIncident(this.incident_id)
+		}
+	},
 };
 </script>
 
