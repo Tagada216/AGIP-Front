@@ -1,6 +1,8 @@
 <template>
     <div style="100vh">
-        <base-header title="Main Courante"></base-header>
+        <base-header title="Main Courante">
+			<button class="header-btn"><i class="fas fa-file-excel"></i></button>
+		</base-header>
         <splitpanes watch-slots  class="default-theme" horizontal>
             <div splitpanes-size="0" splitpanes-max="0"></div>
 
@@ -79,4 +81,20 @@ div.default-theme.splitpanes--horizontal
         &::after
             background-color: white
 
+.header-btn
+    line-height: 70px
+    height: 70px
+    width: 70px
+    padding: 0
+    margin: 0
+    float: right
+    border: none
+    color: white
+    font-size: 50px
+    background-color: #2a2a2e
+    &:hover
+        background-color: #b7011d
+        cursor: pointer
+    &:focus
+        border: none
 </style>

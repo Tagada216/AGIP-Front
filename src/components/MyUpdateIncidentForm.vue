@@ -1,8 +1,5 @@
 <template>
     <el-form ref="form" :model="form" label-position="top">
-		<el-button @click="test()"></el-button>
-		<br/>
-		<br/>
         <el-row :gutter="20">
             <el-col :span="6">
                 <!-- Références incident -->
@@ -121,6 +118,7 @@
                                 v-for="enseigne in remoteEnum.enseignes"
                                 :label="enseigne.id"
                                 :key="enseigne.id"
+                                v-if="!enseigne.is_deprecated || enseigne_impactee.includes(enseigne.id)"
                             >{{enseigne.nom}}</el-checkbox>
                         </el-checkbox-group>
                     </el-form-item>
@@ -164,8 +162,14 @@
                         ></el-input>
                     </el-form-item>
 
-                    <span>TODO Application impactée</span>
-                    <!-- <el-autocomplete placeholder="Application impactée" v-model="textarea"></el-autocomplete> -->
+                    <el-form-item label="TODO Application impactée">
+                        <el-autocomplete
+                            placeholder="Application impactée"
+                            v-model="applicationImpactee"
+                            :fetch-suggestions="getMatchingApplications"
+                            value-key="display_name"
+                        ></el-autocomplete>
+                    </el-form-item>
                 </el-card>
                 <!-- Fin Infos générales incident -->
             </el-col>
@@ -184,6 +188,13 @@
                 <el-button type="danger" @click="confirmDelete()">Confirmer</el-button>
             </span>
         </el-dialog>
+		<!-- Fin Modal de confirmation de suppression d'une reférence problème -->
+
+
+        <el-form-item style="text-align: center">
+            <el-button type="primary" @click="onSubmit()">Sauvegarder</el-button>
+        </el-form-item>
+
     </el-form>
 </template>
 
@@ -192,18 +203,17 @@ import Axios from 'axios';
 export default {
     created() {
         this.getFieldsOptions();
-		this.getIncident(this.incident_id);
-	},
-	
-	props: {
-		incident_id:{
-			type: Number,
-		}
-	},
+        this.getIncident(this.incident_id);
+    },
+
+    props: {
+        incident_id: {
+            type: Number,
+        },
+    },
 
     data() {
         return {
-			//incident_id: 752,
             references: [],
             fauxIncident: false,
             dateDebut: '',
@@ -215,11 +225,13 @@ export default {
             priorite: '',
             status: '',
             enseigne_impactee: [],
+            applicationImpactee: '',
 
             remoteEnum: {
                 priorites: [],
                 status: [],
                 enseignes: [],
+                applications: [],
             },
 
             remoteIncident: {},
@@ -235,7 +247,14 @@ export default {
     },
     methods: {
         onSubmit() {
-            console.log('submit!');
+            this.$refs['form'].validate(valid => {
+                if (valid) {
+                    alert('submit!');
+                } else {
+                    console.log('error submit!!');
+                    return false;
+                }
+            });
         },
         confirmDelete() {
             this.references.splice(this.indexToDelete, 1);
@@ -269,6 +288,42 @@ export default {
             Axios.get('http://localhost:5000/api/enseignes').then(response => {
                 this.remoteEnum.enseignes = response.data;
             });
+
+            Axios.get('http://localhost:5000/api/applications').then(
+                response => {
+                    this.remoteEnum.applications = response.data.data;
+                }
+            );
+        },
+
+        getMatchingApplications(requete, retour) {
+            if (requete.length > 1) {
+                var apps = this.remoteEnum.applications;
+                var results = requete
+                    ? apps.filter(this.createFilter(requete))
+                    : apps;
+                retour(results);
+            } else {
+                retour([{ nom: '' }]);
+            }
+        },
+
+        createFilter(queryString) {
+            return apps => {
+                return (
+                    apps.code_irt
+                        .toLowerCase()
+                        .indexOf(queryString.toLowerCase()) != -1 ||
+                    apps.trigramme
+                        .toLowerCase()
+                        .indexOf(queryString.toLowerCase()) != -1 ||
+                    apps.nom.toLowerCase().indexOf(queryString.toLowerCase()) !=
+                        -1 ||
+                    apps.libelle_court
+                        .toLowerCase()
+                        .indexOf(queryString.toLowerCase()) != -1
+                );
+            };
         },
 
         getIncident(idIncident) {
@@ -276,48 +331,45 @@ export default {
             Axios.get(
                 'http://localhost:5000/api/main-courante/' + idIncident
             ).then(response => {
-				console.log(response.data[0]);
-				
-                this.description = response.data[0].description
-                this.dateDebut = response.data[0].date_debut
-                this.dateFin = response.data[0].date_fin
-				this.impact = response.data[0].impact
-                this.status = response.data[0].status
-				this.priorite = response.data[0].priorite
+                console.log(response.data[0]);
 
-				this.enseigne_impactee = []
-				this.references = []
+                this.description = response.data[0].description;
+                this.dateDebut = response.data[0].date_debut;
+                this.dateFin = response.data[0].date_fin;
+                this.impact = response.data[0].impact;
+                this.status = response.data[0].status;
+                this.priorite = response.data[0].priorite;
 
-				for (const ens_id of response.data[0].id_enseigne.split('/')) {
-					this.enseigne_impactee.push(parseInt(ens_id))
-				}
+                this.enseigne_impactee = [];
+                this.references = [];
 
-				for (let index = 0; index < response.data[0].reference_id.split('/').length; index++) {
-					const id = response.data[0].reference_id.split('/')[index];
-					const ref = response.data[0].reference.split('/')[index];
-					this.references.push({reference_id: id, reference: ref})
-				}
+                for (const ens_id of response.data[0].id_enseigne.split('/')) {
+                    this.enseigne_impactee.push(parseInt(ens_id));
+                }
+
+                for (
+                    let index = 0;
+                    index < response.data[0].reference_id.split('/').length;
+                    index++
+                ) {
+                    const id = response.data[0].reference_id.split('/')[index];
+                    const ref = response.data[0].reference.split('/')[index];
+                    this.references.push({ reference_id: id, reference: ref });
+                }
             });
-		},
-		
-		test(){
-			console.log(this.incident_id);
-			
-		},
-	},
-	
-	watch:{
-		incident_id: function(){
-			this.getIncident(this.incident_id)
-		}
-	}
+        },
+    },
 
-
+    watch: {
+        incident_id: function() {
+            this.getIncident(this.incident_id);
+        },
+    },
 };
 </script>
 
 
-<style lang="sass" scoped>
+<style lang="sass">
 	.el-form
 		margin: 20px
 		text-align: left
@@ -331,7 +383,10 @@ export default {
 	.el-checkbox-group
 		text-align: center
 
-	.el-date-editor.el-input
+	.el-date-editor.el-input, .el-select, .el-autocomplete
 		width: 100%
+
+	label.el-form-item__label
+		line-height: 15px
 </style>
 

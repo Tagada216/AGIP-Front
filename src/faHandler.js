@@ -16,6 +16,7 @@ import {
     faChartBar,
     faBookOpen,
     faSearch,
+    faFileExcel,
 } from '@fortawesome/free-solid-svg-icons';
 
 library.add(
@@ -26,6 +27,7 @@ library.add(
     faHandsHelping,
     faChartBar,
     faBookOpen,
-    faSearch
+    faSearch,
+    faFileExcel
 );
 ///////////////////////////////////////////////////////////////////////////////
