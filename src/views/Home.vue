@@ -6,7 +6,7 @@
 	<p>
 		AGIPRO pour Applicatif de Gestion des Incidents et des PROblèmes, <br>
 		est une plateforme destinée à simplifier et fiabiliser les proccessus <br>
-		de gestion d'incidents et de problèmes
+		de gestion d'incidents et de problèmes.
 	</p>
     <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
   </div>

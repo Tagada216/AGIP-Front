@@ -75,6 +75,42 @@
                             :disabled="fauxIncident"
                         />
                     </el-form-item>
+                    <el-form-item label="Détection" required>
+                        <el-date-picker
+                            v-model="dateDetection"
+                            type="datetime"
+                            placeholder="Sélectionnez l'horodatage"
+                            format="dd/MM/yyyy HH:mm:ss"
+                            value-format="yyyy/MM/dd HH:mm:ss"
+                        />
+                    </el-form-item>
+                    <el-form-item label="Communication à la Tour De Contrôle" required>
+                        <el-date-picker
+                            v-model="dateCommunicationTDC"
+                            type="datetime"
+                            placeholder="Sélectionnez l'horodatage"
+                            format="dd/MM/yyyy HH:mm:ss"
+                            value-format="yyyy/MM/dd HH:mm:ss"
+                        />
+                    </el-form-item>
+                    <el-form-item label="Qualification P0 P1" required>
+                        <el-date-picker
+                            v-model="dateQualificationP01"
+                            type="datetime"
+                            placeholder="Sélectionnez l'horodatage"
+                            format="dd/MM/yyyy HH:mm:ss"
+                            value-format="yyyy/MM/dd HH:mm:ss"
+                        />
+                    </el-form-item>
+                    <el-form-item label="Première communication à l'enseigne" required>
+                        <el-date-picker
+                            v-model="datePremiereCom"
+                            type="datetime"
+                            placeholder="Sélectionnez l'horodatage"
+                            format="dd/MM/yyyy HH:mm:ss"
+                            value-format="yyyy/MM/dd HH:mm:ss"
+                        />
+                    </el-form-item>
                 </el-card>
                 <!-- Fin Horodatage -->
             </el-col>
@@ -169,6 +205,7 @@
                 </el-card>
                 <!-- Fin Infos générales incident -->
             </el-col>
+            <el-button type="submit" @click="envoyerMail()">Envoyer un mail</el-button>
         </el-row>
 
         <!-- Modal de confirmation de suppression d'une reférence problème -->
@@ -189,6 +226,7 @@
 
 <script>
 import Axios from 'axios';
+import { scrypt } from 'crypto';
 export default {
     created() {
         this.getFieldsOptions();
@@ -199,7 +237,7 @@ export default {
 		incident_id:{
 			type: Number,
 		}
-	},
+    },
 
     data() {
         return {
@@ -215,6 +253,10 @@ export default {
             priorite: '',
             status: '',
             enseigne_impactee: [],
+            dateDetection:'',
+            dateCommunicationTDC:'',
+            dateQualificationP01:'',
+            datePremiereCom:'',
 
             remoteEnum: {
                 priorites: [],
@@ -249,7 +291,9 @@ export default {
         handleCreate() {
             this.references.push({ reference: '' });
         },
-
+        envoyerMail(to, body, sub){
+            //window.open("mailto:lucie-varlet@hotmail.fr?subject=objet&body=Description")
+        },
         getFieldsOptions() {
             // Obtention des prioritées
             Axios.get('http://localhost:5000/api/incidents/priorite').then(
@@ -283,7 +327,11 @@ export default {
                 this.dateFin = response.data[0].date_fin
 				this.impact = response.data[0].impact
                 this.status = response.data[0].status
-				this.priorite = response.data[0].priorite
+                this.priorite = response.data[0].priorite
+                this.dateDetection=response.data[0].date_detection
+                this.dateCommunicationTDC=response.data[0].date_communication_tdc
+                this.dateQualificationP01=response.data[0].date_qualif_p01
+                this.datePremiereCom=response.data[0].date_premier_com
 
 				this.enseigne_impactee = []
 				this.references = []
