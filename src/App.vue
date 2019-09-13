@@ -6,6 +6,10 @@
 </template>
 
 <style lang="scss">
+*{
+	//font-family: 'Montserrat', Helvetica, Arial, sans-serif;
+}
+
 #app {
     font-family: 'Montserrat', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;

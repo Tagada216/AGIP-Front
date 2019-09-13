@@ -1,9 +1,18 @@
 <template>
     <div style="100vh">
         <base-header title="Main Courante">
-			<button class="header-btn"><i class="fas fa-file-excel"></i></button>
-		</base-header>
-        <splitpanes watch-slots  class="default-theme" horizontal>
+            <el-tooltip
+                class="item"
+                effect="light"
+                content="Export Excel"
+                placement="bottom-end"
+            >
+                <button class="header-btn">
+                    <i class="fas fa-file-excel"></i>
+                </button>
+            </el-tooltip>
+        </base-header>
+        <splitpanes watch-slots class="default-theme" horizontal>
             <div splitpanes-size="0" splitpanes-max="0"></div>
 
             <grid
@@ -46,7 +55,7 @@ export default {
 
     methods: {
         updateID(id) {
-			this.curID = id;
+            this.curID = id;
         },
     },
 };

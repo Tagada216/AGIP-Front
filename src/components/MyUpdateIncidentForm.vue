@@ -136,9 +136,9 @@
 
                         <el-col :span="6">
                             <el-form-item label="Statut" required>
-                                <el-select v-model="status">
+                                <el-select v-model="statut">
                                     <el-option
-                                        v-for="item in remoteEnum.status"
+                                        v-for="item in remoteEnum.statut"
                                         :key="item.id"
                                         :label="item.nom"
                                         :value="item.id"
@@ -261,7 +261,7 @@ export default {
             description_contournement: '',
             is_contournement: false,
             priorite: '',
-            status: '',
+            statut: '',
             enseigne_impactee: [],
             applicationImpactee: '',
             dateDetection:'',
@@ -271,12 +271,10 @@ export default {
 
             remoteEnum: {
                 priorites: [],
-                status: [],
+                statut: [],
                 enseignes: [],
                 applications: [],
             },
-
-            remoteIncident: {},
 
             // Ligne de test qui sera certainement à supprimer
             form: {},
@@ -321,10 +319,10 @@ export default {
                 }
             );
 
-            // Obtention des status
-            Axios.get('http://localhost:5000/api/incidents/status').then(
+            // Obtention des statut
+            Axios.get('http://localhost:5000/api/incidents/statut').then(
                 response => {
-                    this.remoteEnum.status = response.data;
+                    this.remoteEnum.statut = response.data;
                 }
             );
 
@@ -381,7 +379,7 @@ export default {
                 this.dateDebut = response.data[0].date_debut
                 this.dateFin = response.data[0].date_fin
 				this.impact = response.data[0].impact
-                this.status = response.data[0].status
+                this.statut = response.data[0].statut
                 this.priorite = response.data[0].priorite
                 this.dateDetection=response.data[0].date_detection
                 this.dateCommunicationTDC=response.data[0].date_communication_tdc
