@@ -10,7 +10,7 @@
                     <el-table :data="references" border>
                         <el-table-column label="Référence">
                             <template slot-scope="scope">
-                                <el-input v-model="references[scope.$index].reference"></el-input>
+                                <el-input id="ref" v-model="references[scope.$index].reference"></el-input>
                             </template>
                         </el-table-column>
                         <el-table-column width="60">
@@ -42,7 +42,7 @@
                     </div>
 
                     <el-form-item label="Début de l'incident" required>
-                        <el-date-picker
+                        <el-date-picker id="date"
                             v-model="dateDebut"
                             type="datetime"
                             placeholder="Selectionnez l'horodatage"
@@ -72,7 +72,7 @@
                             :disabled="fauxIncident"
                         />
                     </el-form-item>
-                    <el-form-item label="Détection" required>
+                    <el-form-item label="Détection">
                         <el-date-picker
                             v-model="dateDetection"
                             type="datetime"
@@ -81,7 +81,7 @@
                             value-format="yyyy/MM/dd HH:mm:ss"
                         />
                     </el-form-item>
-                    <el-form-item label="Communication à la Tour De Contrôle" required>
+                    <el-form-item label="Communication à la Tour De Contrôle">
                         <el-date-picker
                             v-model="dateCommunicationTDC"
                             type="datetime"
@@ -90,7 +90,7 @@
                             value-format="yyyy/MM/dd HH:mm:ss"
                         />
                     </el-form-item>
-                    <el-form-item label="Qualification P0 P1" required>
+                    <el-form-item label="Qualification P0 P1">
                         <el-date-picker
                             v-model="dateQualificationP01"
                             type="datetime"
@@ -99,7 +99,7 @@
                             value-format="yyyy/MM/dd HH:mm:ss"
                         />
                     </el-form-item>
-                    <el-form-item label="Première communication à l'enseigne" required>
+                    <el-form-item label="Première communication à l'enseigne">
                         <el-date-picker
                             v-model="datePremiereCom"
                             type="datetime"
@@ -123,7 +123,7 @@
                     <el-row :gutter="20">
                         <el-col :span="6">
                             <el-form-item label="Priorité" required>
-                                <el-select v-model="priorite">
+                                <el-select id ="prio" v-model="priorite">
                                     <el-option
                                         v-for="item in remoteEnum.priorites"
                                         :key="item.id"
@@ -149,8 +149,8 @@
                     </el-row>
 
                     <el-form-item label="Enseigne(s) impactée(s)" required>
-                        <el-checkbox-group v-model="enseigne_impactee">
-                            <el-checkbox
+                        <el-checkbox-group id="enseigne" v-model="enseigne_impactee">
+                            <el-checkbox id="check"
                                 v-for="enseigne in remoteEnum.enseignes"
                                 :label="enseigne.id"
                                 :key="enseigne.id"
@@ -160,7 +160,7 @@
                     </el-form-item>
 
                     <el-form-item label="Description" required>
-                        <el-input
+                        <el-input id="desc"
                             type="textarea"
                             :autosize="{ minRows: 2, maxRows: 8}"
                             placeholder="Description"
@@ -169,7 +169,7 @@
                     </el-form-item>
 
                     <el-form-item label="Impact" required>
-                        <el-input
+                        <el-input id="imp"
                             type="textarea"
                             :autosize="{ minRows: 4, maxRows: 8}"
                             placeholder="Impact"
@@ -206,10 +206,45 @@
                             value-key="display_name"
                         ></el-autocomplete>
                     </el-form-item>
+
+                    <el-form-item label="Cause">
+                        <el-input id="cause"
+                            type="textarea"
+                            :autosize="{minRows: 4, maxRows: 8}"
+                            placeholder="Cause"
+                            v-model="cause"
+                        ></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="Origine">
+                        <el-input id="origine"
+                            type="textarea"
+                            :autosize="{minRows: 4, maxRows: 8}"
+                            placeholder="Origine"
+                            v-model="origine"
+                        ></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="Action de rétablissement">
+                        <el-input id="actionRetablissement"
+                            type="textarea"
+                            :autosize="{minRows: 4, maxRows: 8}"
+                            placeholder="Action de rétablissement"
+                            v-model="action_retablissement"
+                        ></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="Plan d'action">
+                        <el-input id="planAction"
+                            type="textarea"
+                            :autosize="{minRows: 4, maxRows: 8}"
+                            placeholder="Plan d'action"
+                            v-model="plan_action"
+                        ></el-input>
+                    </el-form-item>
                 </el-card>
                 <!-- Fin Infos générales incident -->
             </el-col>
-            <el-button type="submit" @click="envoyerMail()">Envoyer un mail</el-button>
         </el-row>
 
         <!-- Modal de confirmation de suppression d'une reférence problème -->
@@ -230,6 +265,7 @@
 
         <el-form-item style="text-align: center">
             <el-button type="primary" @click="onSubmit()">Sauvegarder</el-button>
+            <el-button type="primary" @click="envoyerMail()">Envoyer un mail</el-button>
         </el-form-item>
 
     </el-form>
@@ -238,6 +274,7 @@
 <script>
 import Axios from 'axios';
 import { scrypt } from 'crypto';
+import { escape } from 'querystring';
 export default {
     created() {
         this.getFieldsOptions();
@@ -268,6 +305,10 @@ export default {
             dateCommunicationTDC:'',
             dateQualificationP01:'',
             datePremiereCom:'',
+            cause:'',
+            origine:'',
+            action_retablissement:'',
+            plan_action:'',
 
             remoteEnum: {
                 priorites: [],
@@ -310,8 +351,41 @@ export default {
         handleCreate() {
             this.references.push({ reference: '' });
         },
-        envoyerMail(to, body, sub){
-            //window.open("mailto:lucie-varlet@hotmail.fr?subject=objet&body=Description")
+
+        envoyerMail(){
+            //Récupération des différents champs 
+            var desc=document.getElementById('desc').value
+            var imp=document.getElementById('imp').value
+            var prio=document.getElementById('prio').value
+            var enseigne=document.getElementById('enseigne').value
+            var ref=document.getElementById('ref').value
+            var date=document.getElementById('date').value
+            var cause=document.getElementById('cause').value
+            var origine=document.getElementById('origine').value
+            var actionRetablissement=document.getElementById('actionRetablissement').value
+            var planAction=document.getElementById('planAction').value
+
+            //Définition des adresses mail, de l'objet et du contenu du mail
+            var adresseMail = "lucie.varlet@socgen.com"
+            var obj = "[Incident "+prio+"][][Annonce]["+ref+"][]["+date+"]"
+            var body = "INCIDENT TRAITE EN "+prio
+            +"%0D%0A %0D%0ADescription%0D%0A"+desc
+            +"%0D%0A %0D%0AEnseigne impactée%0D%0A"+enseigne+"%0D%0AVisible du client final : %0D%0AListe détaillée des clients et opérations à fournir au métier : %0D%0A"
+            +"%0D%0A %0D%0AImpacts%0D%0A"+imp
+            +"%0D%0A %0D%0ACauses%0D%0A"+cause
+            +"%0D%0A %0D%0AActions de résolution menées%0D%0A"+actionRetablissement
+            +"%0D%0A %0D%0APlan d'actions%0D%0A"+planAction
+            +"%0D%0A %0D%0AProchaine communication à ..h..%0D%0A"
+            +"%0D%0A %0D%0ACordialement,"
+            +"%0D%0AXXXXXXXXXX"
+            +"%0D%0ATour De Contrôle"
+            +"%0D%0AITIM/GSI/TDC"
+            +"%0D%0AHeures Ouvrées : 01-42-14-22-23"
+            +"%0D%0AAstreinte de crise : 06-09-79-20-35"
+
+
+            //Ouvre outlook avec le mail pré-rempli (adresses mail, objet, corps du mail (Possibilité d'ajouter les CC))
+            window.open("mailto:"+adresseMail+"?subject="+obj+"&body="+body)
         },
         getFieldsOptions() {
             // Obtention des prioritées
@@ -387,6 +461,10 @@ export default {
                 this.dateCommunicationTDC=response.data[0].date_communication_tdc
                 this.dateQualificationP01=response.data[0].date_qualif_p01
                 this.datePremiereCom=response.data[0].date_premier_com
+                this.cause=response.data[0].cause
+                this.origine=response.data[0].origine
+                this.action_retablissement=response.data[0].action_retablissement
+                this.plan_action=response.data[0].plan_action
 
 				this.enseigne_impactee = []
 				this.references = []
