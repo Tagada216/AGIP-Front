@@ -166,14 +166,36 @@
                         ></el-input>
                     </el-form-item>
 
-                    <el-form-item label="Application impactée" prop="applicationImpactee">
-                        <el-autocomplete
-                            placeholder="Application impactée"
-                            v-model="form.applicationImpactee"
-                            :fetch-suggestions="getMatchingApplications"
-                            value-key="display_name"
-                        ></el-autocomplete>
-                    </el-form-item>
+                    <el-table :data="remoteEnum.applicationImpactee" border>
+                        <el-table-column label="Application(s) impctée(s)" prop="applicationImpactee">
+                            <template slot-scope="scope">
+                                <el-autocomplete 
+                                placeholder="Application impactée" 
+                                v-model="remoteEnum.applicationImpactee[scope.$index].applicationImpactee"
+                                :fetch-suggestions="getMatchingApplications"
+                                value-key="display_name"
+                                ></el-autocomplete>
+                            </template>
+                        </el-table-column>
+                        <el-table-column width="60">
+                            <template slot="header">
+                                <el-button
+                                    type="primary"
+                                    icon="el-icon-plus"
+                                    circle
+                                    @click="handleCreateApp()"
+                                />
+                            </template>
+                            <template slot-scope="scope">
+                                <el-button
+                                    type="danger"
+                                    icon="el-icon-delete"
+                                    circle
+                                    @click="handleDeleteApp(scope.$index)"
+                                />
+                            </template>
+                        </el-table-column>
+                    </el-table>
                 </el-card>
                 <!-- Fin Infos générales incident -->
             </el-col>
@@ -194,6 +216,20 @@
         </el-dialog>
         <!-- Fin Modal de confirmation de suppression d'une reférence problème -->
 
+        <!-- Modal de confirmation de suppression d'une application impactée -->
+        <el-dialog
+            title="Demande de confirmation"
+            :visible.sync="delConfirmationModalVisibleApp"
+            width="40%"
+            center
+        >
+            <span>Etes vous sur de vouloir supprimer l'application : {{refToDelete}}</span>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="delConfirmationModalVisibleApp = false">Annuler</el-button>
+                <el-button type="danger" @click="confirmDeleteApp()">Confirmer</el-button>
+            </span>
+        </el-dialog>
+		<!-- Fin Modal de confirmation de suppression d'une application impactée-->
         <el-form-item style="text-align: center">
             <el-button type="primary" @click="submit()">Sauvegarder</el-button>
         </el-form-item>
@@ -201,6 +237,7 @@
 </template>
 
 <script>
+import confirmationVue from './confirmation.vue';
 export default {
     created() {
         this.getFieldsOptions();
@@ -213,7 +250,7 @@ export default {
                 priorites: [],
                 statut: [],
                 enseignes: [],
-                applications: [],
+                applicationImpactee: [],
             },
 
             // Données du formulaire
@@ -294,6 +331,8 @@ export default {
 
             // Les lignes suivantes sont des variables nécessaires au modal de suppression
             delConfirmationModalVisible: false,
+            delConfirmationModalVisibleApp: false,
+            messageConfirmation:true,
             indexRefToDelete: 0,
             refToDelete: '',
         };
@@ -305,10 +344,12 @@ export default {
                     console.log(this.form);
                     this.$http.post(
                         'http://localhost:5000/api/main-courante',
-                        this.form
+                        this.form,
+                        window.confirm("L'enregistrement a bien été effectué")
                     );
                 } else {
                     console.log('error submit!!');
+                        window.confirm("Veuillez remplir tous les champs")
                     return false;
                 }
             });
@@ -324,6 +365,19 @@ export default {
         },
         handleCreate() {
             this.form.references.push({ reference: '' });
+        },
+
+        confirmDeleteApp() {
+            this.remoteEnum.applicationImpactee.splice(this.indexToDelete, 1);
+            this.delConfirmationModalVisibleApp = false;
+        },
+        handleDeleteApp(index) {
+            this.indexToDelete = index;
+            this.refToDelete = this.remoteEnum.applicationImpactee[index].applicationImpactee;
+            this.delConfirmationModalVisibleApp = true;
+        },
+        handleCreateApp() {
+            this.remoteEnum.applicationImpactee.push({ applicationImpactee: '' });
         },
 
         setContournementRule() {

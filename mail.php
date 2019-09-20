@@ -1,5 +1,5 @@
 <?php
-    $to = 'lucie-varlet@hotmail.fr';
+    /*$to = 'lucie-varlet@hotmail.fr';
     $subject='Test envoie mail';
 
     $message="
@@ -37,5 +37,8 @@
     $headers[] = 'MIME-Version: 1.0';
     $headers[] = 'Content-type: text/html; charset=iso-8859-1';
 
-    mail($to,$subject,$message,implode("\r\n", $headers));
+    mail($to,$subject,$message,implode("\r\n", $headers));*/
+    $email="lucie.varlet@socgen.com";
+    $message="Test";
+    mail("lucie.varlet@socgen.com", "This is an email from:" .$email, $message);
 ?>

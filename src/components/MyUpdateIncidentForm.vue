@@ -10,7 +10,7 @@
                     <el-table :data="form.references" border>
                         <el-table-column label="Référence">
                             <template slot-scope="scope">
-                                <el-input v-model="form.references[scope.$index].reference"></el-input>
+                                <el-input id="reference" v-model="form.references[scope.$index].reference"></el-input>
                             </template>
                         </el-table-column>
                         <el-table-column width="60">
@@ -42,7 +42,7 @@
                     </div>
 
                     <el-form-item label="Début de l'incident" prop="date_debut">
-                        <el-date-picker
+                        <el-date-picker id="date_debut"
                             v-model="form.date_debut"
                             type="datetime"
                             placeholder="Selectionnez l'horodatage"
@@ -127,7 +127,7 @@
                     <el-row :gutter="20">
                         <el-col :span="6">
                             <el-form-item label="Priorité" prop="priorite_id">
-                                <el-select v-model="form.priorite_id">
+                                <el-select id="priorite_id" v-model="form.priorite_id">
                                     <el-option
                                         v-for="item in remoteEnum.priorites"
                                         :key="item.id"
@@ -140,7 +140,7 @@
 
                         <el-col :span="6">
                             <el-form-item label="Statut" prop="statut_id">
-                                <el-select v-model="form.statut_id">
+                                <el-select id="statut_id" v-model="form.statut_id">
                                     <el-option
                                         v-for="item in remoteEnum.statut"
                                         :key="item.id"
@@ -154,7 +154,7 @@
 
                     <el-form-item label="Enseigne(s) impactée(s)" prop="enseigne_impactee">
                         <el-checkbox-group v-model="form.enseigne_impactee">
-                            <el-checkbox
+                            <el-checkbox id="enseigne"
                                 v-for="enseigne in remoteEnum.enseignes"
                                 :label="enseigne.id"
                                 :key="enseigne.id"
@@ -164,7 +164,7 @@
                     </el-form-item>
 
                     <el-form-item label="Description" prop="description">
-                        <el-input
+                        <el-input id="description"
                             type="textarea"
                             :autosize="{ minRows: 2, maxRows: 8}"
                             placeholder="Description"
@@ -173,7 +173,7 @@
                     </el-form-item>
 
                     <el-form-item label="Impact" prop="description_impact">
-                        <el-input
+                        <el-input id="description_impact"
                             type="textarea"
                             :autosize="{ minRows: 4, maxRows: 8}"
                             placeholder="Impact"
@@ -206,14 +206,36 @@
                         ></el-input>
                     </el-form-item>
 
-                    <el-form-item label="Application impactée" prop="applicationImpactee">
-                        <el-autocomplete
-                            placeholder="Application impactée"
-                            v-model="form.applicationImpactee"
-                            :fetch-suggestions="getMatchingApplications"
-                            value-key="display_name"
-                        ></el-autocomplete>
-                    </el-form-item>
+                    <el-table :data="remoteEnum.applicationImpactee" border>
+                        <el-table-column label="Application(s) impctée(s)" prop="applicationImpactee">
+                            <template slot-scope="scope">
+                                <el-autocomplete
+                                placeholder="Application impactée" 
+                                v-model="remoteEnum.applicationImpactee[scope.$index].applicationImpactee"
+                                :fetch-suggestions="getMatchingApplications"
+                                value-key="display_name"
+                                ></el-autocomplete>
+                            </template>
+                        </el-table-column>
+                        <el-table-column width="60">
+                            <template slot="header">
+                                <el-button
+                                    type="primary"
+                                    icon="el-icon-plus"
+                                    circle
+                                    @click="handleCreateApp()"
+                                />
+                            </template>
+                            <template slot-scope="scope">
+                                <el-button
+                                    type="danger"
+                                    icon="el-icon-delete"
+                                    circle
+                                    @click="handleDeleteApp(scope.$index)"
+                                />
+                            </template>
+                        </el-table-column>
+                    </el-table>
 
                     <el-form-item label="Cause">
                         <el-input id="cause"
@@ -233,8 +255,8 @@
                         ></el-input>
                     </el-form-item>
 
-                    <el-form-item label="Action de rétablissement">
-                        <el-input id="actionRetablissement"
+                    <el-form-item label="Action de rétablissement" prop="action_retablissement">
+                        <el-input id="action_retablissement"
                             type="textarea"
                             :autosize="{minRows: 4, maxRows: 8}"
                             placeholder="Action de rétablissement"
@@ -242,8 +264,8 @@
                         ></el-input>
                     </el-form-item>
 
-                    <el-form-item label="Plan d'action">
-                        <el-input id="planAction"
+                    <el-form-item label="Plan d'action" prop="plan_action">
+                        <el-input id="plan_action"
                             type="textarea"
                             :autosize="{minRows: 4, maxRows: 8}"
                             placeholder="Plan d'action"
@@ -270,6 +292,20 @@
         </el-dialog>
 		<!-- Fin Modal de confirmation de suppression d'une reférence problème -->
 
+        <!-- Modal de confirmation de suppression d'une application impactée -->
+        <el-dialog
+            title="Demande de confirmation"
+            :visible.sync="delConfirmationModalVisibleApp"
+            width="40%"
+            center
+        >
+            <span>Etes vous sur de vouloir supprimer l'application : {{refToDelete}}</span>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="delConfirmationModalVisibleApp = false">Annuler</el-button>
+                <el-button type="danger" @click="confirmDeleteApp()">Confirmer</el-button>
+            </span>
+        </el-dialog>
+		<!-- Fin Modal de confirmation de suppression d'une application impactée-->
 
         <el-form-item style="text-align: center">
             <el-button type="primary" @click="onSubmit()">Sauvegarder</el-button>
@@ -283,6 +319,10 @@
 import Axios from 'axios';
 import { scrypt } from 'crypto';
 import { escape } from 'querystring';
+import { open } from 'fs';
+import confirmationVue from './confirmation.vue';
+//import func from '../../vue-temp/vue-editor-bridge';
+
 export default {
     created() {
         this.getFieldsOptions();
@@ -302,7 +342,7 @@ export default {
                 priorites: [],
                 statut: [],
                 enseignes: [],
-                applications: [],
+                applicationImpactee: [],
             },
 
             // Données du formulaire
@@ -312,6 +352,10 @@ export default {
                 date_debut: '', //
                 date_fin: null, //
                 description: '', //
+                cause:'',
+                origine:'',
+                action_retablissement:'',
+                plan_action:'',
                 description_impact: '', //
                 description_contournement: 'Aucun contournement', //
                 is_contournement: false, //
@@ -322,7 +366,8 @@ export default {
 				date_detection: '',
 				date_communication_TDC: '',
 				date_qualification_p01: '',
-				date_premiere_com: ''
+                date_premiere_com: '',
+
             },
 
             rules: {
@@ -354,6 +399,22 @@ export default {
                         trigger: 'blur',
                     },
                 ],
+                plan_action: [
+                    {
+                        required:false,
+                        message:"Plan d'action",
+                        trigger:'blur',
+                    }
+                ],
+
+                action_retablissement: [
+                    {
+                        required:false,
+                        message:"Action de rétablissement",
+                        trigger:'blur',
+                    }
+                ],
+
                 priorite_id: [
                     {
                         required: true,
@@ -387,22 +448,27 @@ export default {
 
             // Les lignes suivantes sont des variables nécessaires au modal de suppression
             delConfirmationModalVisible: false,
+            delConfirmationModalVisibleApp: false,
             indexRefToDelete: 0,
             refToDelete: '',
         };
     },
     methods: {
         onSubmit() {
-			console.log(this.form);
-			
-            // this.$refs['form'].validate(valid => {
-            //     if (valid) {
-            //         alert('submit!');
-            //     } else {
-            //         console.log('error submit!!');
-            //         return false;
-            //     }
-            // });
+            console.log(this.form);
+
+            /*this.$refs['form'].validate(valid=>{
+                if(valid){
+                    console.log(this.form);
+                    this.$http.put(
+                        'http://localhost:5000/api/main-courante',
+                        this.form
+                    );
+                } else {
+                    console.log('error');
+                    return false;
+                }
+            })*/
 		},
 		
         confirmDelete() {
@@ -418,41 +484,90 @@ export default {
             this.form.references.push({ reference: '' });
         },
 
+        confirmDeleteApp() {
+            this.remoteEnum.applicationImpactee.splice(this.indexToDelete, 1);
+            this.delConfirmationModalVisibleApp = false;
+        },
+        handleDeleteApp(index) {
+            this.indexToDelete = index;
+            this.refToDelete = this.remoteEnum.applicationImpactee[index].applicationImpactee;
+            this.delConfirmationModalVisibleApp = true;
+        },
+        handleCreateApp() {
+            this.remoteEnum.applicationImpactee.push({ applicationImpactee: '' });
+        },
+
         envoyerMail(){
-            //Récupération des différents champs 
-            var desc=document.getElementById('desc').value
-            var imp=document.getElementById('imp').value
-            var prio=document.getElementById('prio').value
+
+            //Récupération des différents champs
+             
+            var description=document.getElementById('description').value
+            var description_impact=document.getElementById('description_impact').value
+            var priorite_id=document.getElementById('priorite_id').value
             var enseigne=document.getElementById('enseigne').value
-            var ref=document.getElementById('ref').value
-            var date=document.getElementById('date').value
+            //var ref=document.getElementById('reference').value
+            var date_debut=document.getElementById('date_debut').value
             var cause=document.getElementById('cause').value
             var origine=document.getElementById('origine').value
-            var actionRetablissement=document.getElementById('actionRetablissement').value
-            var planAction=document.getElementById('planAction').value
-
+            var action_retablissement=document.getElementById('action_retablissement').value
+            var plan_action=document.getElementById('plan_action').value
+            var enseigne=this.form.enseigne_impactee
+            var ref=this.form.references
             //Définition des adresses mail, de l'objet et du contenu du mail
-            var adresseMail = "lucie.varlet@socgen.com"
-            var obj = "[Incident "+prio+"][][Annonce]["+ref+"][]["+date+"]"
-            var body = "INCIDENT TRAITE EN "+prio
-            +"%0D%0A %0D%0ADescription%0D%0A"+desc
-            +"%0D%0A %0D%0AEnseigne impactée%0D%0A"+enseigne+"%0D%0AVisible du client final : %0D%0AListe détaillée des clients et opérations à fournir au métier : %0D%0A"
-            +"%0D%0A %0D%0AImpacts%0D%0A"+imp
-            +"%0D%0A %0D%0ACauses%0D%0A"+cause
-            +"%0D%0A %0D%0AActions de résolution menées%0D%0A"+actionRetablissement
-            +"%0D%0A %0D%0APlan d'actions%0D%0A"+planAction
-            +"%0D%0A %0D%0AProchaine communication à ..h..%0D%0A"
-            +"%0D%0A %0D%0ACordialement,"
-            +"%0D%0AXXXXXXXXXX"
-            +"%0D%0ATour De Contrôle"
-            +"%0D%0AITIM/GSI/TDC"
-            +"%0D%0AHeures Ouvrées : 01-42-14-22-23"
-            +"%0D%0AAstreinte de crise : 06-09-79-20-35"
 
+            var adresseMail = "lucie.varlet@socgen.com"
+            var obj = "[Incident "+priorite_id+"]["+enseigne+"][Annonce]["+ref+"][]["+date_debut+"]"
+            var formatedBody= "INCIDENT TRAITE EN "+priorite_id
+            +"\n \nDescription\n"+description
+            +"\n \nEnseigne impactée\n"+enseigne+"\nVisible du client final : \nListe détaillée des clients et opérations à fournir au métier : \n"
+            +"\n \nImpacts\n"+description_impact
+            +"\n \nCauses\n"+cause
+            +"\n \nActions de résolution menées\n"+action_retablissement
+            +"\n \nPlan d'actions\n"+plan_action
+            +"\n \nProchaine communication à ..h..\n"
+            +"\n \nCordialement,"
+            +"\nXXXXXXXXXX"
+            +"\nTour De Contrôle"
+            +"\nITIM/GSI/TDC"
+            +"\nHeures Ouvrées : 01-42-14-22-23"
+            +"\nAstreinte de crise : 06-09-79-20-35"
 
             //Ouvre outlook avec le mail pré-rempli (adresses mail, objet, corps du mail (Possibilité d'ajouter les CC))
-            window.open("mailto:"+adresseMail+"?subject="+obj+"&body="+body)
-		},
+            //window.open("mailto:"+adresseMail+"?subject="+obj+"&body="+body)
+            var mailTo = ("mailto:"+adresseMail+"?subject="+obj+"&body="+encodeURIComponent(formatedBody))
+            window.location.href=mailTo
+
+            ////////////////////////////////////////
+            //////////////NODEMAILER////////////////
+            ////////////////////////////////////////
+            
+            /*const nodeMailer = require('nodemailer');
+
+                var transporter = nodeMailer.createTransport({
+                    service: 'Outlook365',
+                    auth: {
+                        user: '',
+                        pass: '',
+                    },
+                });
+
+                var mailOptions = {
+                    from: 'lucie.varlet@socgen.com',
+                    to: 'lucie-varlet@hotmail.fr',
+                    subject: 'Test',
+                    text: 'Message',
+                    html: '<b>corps du mail</b>',
+                };
+
+                transporter.sendMail(mailOptions, function(error, info) {
+                    if (error) {
+                        return console.log(error);
+                    }
+                    console.log('Message sent: ' + info.response);
+                });
+
+                transporter.close();*/
+        },
 		
         // Méthode de récupération de tout les champs énumérées
         getFieldsOptions() {
@@ -463,7 +578,7 @@ export default {
                     this.remoteEnum.priorites = response.data;
                 });
 
-            // Obtention des statut
+            // Obtention des statuts
             this.$http
                 .get('http://localhost:5000/api/incidents/statut')
                 .then(response => {
@@ -527,9 +642,9 @@ export default {
                 this.form.description = response.data[0].description
                 this.form.date_debut = response.data[0].date_debut
                 this.form.date_fin = response.data[0].date_fin
-				this.form.impact = response.data[0].impact
-                this.form.statut = response.data[0].statut
-                this.form.priorite = response.data[0].priorite
+				this.form.description_impact = response.data[0].description_impact
+                this.form.statut_id = response.data[0].statut
+                this.form.priorite_id = response.data[0].priorite
                 this.form.date_detection=response.data[0].date_detection
                 this.form.date_communication_TDC=response.data[0].date_communication_tdc
                 this.form.date_qualification_p01=response.data[0].date_qualif_p01
@@ -544,7 +659,7 @@ export default {
 
 				for (const ens_id of response.data[0].id_enseigne.split('/')) {
 					this.form.enseigne_impactee.push(parseInt(ens_id))
-				}
+                }
 
 				for (let index = 0; index < response.data[0].reference_id.split('/').length; index++) {
 					const id = response.data[0].reference_id.split('/')[index];
@@ -589,4 +704,3 @@ export default {
 	label.el-form-item__label
 		line-height: 15px
 </style>
-
