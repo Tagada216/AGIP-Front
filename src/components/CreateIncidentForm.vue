@@ -1,4 +1,8 @@
 <template>
+    <!-- 
+		Toutes les balise commancant par "el-" correspondent à des composant venant de la librairie Element. 
+		Pour plus d'information voir le site : https://element.eleme.io/#/fr-FR/component/installation 
+    -->
     <el-form ref="form" :model="form" :rules="rules" label-position="top">
         <el-row :gutter="20">
             <el-col :span="6">
@@ -10,7 +14,11 @@
                     <el-table :data="form.references" border>
                         <el-table-column label="Référence">
                             <template slot-scope="scope">
-                                <el-input v-model="form.references[scope.$index].reference"></el-input>
+                                <el-input
+                                    v-model="
+                                        form.references[scope.$index].reference
+                                    "
+                                ></el-input>
                             </template>
                         </el-table-column>
                         <el-table-column width="60">
@@ -31,6 +39,9 @@
                                 />
                             </template>
                         </el-table-column>
+                        <template slot="empty">
+                            <span class="arrayFormEmpty">Aucune donnée</span>
+                        </template>
                     </el-table>
                 </el-card>
                 <!-- Fin Références incident -->
@@ -81,7 +92,9 @@
                 <!-- Infos générales incident -->
                 <el-card>
                     <div slot="header">
-                        <h4 class="card-header">Informations générales de l'incident</h4>
+                        <h4 class="card-header">
+                            Informations générales de l'incident
+                        </h4>
                     </div>
 
                     <el-row :gutter="20">
@@ -112,21 +125,25 @@
                         </el-col>
                     </el-row>
 
-                    <el-form-item label="Enseigne(s) impactée(s)" prop="enseigne_impactee">
+                    <el-form-item
+                        label="Enseigne(s) impactée(s)"
+                        prop="enseigne_impactee"
+                    >
                         <el-checkbox-group v-model="form.enseigne_impactee">
                             <el-checkbox
                                 v-for="enseigne in remoteEnum.enseignes"
                                 :label="enseigne.id"
                                 :key="enseigne.id"
                                 v-if="!enseigne.is_deprecated"
-                            >{{enseigne.nom}}</el-checkbox>
+                                >{{ enseigne.nom }}</el-checkbox
+                            >
                         </el-checkbox-group>
                     </el-form-item>
 
                     <el-form-item label="Description" prop="description">
                         <el-input
                             type="textarea"
-                            :autosize="{ minRows: 2, maxRows: 8}"
+                            :autosize="{ minRows: 2, maxRows: 8 }"
                             placeholder="Description"
                             v-model="form.description"
                         ></el-input>
@@ -135,7 +152,7 @@
                     <el-form-item label="Impact" prop="description_impact">
                         <el-input
                             type="textarea"
-                            :autosize="{ minRows: 4, maxRows: 8}"
+                            :autosize="{ minRows: 4, maxRows: 8 }"
                             placeholder="Impact"
                             v-model="form.description_impact"
                         ></el-input>
@@ -159,21 +176,28 @@
                     >
                         <el-input
                             type="textarea"
-                            :autosize="{ minRows: 4, maxRows: 8}"
+                            :autosize="{ minRows: 4, maxRows: 8 }"
                             placeholder="Contournement"
                             v-model="form.description_contournement"
                             :disabled="!form.is_contournement"
                         ></el-input>
                     </el-form-item>
 
-                    <el-table :data="remoteEnum.applicationImpactee" border>
-                        <el-table-column label="Application(s) impctée(s)" prop="applicationImpactee">
+                    <el-table :data="form.application_impactee" border>
+                        <el-table-column
+                            label="Application(s) impactée(s)"
+                            prop="application_impactee"
+                        >
                             <template slot-scope="scope">
-                                <el-autocomplete 
-                                placeholder="Application impactée" 
-                                v-model="remoteEnum.applicationImpactee[scope.$index].applicationImpactee"
-                                :fetch-suggestions="getMatchingApplications"
-                                value-key="display_name"
+                                <el-autocomplete
+                                    placeholder="Application impactée"
+                                    v-model="
+                                        form.application_impactee[scope.$index]
+                                            .display_name
+                                    "
+                                    :fetch-suggestions="getMatchingApplications"
+                                    value-key="display_name"
+                                    @select="appSelected"
                                 ></el-autocomplete>
                             </template>
                         </el-table-column>
@@ -195,6 +219,9 @@
                                 />
                             </template>
                         </el-table-column>
+                        <template slot="empty">
+                            <span class="arrayFormEmpty">Aucune donnée</span>
+                        </template>
                     </el-table>
                 </el-card>
                 <!-- Fin Infos générales incident -->
@@ -208,10 +235,17 @@
             width="40%"
             center
         >
-            <span>Etes vous sur de vouloir supprimer la référence : {{refToDelete}}</span>
+            <span
+                >Etes vous sur de vouloir supprimer la référence :
+                {{ refToDelete }}</span
+            >
             <span slot="footer" class="dialog-footer">
-                <el-button @click="delConfirmationModalVisible = false">Annuler</el-button>
-                <el-button type="danger" @click="confirmDelete()">Confirmer</el-button>
+                <el-button @click="delConfirmationModalVisible = false"
+                    >Annuler</el-button
+                >
+                <el-button type="danger" @click="confirmDelete()"
+                    >Confirmer</el-button
+                >
             </span>
         </el-dialog>
         <!-- Fin Modal de confirmation de suppression d'une reférence problème -->
@@ -223,13 +257,21 @@
             width="40%"
             center
         >
-            <span>Etes vous sur de vouloir supprimer l'application : {{refToDelete}}</span>
+            <span
+                >Etes vous sur de vouloir supprimer l'application :
+                {{ refToDeleteApp }}</span
+            >
             <span slot="footer" class="dialog-footer">
-                <el-button @click="delConfirmationModalVisibleApp = false">Annuler</el-button>
-                <el-button type="danger" @click="confirmDeleteApp()">Confirmer</el-button>
+                <el-button @click="delConfirmationModalVisibleApp = false"
+                    >Annuler</el-button
+                >
+                <el-button type="danger" @click="confirmDeleteApp()"
+                    >Confirmer</el-button
+                >
             </span>
         </el-dialog>
-		<!-- Fin Modal de confirmation de suppression d'une application impactée-->
+        <!-- Fin Modal de confirmation de suppression d'une application impactée-->
+
         <el-form-item style="text-align: center">
             <el-button type="primary" @click="submit()">Sauvegarder</el-button>
         </el-form-item>
@@ -250,7 +292,7 @@ export default {
                 priorites: [],
                 statut: [],
                 enseignes: [],
-                applicationImpactee: [],
+                application_impactee: [],
             },
 
             // Données du formulaire
@@ -266,9 +308,10 @@ export default {
                 priorite_id: '', //
                 statut_id: '', //
                 enseigne_impactee: [],
-                applicationImpactee: '',
+                application_impactee: [],
             },
 
+            // Règles de validation pour le formulaire
             rules: {
                 date_debut: [
                     {
@@ -320,7 +363,7 @@ export default {
                         trigger: 'change',
                     },
                 ],
-                applicationImpactee: [
+                application_impactee: [
                     {
                         required: true,
                         message: 'Champ non rempli',
@@ -332,28 +375,70 @@ export default {
             // Les lignes suivantes sont des variables nécessaires au modal de suppression
             delConfirmationModalVisible: false,
             delConfirmationModalVisibleApp: false,
-            messageConfirmation:true,
+            messageConfirmation: true,
             indexRefToDelete: 0,
+            indexRefToDeleteApp: 0,
             refToDelete: '',
+            refToDeleteApp: '',
         };
     },
     methods: {
+        // Cette méthode est lancée quand un champ d'appli impacté s'est vu selectionné une appli parmis les propositions
+        // Quand tel est le cas, on insere les données de l'appli (CI et trigramme) pour pouvoir la relier en BDD
+        appSelected(appSelection) {
+            const appIndex = this.form.application_impactee
+                .map(el => el.display_name)
+                .indexOf(appSelection.display_name);
+            this.form.application_impactee[appIndex] = appSelection;
+        },
+
+        // Méthode exécuté par le bouton "Sauvegarder".
+        // Elle gère la validation du formulaire ainsi que l'envoie des données vers l'API
         submit() {
             this.$refs['form'].validate(valid => {
                 if (valid) {
+                    // On vérifie qu'il y a au moins une référence
+                    if (this.form.references.length == 0) {
+                        alert('Aucune donnée dans les références');
+                        return false;
+                    }
+                    // On vérifie qu'il y a au moins une application impactée
+                    else if (this.form.application_impactee.length == 0) {
+                        alert('Aucune donnée dans les applications impactées');
+                        return false;
+                    }
+
                     console.log(this.form);
-                    this.$http.post(
-                        'http://localhost:5000/api/main-courante',
-                        this.form,
-                        window.confirm("L'enregistrement a bien été effectué")
-                    );
+
+                    this.$http
+                        .post(
+                            'http://localhost:5000/api/main-courante',
+                            this.form
+                        )
+                        .then(result => {
+                            /* 
+								Ajout du then pour attendre que l'API réponde 
+								Car il se peut que ça se passe mal et qu'on envoi quand même un message de succés.
+								De plus la fonction window.alert() stop tous les autres traitement JS
+							*/
+
+                            // Utilisation d'un alert plutot que d'un confirm renvoyant un boolean qui n'est pas nécessaire
+                            window.alert(
+                                "L'enregistrement a bien été effectué"
+                            )
+                    	})
                 } else {
                     console.log('error submit!!');
-                        window.confirm("Veuillez remplir tous les champs")
+                    window.alert('Veuillez remplir tous les champs');
                     return false;
                 }
             });
         },
+
+        ////////////////////////////////////////
+        // Il faudra voir pour dedoublonner ces fonctions mais c'est pas urgent
+        ////////////////////////////////////////
+        // Les handler pour la table et le modal des references
         confirmDelete() {
             this.form.references.splice(this.indexToDelete, 1);
             this.delConfirmationModalVisible = false;
@@ -367,24 +452,32 @@ export default {
             this.form.references.push({ reference: '' });
         },
 
+        // Les handler pour la table et le modal des applis impactees
         confirmDeleteApp() {
-            this.remoteEnum.applicationImpactee.splice(this.indexToDelete, 1);
+            this.form.application_impactee.splice(this.indexRefToDeleteApp, 1);
             this.delConfirmationModalVisibleApp = false;
         },
         handleDeleteApp(index) {
-            this.indexToDelete = index;
-            this.refToDelete = this.remoteEnum.applicationImpactee[index].applicationImpactee;
+            this.indexRefToDeleteApp = index;
+            this.refToDeleteApp = this.form.application_impactee[
+                index
+            ].application_impactee;
             this.delConfirmationModalVisibleApp = true;
         },
         handleCreateApp() {
-            this.remoteEnum.applicationImpactee.push({ applicationImpactee: '' });
+            this.form.application_impactee.push({ display_name: '' });
         },
+        ////////////////////////////////////////
 
+        // Fonction pour activer le "required" du champ "Description Contournement" en fonction du selecteur OUI/NON
         setContournementRule() {
             this.rules.description_contournement[0].required = !this.rules
-				.description_contournement[0].required
-			this.form.description_contournement = !this.rules
-				.description_contournement[0].required ? "Aucun contournement" : ""
+                .description_contournement[0].required;
+
+            this.form.description_contournement = !this.rules
+                .description_contournement[0].required
+                ? 'Aucun contournement'
+                : '';
         },
 
         // Méthode de récupération de tout les champs énumérées
@@ -418,6 +511,10 @@ export default {
                 });
         },
 
+        ////////////////////////////////////////
+        // Ces 2 fonctions sont nécessaire pour afficher les application dans le champ el-autocomplete
+        // Voir "querySearch" et "createFilter" dans https://element.eleme.io/#/en-US/component/input#autocomplete
+        ////////////////////////////////////////
         // Récupère les applis qui match avec la saisie de l'utilisateur
         getMatchingApplications(requete, retour) {
             if (requete.length > 1) {
@@ -426,11 +523,11 @@ export default {
                     ? apps.filter(this.createAppFilter(requete))
                     : apps;
                 retour(results);
+                //console.log(retour);
             } else {
                 retour([{ nom: '' }]);
             }
         },
-
         // Crée le filtre nécessaire à matcher les applis
         createAppFilter(queryString) {
             return apps => {
@@ -449,29 +546,36 @@ export default {
                 );
             };
         },
+        ////////////////////////////////////////
     },
 };
 </script>
 
-
+<!-- 
+	Ici on met le CSS du component mais en SASS (pas SCSS)
+	Voir : https://en.wikipedia.org/wiki/Sass_(stylesheet_language)
+	Ou : https://sass-lang.com/guide
+-->
 <style lang="sass">
-	.el-form
-		margin: 20px
-		text-align: left
-		
-	.card-header, .cell .el-input
-		margin: 0
+.el-form
+	margin: 20px
+	text-align: left
 
-	.el-card
-		margin-bottom: 20px
+.card-header, .cell .el-input
+	margin: 0
 
-	.el-checkbox-group
-		text-align: center
+.el-card
+	margin-bottom: 20px
 
-	.el-date-editor.el-input, .el-select, .el-autocomplete
-		width: 100%
+.el-checkbox-group
+	text-align: center
 
-	label.el-form-item__label
-		line-height: 15px
+.el-date-editor.el-input, .el-select, .el-autocomplete
+	width: 100%
+
+label.el-form-item__label
+	line-height: 15px
+
+.arrayFormEmpty
+	color: red
 </style>
-

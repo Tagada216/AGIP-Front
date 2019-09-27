@@ -1,5 +1,5 @@
 <template>
-  <sidebar-menu widthCollapsed="70px" :menu="menu"/>
+    <sidebar-menu widthCollapsed="70px" :menu="menu" />
 </template>
 
 <style lang="sass">
@@ -9,7 +9,7 @@ $itemlineHeight: 50px
 $iconHeight: 50px
 $iconWidth: 50px
 
-.active-item   
+.active-item
     background-color: $primaryColor
     & > a:hover
         background-color: $primaryColor
@@ -38,7 +38,6 @@ $iconWidth: 50px
 
     .vsm-item.first-item.open-item > .vsm-link
         background-color: #888888
-
 </style>
 
 <script>

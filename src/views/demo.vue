@@ -1,10 +1,10 @@
 # demo.vue
 
 <template>
-  <div>
-    <base-header title="TEST"></base-header>
-    <update-incident-form :incident_id="1"></update-incident-form>
-  </div>
+    <div>
+        <base-header title="TEST"></base-header>
+        <update-incident-form :incident_id="1"></update-incident-form>
+    </div>
 </template>
 
 <script>
@@ -13,8 +13,7 @@ import UpdateIncidentForm from '@/components/MyUpdateIncidentForm';
 
 export default {
     data() {
-        return {
-        };
+        return {};
     },
 
     components: {
@@ -34,8 +33,4 @@ export default {
 };
 </script>
 
-
-<style lang="sass" scoped>
-
-
-</style>
+<style lang="sass" scoped></style>

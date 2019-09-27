@@ -1,13 +1,13 @@
 <template>
-  <div id="app" style="height: 100vh">
-    <MySidebar/>
-    <router-view style="height: 100vh"/>
-  </div>
+    <div id="app" style="height: 100vh">
+        <MySidebar />
+        <router-view style="height: 100vh" />
+    </div>
 </template>
 
 <style lang="scss">
-*{
-	//font-family: 'Montserrat', Helvetica, Arial, sans-serif;
+* {
+    //font-family: 'Montserrat', Helvetica, Arial, sans-serif;
 }
 
 #app {
@@ -17,7 +17,7 @@
     text-align: center;
     color: #2c3e50;
     margin-left: 70px;
-	box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 body {
@@ -26,9 +26,8 @@ body {
 }
 
 * {
-	box-sizing: border-box;
+    box-sizing: border-box;
 }
-
 </style>
 
 <script>

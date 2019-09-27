@@ -1,24 +1,24 @@
 <template>
-  <div style="height: 100%;">
-    <ag-grid-vue
-      style="width: 100%; height: 100%; min-height: 85%"
-      class="ag-theme-balham"
-      :rowData="rowData"
-      :columnDefs="columnDefs"
-      :rowSelection="rowSelection"
-      @row-selected="onRowSelected"
-    ></ag-grid-vue>
-    <!-- <download-excel :data="rowData">
+    <div style="height: 100%;">
+        <ag-grid-vue
+            style="width: 100%; height: 100%; min-height: 85%"
+            class="ag-theme-balham"
+            :rowData="rowData"
+            :columnDefs="columnDefs"
+            :rowSelection="rowSelection"
+            @row-selected="onRowSelected"
+        ></ag-grid-vue>
+        <!-- <download-excel :data="rowData">
       Download Data
       <span>TEST</span>
     </download-excel> -->
-  </div>
+    </div>
 </template>
 
 <script>
 import { AgGridVue } from 'ag-grid-vue';
 import axios from 'axios';
-import SSF from 'ssf';
+//import SSF from 'ssf';
 import JsonExcel from 'vue-json-excel';
 
 export default {
@@ -31,8 +31,8 @@ export default {
         };
     },
     components: {
-		'ag-grid-vue': AgGridVue,
-		'download-excel': JsonExcel,
+        'ag-grid-vue': AgGridVue,
+        'download-excel': JsonExcel,
     },
 
     mounted() {
@@ -46,13 +46,13 @@ export default {
             this.rowData = data;
         },
         setColDef(colNames) {
-			this.columnDefs = [];
-			// console.log(colNames);
-			
+            this.columnDefs = [];
+            // console.log(colNames);
+
             for (const colName of colNames) {
                 this.columnDefs.push({
-					field: '' + colName,
-					hide: colName == 'id',
+                    field: '' + colName,
+                    hide: colName == 'id',
                     width: (1 / colNames.length) * 2000,
                     sortable: true,
                     filter: true,
@@ -69,20 +69,24 @@ export default {
 };
 </script>
 
+<!-- 
+	Ici on met le CSS du component mais en SASS (pas SCSS)
+	Voir : https://en.wikipedia.org/wiki/Sass_(stylesheet_language)
+	Ou : https://sass-lang.com/guide
+-->
 <style lang="sass" scoped>
-	.grid-search
-		height: 15%
-		font-size : 1.8em
+.grid-search
+	height: 15%
+	font-size : 1.8em
 
-		& svg
-			font-size : 2em
-			color: #5f5f5f
-
-	input
-		height: 100%
-		width: 95%
-		border: none
+	& svg
 		font-size : 2em
-		background-color: transparent
+		color: #5f5f5f
 
+input
+	height: 100%
+	width: 95%
+	border: none
+	font-size : 2em
+	background-color: transparent
 </style>
