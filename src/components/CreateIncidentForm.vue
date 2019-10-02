@@ -280,7 +280,11 @@
 
 <script>
 import confirmationVue from './confirmation.vue';
+import MyUpdateIncidentForm from './MyUpdateIncidentForm.vue'
+import { thisExpression } from 'babel-types';
 export default {
+
+    components:{MyUpdateIncidentForm},
     created() {
         this.getFieldsOptions();
     },
@@ -402,6 +406,7 @@ export default {
                         alert('Aucune donnée dans les références');
                         return false;
                     }
+
                     // On vérifie qu'il y a au moins une application impactée
                     else if (this.form.application_impactee.length == 0) {
                         alert('Aucune donnée dans les applications impactées');

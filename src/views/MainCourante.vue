@@ -7,8 +7,18 @@
                 content="Export Excel"
                 placement="bottom-end"
             >
-                <button class="header-btn">
+                <button class="header-btn" @click="csvExport(csvData)">
                     <i class="fas fa-file-excel"></i>
+                </button>
+            </el-tooltip>
+            <el-tooltip
+                class="item"
+                effect="light"
+                content="Dupliquer"
+                placement="bottom-end"
+            >
+                <button class="header-btn" @click="dupliquer()">
+                    <i class="fas fa-file"></i>
                 </button>
             </el-tooltip>
         </base-header>
@@ -39,23 +49,64 @@ import Grid from '@/components/Grid.vue';
 import Splitpanes from 'splitpanes';
 import UpdateIncidentForm from '@/components/MyUpdateIncidentForm';
 import 'splitpanes/dist/splitpanes.css';
+import Axios from 'axios';
 
 export default {
     data() {
         return { curID: 1 };
     },
 
+    ////////Empêche d'afficher les propriétés de l'incident sélectionné
+    /*data:{
+        users:[],
+    },*/
+
     components: {
         Grid,
         Splitpanes,
         UpdateIncidentForm,
+    },
+    
+    computed:{
+        csvData(){
+            return this.users.map(item=>({
+                ...item
+            }));
+        }
     },
 
     methods: {
         updateID(id) {
             this.curID = id;
         },
+
+        csvExport(arrData){
+            let csvContent="data:text/csv;charset=utf-8,";
+            csvContent+=[
+                Object.keys(arrData[0]).join(";"),
+                ...arrData.map(item=>
+                Object.values(item).join(";"))
+            ]
+                .join("\n")
+                .replace(/(^\[)|(\]$)/gm, "");
+
+            const data = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", data);
+            link.setAttribute("download", "mainCourante.csv");
+            link.click();
+        },
+        
+        dupliquer(){
+            window.location.href="/#/new-incident"
+        },
     },
+
+    mounted(){
+        fetch("http://localhost:5000/api/main-courante")
+            .then(resp=>resp.json())
+            .then(json=>(this.users=json));
+    }
 };
 </script>
 
