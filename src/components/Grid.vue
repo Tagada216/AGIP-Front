@@ -8,18 +8,11 @@
             :rowSelection="rowSelection"
             @row-selected="onRowSelected"
         ></ag-grid-vue>
-        <!-- <download-excel :data="rowData">
-      Download Data
-      <span>TEST</span>
-    </download-excel> -->
     </div>
 </template>
 
 <script>
 import { AgGridVue } from 'ag-grid-vue';
-import axios from 'axios';
-//import SSF from 'ssf';
-import JsonExcel from 'vue-json-excel';
 
 export default {
     name: 'LargeDataSetExample',
@@ -29,15 +22,19 @@ export default {
             columnDefs: this.columnDefs,
             rowSelection: 'single',
         };
-    },
+	},
+	
     components: {
         'ag-grid-vue': AgGridVue,
-        'download-excel': JsonExcel,
-    },
+	},
+	
+	props: {
+		dataLink: String
+	},
 
     mounted() {
-        axios
-            .get('http://localhost:5000/api/main-courante/formated')
+        this.$http
+            .get(this.dataLink)
             .then(response => this.setGridData(response.data));
     },
     methods: {
@@ -53,7 +50,7 @@ export default {
                 this.columnDefs.push({
                     field: '' + colName,
                     hide: colName == 'id',
-                    width: (1 / colNames.length) * 2000,
+                    width: (1 / (colNames.length/2)) * 3000,
                     sortable: true,
                     filter: true,
                 });
@@ -61,7 +58,6 @@ export default {
         },
         onRowSelected(event) {
             if (event.node.selected) {
-                // console.log('GRID : ' + event.data.id);
                 this.$emit('incidentSelected', event.data.id);
             }
         },

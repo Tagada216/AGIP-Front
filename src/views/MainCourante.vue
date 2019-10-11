@@ -1,22 +1,19 @@
 <template>
     <div style="100vh">
         <base-header title="Main Courante">
-            <el-tooltip
-                class="item"
-                effect="light"
-                content="Export Excel"
-                placement="bottom-end"
-            >
-                <button class="header-btn" @click="csvExport(csvData)">
-                    <i class="fas fa-file-excel"></i>
+            <el-tooltip class="item" effect="light" content="Export Excel" placement="bottom-end">
+                <button class="header-btn">
+                    <download-excel
+                        :fetch="fetchMainCourrante"
+                        :before-generate="startDownload"
+						:name="exportFileName"
+                    >
+                        <i class="fas fa-file-excel"></i>
+                    </download-excel>
                 </button>
             </el-tooltip>
-            <el-tooltip
-                class="item"
-                effect="light"
-                content="Dupliquer"
-                placement="bottom-end"
-            >
+
+            <el-tooltip class="item" effect="light" content="Dupliquer" placement="bottom-end">
                 <button class="header-btn" @click="dupliquer()">
                     <i class="fas fa-file"></i>
                 </button>
@@ -31,6 +28,7 @@
                 splitpanes-max="100"
                 style="height: 100%"
                 @incidentSelected="updateID"
+				dataLink="http://localhost:5000/api/main-courante/formated"
             />
 
             <update-incident-form
@@ -50,29 +48,21 @@ import Splitpanes from 'splitpanes';
 import UpdateIncidentForm from '@/components/MyUpdateIncidentForm';
 import 'splitpanes/dist/splitpanes.css';
 import Axios from 'axios';
+import JsonExcel from 'vue-json-excel';
 
 export default {
     data() {
-        return { curID: 1 };
+        return { 
+			curID: 1,
+			exportFileName: "Main Courante"
+		};
     },
-
-    ////////Empêche d'afficher les propriétés de l'incident sélectionné
-    /*data:{
-        users:[],
-    },*/
 
     components: {
         Grid,
         Splitpanes,
         UpdateIncidentForm,
-    },
-    
-    computed:{
-        csvData(){
-            return this.users.map(item=>({
-                ...item
-            }));
-        }
+        'download-excel': JsonExcel,
     },
 
     methods: {
@@ -80,33 +70,28 @@ export default {
             this.curID = id;
         },
 
-        csvExport(arrData){
-            let csvContent="data:text/csv;charset=utf-8,";
-            csvContent+=[
-                Object.keys(arrData[0]).join(";"),
-                ...arrData.map(item=>
-                Object.values(item).join(";"))
-            ]
-                .join("\n")
-                .replace(/(^\[)|(\]$)/gm, "");
+        async fetchMainCourrante() {
+            const response = await this.$http.get(
+                'http://localhost:5000/api/main-courante/formated'
+            )
+            return response.data;
+        },
 
-            const data = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", data);
-            link.setAttribute("download", "mainCourante.csv");
-            link.click();
-        },
-        
-        dupliquer(){
-            window.location.href="/#/new-incident"
-        },
+        dupliquer() {
+            window.location.href = '/#/new-incident';
+		},
+		
+		startDownload(){
+        	this.exportFileName = this.getExportTitle()
+		},
+
+		// 
+		getExportTitle(){
+			const now = new Date()
+			return `Main Courante ${now.toLocaleDateString().replace(/\//g,'-')} ${now.toLocaleTimeString()}`
+			
+		}
     },
-
-    mounted(){
-        fetch("http://localhost:5000/api/main-courante")
-            .then(resp=>resp.json())
-            .then(json=>(this.users=json));
-    }
 };
 </script>
 

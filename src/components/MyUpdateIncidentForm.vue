@@ -833,7 +833,8 @@ export default {
                     : false;
                 this.form.description_contournement = response.data[0].description_contournement
                 this.form.enseigne_impactee = [];
-                this.form.references = [];
+				this.form.references = [];
+				this.form.application_impactee = [];
 
                 for (const ens_id of response.data[0].id_enseigne.split('/')) {
                     this.form.enseigne_impactee.push(parseInt(ens_id));
@@ -850,7 +851,18 @@ export default {
                         reference_id: id,
                         reference: ref,
                     });
+				}
+				
+				for (const app of response.data[0].display_name.split('|||')) {
+					console.log({display_name: app });
+					
+                    this.form.application_impactee.push({display_name: app })
                 }
+				
+				console.log(this.form.application_impactee);
+				
+				
+
             });
         },
     },

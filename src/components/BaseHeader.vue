@@ -21,7 +21,7 @@ export default {
 -->
 <style lang="sass" scoped>
 div
-    height: 71px
+    height: 70px
     margin: 0
     background-color: #ed1a3a
     color: white

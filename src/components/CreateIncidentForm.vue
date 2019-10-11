@@ -92,9 +92,7 @@
                 <!-- Infos générales incident -->
                 <el-card>
                     <div slot="header">
-                        <h4 class="card-header">
-                            Informations générales de l'incident
-                        </h4>
+                        <h4 class="card-header">Informations générales de l'incident</h4>
                     </div>
 
                     <el-row :gutter="20">
@@ -125,18 +123,14 @@
                         </el-col>
                     </el-row>
 
-                    <el-form-item
-                        label="Enseigne(s) impactée(s)"
-                        prop="enseigne_impactee"
-                    >
+                    <el-form-item label="Enseigne(s) impactée(s)" prop="enseigne_impactee">
                         <el-checkbox-group v-model="form.enseigne_impactee">
                             <el-checkbox
                                 v-for="enseigne in remoteEnum.enseignes"
                                 :label="enseigne.id"
                                 :key="enseigne.id"
                                 v-if="!enseigne.is_deprecated"
-                                >{{ enseigne.nom }}</el-checkbox
-                            >
+                            >{{ enseigne.nom }}</el-checkbox>
                         </el-checkbox-group>
                     </el-form-item>
 
@@ -235,17 +229,13 @@
             width="40%"
             center
         >
-            <span
-                >Etes vous sur de vouloir supprimer la référence :
-                {{ refToDelete }}</span
-            >
+            <span>
+                Etes vous sur de vouloir supprimer la référence :
+                {{ refToDelete }}
+            </span>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="delConfirmationModalVisible = false"
-                    >Annuler</el-button
-                >
-                <el-button type="danger" @click="confirmDelete()"
-                    >Confirmer</el-button
-                >
+                <el-button @click="delConfirmationModalVisible = false">Annuler</el-button>
+                <el-button type="danger" @click="confirmDelete()">Confirmer</el-button>
             </span>
         </el-dialog>
         <!-- Fin Modal de confirmation de suppression d'une reférence problème -->
@@ -257,17 +247,13 @@
             width="40%"
             center
         >
-            <span
-                >Etes vous sur de vouloir supprimer l'application :
-                {{ refToDeleteApp }}</span
-            >
+            <span>
+                Etes vous sur de vouloir supprimer l'application :
+                {{ refToDeleteApp }}
+            </span>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="delConfirmationModalVisibleApp = false"
-                    >Annuler</el-button
-                >
-                <el-button type="danger" @click="confirmDeleteApp()"
-                    >Confirmer</el-button
-                >
+                <el-button @click="delConfirmationModalVisibleApp = false">Annuler</el-button>
+                <el-button type="danger" @click="confirmDeleteApp()">Confirmer</el-button>
             </span>
         </el-dialog>
         <!-- Fin Modal de confirmation de suppression d'une application impactée-->
@@ -280,11 +266,10 @@
 
 <script>
 import confirmationVue from './confirmation.vue';
-import MyUpdateIncidentForm from './MyUpdateIncidentForm.vue'
+import MyUpdateIncidentForm from './MyUpdateIncidentForm.vue';
 import { thisExpression } from 'babel-types';
 export default {
-
-    components:{MyUpdateIncidentForm},
+    components: { MyUpdateIncidentForm },
     created() {
         this.getFieldsOptions();
     },
@@ -399,17 +384,29 @@ export default {
         // Méthode exécuté par le bouton "Sauvegarder".
         // Elle gère la validation du formulaire ainsi que l'envoie des données vers l'API
         submit() {
+			console.log(this.form.application_impactee);
+			
             this.$refs['form'].validate(valid => {
                 if (valid) {
                     // On vérifie qu'il y a au moins une référence
                     if (this.form.references.length == 0) {
-                        alert('Aucune donnée dans les références');
+                        this.$message({
+                        dangerouslyUseHTMLString: true,
+                        message:
+                            "<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Au moins une <strong>Référence</strong> doit être renseignée.</p>",
+                        type: 'error',
+                    });
                         return false;
                     }
 
                     // On vérifie qu'il y a au moins une application impactée
                     else if (this.form.application_impactee.length == 0) {
-                        alert('Aucune donnée dans les applications impactées');
+                        this.$message({
+                        dangerouslyUseHTMLString: true,
+                        message:
+                            "<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Au moins une <strong>Application</strong> doit être renseignée.</p>",
+                        type: 'error',
+                    });
                         return false;
                     }
 
@@ -427,14 +424,21 @@ export default {
 								De plus la fonction window.alert() stop tous les autres traitement JS
 							*/
 
-                            // Utilisation d'un alert plutot que d'un confirm renvoyant un boolean qui n'est pas nécessaire
-                            window.alert(
-                                "L'enregistrement a bien été effectué"
-                            )
-                    	})
+                            // Ceci est un composent du module Element (Voir : https://element.eleme.io/#/fr-FR/component/message)
+                            this.$message({
+                                dangerouslyUseHTMLString: true,
+                                message:
+                                    "<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+                                type: 'success',
+                            });
+                        });
                 } else {
-                    console.log('error submit!!');
-                    window.alert('Veuillez remplir tous les champs');
+                    this.$message({
+                        dangerouslyUseHTMLString: true,
+                        message:
+                            "<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Tous les <strong>Champs requis</strong> n'ont pas été remplis.</p>",
+                        type: 'error',
+                    });
                     return false;
                 }
             });
