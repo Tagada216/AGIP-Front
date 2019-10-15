@@ -910,11 +910,12 @@ export default {
                     });
 				}
 				
-				for (const app of response.data[0].display_name.split('|||')) {
-					console.log({display_name: app });
-					
-                    this.form.application_impactee.push({display_name: app })
-                }
+				if (response.data[0].display_name != null){
+					for (const app of response.data[0].display_name.split('|||')) {
+                    	this.form.application_impactee.push({display_name: app })
+                	}
+				}
+				
 				
 				console.log(this.form.application_impactee);
 				
