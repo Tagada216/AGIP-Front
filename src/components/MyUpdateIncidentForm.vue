@@ -12,7 +12,7 @@
                         <h4 class="card-header">Référence(s) de l'incident</h4>
                     </div>
                     <el-table :data="form.references" border>
-                        <el-table-column label="Référence">
+                        <el-table-column label="* Référence">
                             <template slot-scope="scope">
                                 <el-input
                                     id="reference"
@@ -233,7 +233,7 @@
 
                     <el-table :data="form.application_impactee" border>
                         <el-table-column
-                            label="Application(s) impactée(s)"
+                            label="* Application(s) impactée(s)"
                             prop="application_impactee"
                         >
                             <template slot-scope="scope">
@@ -381,6 +381,8 @@ import Axios from 'axios';
 // import { open } from 'fs';
 // import confirmationVue from './confirmation.vue';
 //import func from '../../vue-temp/vue-editor-bridge';
+import Vue from 'vue'
+
 
 export default {
     created() {
@@ -527,7 +529,7 @@ export default {
         onSubmit() {
             this.$refs['form'].validate(valid => {
                 if (valid) {
-                    // On vérifie qu'il y a au moins une référence
+                    /*// On vérifie qu'il y a au moins une référence
                     if (this.form.references.length == 0) {
                         alert('Aucune donnée dans les références');
                         return false;
@@ -536,6 +538,49 @@ export default {
                     else if (this.form.application_impactee.length == 0) {
                         alert('Aucune donnée dans les applications impactées');
                         return false;
+                    }*/
+
+                    if (this.form.references.length == 0) {
+                        this.$message({
+                        dangerouslyUseHTMLString: true,
+                        message:
+                            "<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Au moins une <strong>Référence</strong> doit être renseignée.</p>",
+                        type: 'error',
+                    });
+                        return false;
+                    }
+
+                    // On vérifie qu'il y a au moins une application impactée
+                    else if (this.form.application_impactee.length == 0) {
+                        this.$message({
+                        dangerouslyUseHTMLString: true,
+                        message:
+                            "<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Au moins une <strong>Application</strong> doit être renseignée.</p>",
+                        type: 'error',
+                    });
+                        return false;
+                    }
+
+                    for (var i=0; i<this.form.application_impactee.length;i++)
+                    {
+                        if(this.form.application_impactee.length>=1 && this.form.application_impactee[i].display_name=='')
+                        {
+                            this.$message({
+                            dangerouslyUseHTMLString: true,
+                            message:
+                                "<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Veuillez remplir le(s) champ(s) 'Application(s) impactée(s) ouvert(s).</p>",
+                            type: 'error',
+                        });
+                            return false;
+                        }
+                    }
+
+                    for (var i=0; i<this.form.references.length;i++)
+                    {
+                        if(this.form.references.length>=1 && this.form.references[i].reference=='')
+                        {
+                            this.form.references[i].reference="A venir"
+                        }
                     }
 
                     console.log(this.form);
@@ -546,11 +591,23 @@ export default {
                             this.form
                         )
                         .then(result => {
-                        	console.log("meh");
+                            //console.log("meh");
+                            this.$message({
+                                dangerouslyUseHTMLString: true,
+                                message:
+                                    "<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+                                type: 'success',
+                            });
                         })
-                    
                 } else {
-                    console.log('error');
+                    /*console.log('error');
+                    return false;*/
+                    this.$message({
+                    dangerouslyUseHTMLString: true,
+                    message:
+                        "<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Tous les <strong>Champs requis</strong> n'ont pas été remplis.</p>",
+                    type: 'error',
+                    });
                     return false;
                 }
             });
