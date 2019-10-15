@@ -187,7 +187,7 @@
                                     placeholder="Application impactée"
                                     v-model="
                                         form.application_impactee[scope.$index]
-                                            .display_name
+                                            .display_name 
                                     "
                                     :fetch-suggestions="getMatchingApplications"
                                     value-key="display_name"
@@ -384,30 +384,58 @@ export default {
         // Méthode exécuté par le bouton "Sauvegarder".
         // Elle gère la validation du formulaire ainsi que l'envoie des données vers l'API
         submit() {
-			console.log(this.form.application_impactee);
-			
+            console.log(this.form.application_impactee);
+
             this.$refs['form'].validate(valid => {
                 if (valid) {
                     // On vérifie qu'il y a au moins une référence
                     if (this.form.references.length == 0) {
                         this.$message({
-                        dangerouslyUseHTMLString: true,
-                        message:
-                            "<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Au moins une <strong>Référence</strong> doit être renseignée.</p>",
-                        type: 'error',
-                    });
+                            dangerouslyUseHTMLString: true,
+                            message:
+                                "<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Au moins une <strong>Référence</strong> doit être renseignée.</p>",
+                            type: 'error',
+                        });
                         return false;
                     }
 
                     // On vérifie qu'il y a au moins une application impactée
                     else if (this.form.application_impactee.length == 0) {
                         this.$message({
-                        dangerouslyUseHTMLString: true,
-                        message:
-                            "<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Au moins une <strong>Application</strong> doit être renseignée.</p>",
-                        type: 'error',
-                    });
+                            dangerouslyUseHTMLString: true,
+                            message:
+                                "<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Au moins une <strong>Application</strong> doit être renseignée.</p>",
+                            type: 'error',
+                        });
                         return false;
+                    }
+
+                    for (
+                        var i = 0;
+                        i < this.form.application_impactee.length;
+                        i++
+                    ) {
+                        if (
+                            this.form.application_impactee.length >= 1 &&
+                            this.form.application_impactee[i].display_name == ''
+                        ) {
+                            this.$message({
+                                dangerouslyUseHTMLString: true,
+                                message:
+                                    "<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Veuillez remplir le(s) champ(s) 'Application(s) impactée(s) ouvert(s).</p>",
+                                type: 'error',
+                            });
+                            return false;
+                        }
+                    }
+
+                    for (var i = 0; i < this.form.references.length; i++) {
+                        if (
+                            this.form.references.length >= 1 &&
+                            this.form.references[i].reference == ''
+                        ) {
+                            this.form.references[i].reference = 'A venir';
+                        }
                     }
 
                     console.log(this.form);
@@ -590,11 +618,13 @@ label.el-form-item__label
 
 th.el-table_1_column_1 .cell
 	&::before
-		content: "*"
+		content: "* "
 		color: red
 
 th.el-table_2_column_3 .cell
 	&::before
-		content: "*"
+		content: "* "
 		color: red
+
+
 </style>

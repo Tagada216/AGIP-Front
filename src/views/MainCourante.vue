@@ -46,11 +46,14 @@
 import Grid from '@/components/Grid.vue';
 import Splitpanes from 'splitpanes';
 import UpdateIncidentForm from '@/components/MyUpdateIncidentForm';
+import methods from '@/components/MyUpdateIncidentForm';
 import 'splitpanes/dist/splitpanes.css';
 import Axios from 'axios';
 import JsonExcel from 'vue-json-excel';
+import { constants } from 'crypto';
 
 export default {
+
     data() {
         return { 
 			curID: 1,
@@ -78,7 +81,7 @@ export default {
         },
 
         dupliquer() {
-            window.location.href = '/#/new-incident';
+            //window.location.href = '/#/new-incident';
 		},
 		
 		startDownload(){
@@ -90,9 +93,12 @@ export default {
 			const now = new Date()
 			return `Main Courante ${now.toLocaleDateString().replace(/\//g,'-')} ${now.toLocaleTimeString()}`
 			
-		}
+        },
+        
+       
     },
-};
+}
+
 </script>
 
 <style lang="sass">
