@@ -899,4 +899,14 @@ export default {
 
 label.el-form-item__label
 	line-height: 15px
+
+th.el-table_3_column_5 .cell
+	&::before
+		content: "*"
+		color: red
+
+th.el-table_4_column_7 .cell
+	&::before
+		content: "*"
+		color: red
 </style>

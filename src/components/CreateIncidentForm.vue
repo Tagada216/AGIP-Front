@@ -587,4 +587,14 @@ label.el-form-item__label
 
 .arrayFormEmpty
 	color: red
+
+th.el-table_1_column_1 .cell
+	&::before
+		content: "*"
+		color: red
+
+th.el-table_2_column_3 .cell
+	&::before
+		content: "*"
+		color: red
 </style>
