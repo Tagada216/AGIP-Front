@@ -482,6 +482,7 @@ export default {
             });
         },
 
+		// Permet de dupliquer l'incident sélectionné dans la main courante
 		duplicate()
 		{
 			// On récupère l'id de l'incident situé après le '=' dans l'url 

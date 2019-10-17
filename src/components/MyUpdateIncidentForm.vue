@@ -662,6 +662,7 @@ export default {
                 : '';
 		},
 		
+		// Crée l'url avec l'id de l'incident sélectionné 
 		dupliquer(){
 			console.log(this.incident_id)
 			window.location.href="/#/new-incident/id="+this.incident_id
