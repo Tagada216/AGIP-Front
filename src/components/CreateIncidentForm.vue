@@ -693,4 +693,8 @@ th:first-child .cell
 		content: "* "
 		color: red
 
+<<<<<<< HEAD
 </style>
+=======
+</style>
+>>>>>>> c43e57ea61fc7f9c0d91fec34e3a08e905ebbf59
