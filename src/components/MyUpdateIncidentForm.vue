@@ -661,7 +661,7 @@ export default {
                 ? 'Aucun contournement'
                 : '';
 		},
-		
+
 		// Crée l'url avec l'id de l'incident sélectionné 
 		dupliquer(){
 			console.log(this.incident_id)

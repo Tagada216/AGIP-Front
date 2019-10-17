@@ -4,7 +4,7 @@
         <img alt="Vue logo" src="../assets/Logo AGIPRO et subtitle_v2.svg" />
         <h1 class="welcomeHeader">Bienvenue dans AGIPROS</h1>
         <p>
-            AGIPROS pour Action terrain prioritaire Gestion des Incidents des PROblèmes et Securiprod,
+            AGIPROS pour ATP Gestion des Incidents des PROblèmes et Securiprod,
             <br />
             est une plateforme destinée à simplifier et fiabiliser les
             proccessus <br />
