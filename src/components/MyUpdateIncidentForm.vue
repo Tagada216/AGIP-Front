@@ -924,12 +924,11 @@ export default {
                     });
 				}
 				
-				if (response.data[0].display_name != null){
-					for (const app of response.data[0].display_name.split('|||')) {
-                    	this.form.application_impactee.push({display_name: app })
-                	}
-				}
-				
+				for (const app of response.data[0].display_name.split('|||')) {
+					console.log({display_name: app });
+					
+                    this.form.application_impactee.push({display_name: app })
+                }
 				
 				console.log(this.form.application_impactee);
 				
@@ -972,21 +971,9 @@ export default {
 label.el-form-item__label
 	line-height: 15px
 
-<<<<<<< HEAD
 th:first-child .cell
 	&::before
 		content: "* "
 		color: red
 
-=======
-th.el-table_3_column_5 .cell
-	&::before
-		content: "*"
-		color: red
-
-th.el-table_4_column_7 .cell
-	&::before
-		content: "*"
-		color: red
->>>>>>> c43e57ea61fc7f9c0d91fec34e3a08e905ebbf59
 </style>
