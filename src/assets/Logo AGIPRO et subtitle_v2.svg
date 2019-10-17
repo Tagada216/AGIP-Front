@@ -9,13 +9,13 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="207.59476mm"
+   width="247.59476mm"
    height="54.104397mm"
    viewBox="0 0 207.59476 54.104397"
    version="1.1"
    id="svg8"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
-   sodipodi:docname="Logo AGIPRO et subtitle.svg"
+   sodipodi:docname="Logo AGIPRO et subtitle_v2.svg"
    inkscape:export-filename="C:\Users\A466935\logo_AGIPRO_sub_final.png"
    inkscape:export-xdpi="244.70753"
    inkscape:export-ydpi="244.70753">
@@ -28,11 +28,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.45"
-     inkscape:cx="442.08651"
-     inkscape:cy="96.392302"
+     inkscape:zoom="1.7324116"
+     inkscape:cx="397.50782"
+     inkscape:cy="80.912903"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layer4"
      showgrid="false"
      inkscape:window-width="2560"
      inkscape:window-height="1377"
@@ -47,7 +47,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -73,14 +73,14 @@
          id="flowPara3727" /></flowRoot>    <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:39.15327072px;line-height:1.25;font-family:Montserrat;-inkscape-font-specification:Montserrat;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.40784657"
-       x="23.120474"
-       y="17.483006"
+       x="10.463901"
+       y="17.986122"
        id="text3739"
-       transform="scale(1.0980867,0.91067487)"><tspan
+       transform="scale(1.0980867,0.9106749)"><tspan
          sodipodi:role="line"
          id="tspan3737"
-         x="23.120474"
-         y="17.483006"
+         x="10.463901"
+         y="17.986122"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:39.15327072px;font-family:Montserrat;-inkscape-font-specification:Montserrat;stroke-width:0.40784657"
          rotate="180 0"
          dy="-25.310894 34.174393"
@@ -88,7 +88,9 @@
    style="font-size:59.81750107px;fill:#ed1a3a;fill-opacity:1;stroke-width:0.40784657"
    id="tspan4205"
    dy="-10.40491"
-   dx="18.420534">V</tspan>G   PRO</tspan></text>
+   dx="18.420534">V</tspan>G   PRO<tspan
+   style="fill:#ed1a3a;fill-opacity:1"
+   id="tspan4629">S</tspan></tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:16.31386185px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.40784657"
@@ -109,12 +111,12 @@
      style="display:inline"
      transform="translate(0.10099807,-0.19417177)">
     <rect
-       style="opacity:1;fill:#ed1a3a;fill-opacity:1;stroke-width:0.53586251"
+       style="opacity:1;fill:#ed1a3a;fill-opacity:1;stroke-width:0.57946795"
        id="rect4250"
-       width="167.7207"
+       width="196.12764"
        height="3.439945"
-       x="39.77306"
-       y="41.140381"
+       x="26.081768"
+       y="41.91864"
        ry="1.0493038" />
   </g>
   <g
@@ -125,11 +127,11 @@
      transform="translate(0.10099807,-0.19417177)">
     <g
        id="g5140"
-       transform="matrix(0.0992803,0,0,0.09198766,72.465737,0.93700302)">
+       transform="matrix(0.0992803,0,0,0.09198766,72.663195,1.6897764)">
       <g
          id="g5082"
          style="fill:#000000"
-         transform="translate(0,-8.0753359)">
+         transform="translate(-141.52597,-9.7356178)">
         <path
            id="path5076"
            d="m 19.593,125.57 135.922,-20.389 c 1.958,-0.294 3.406,-1.976 3.406,-3.956 v -11.65 c 0,-1.98 -1.448,-3.662 -3.406,-3.956 L 19.593,65.231 c -2.19,-0.326 -4.222,1.179 -4.55,3.362 -0.327,2.186 1.178,4.222 3.362,4.55 L 150.921,93.02 v 4.762 L 18.406,117.658 c -2.185,0.328 -3.689,2.364 -3.362,4.55 0.298,1.983 2.004,3.407 3.951,3.407 0.197,0 0.397,-0.014 0.598,-0.045 z"
@@ -187,22 +189,26 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:15.68231201px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.39205778"
-       x="-0.087939948"
-       y="55.967918"
+       x="-4.3408585"
+       y="56.290348"
        id="text46"
-       transform="scale(1.0555772,0.94734903)"><tspan
+       transform="scale(1.0555772,0.947349)"><tspan
          sodipodi:role="line"
          id="tspan44"
-         x="-0.087939948"
-         y="55.967918"
+         x="-4.3408585"
+         y="56.290348"
          style="font-size:6.70277786px;stroke-width:0.39205778"><tspan
    style="font-size:9.87777805px;fill:#ed1a3a;fill-opacity:1;stroke-width:0.39205778"
-   id="tspan859">A</tspan>pplicatif de <tspan
+   id="tspan859">A</tspan><tspan
+   style="font-size:9.87777805px"
+   id="tspan4647">TP</tspan> <tspan
    style="font-size:9.87777805px;fill:#ed1a3a;fill-opacity:1;stroke-width:0.39205778"
    id="tspan857">G</tspan>estion des <tspan
    style="font-size:9.87777805px;fill:#ed1a3a;fill-opacity:1;stroke-width:0.39205778"
-   id="tspan855">I</tspan>ncidents et des <tspan
+   id="tspan855">I</tspan>ncidents des <tspan
    style="font-size:9.87777805px;fill:#ed1a3a;fill-opacity:1;stroke-width:0.39205778"
-   id="tspan853">PRO</tspan>blèmes</tspan></text>
+   id="tspan853">PRO</tspan>blèmes et <tspan
+   style="font-size:9.87777805px;fill:#ed1a3a;fill-opacity:1"
+   id="tspan3812">S</tspan>ecuriprod</tspan></text>
   </g>
 </svg>

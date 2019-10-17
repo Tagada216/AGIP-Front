@@ -10,11 +10,11 @@ import CreateIncidentForm from '@/components/CreateIncidentForm';
 
 export default {
     components: {
-        CreateIncidentForm,
+		CreateIncidentForm,
     },
 
     data() {
         return {};
-    },
+	},
 };
 </script>

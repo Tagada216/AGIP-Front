@@ -12,7 +12,7 @@
                         <h4 class="card-header">Référence(s) de l'incident</h4>
                     </div>
                     <el-table :data="form.references" border>
-                        <el-table-column label="* Référence">
+                        <el-table-column label="Référence">
                             <template slot-scope="scope">
                                 <el-input
                                     id="reference"
@@ -233,7 +233,7 @@
 
                     <el-table :data="form.application_impactee" border>
                         <el-table-column
-                            label="* Application(s) impactée(s)"
+                            label="Application(s) impactée(s)"
                             prop="application_impactee"
                         >
                             <template slot-scope="scope">
@@ -370,6 +370,9 @@
             <el-button type="primary" @click="envoyerMail()"
                 >Envoyer un mail</el-button
             >
+			<el-button type="primary" @click="dupliquer()"
+                >Dupliquer</el-button
+            >
         </el-form-item>
     </el-form>
 </template>
@@ -382,19 +385,20 @@ import Axios from 'axios';
 // import confirmationVue from './confirmation.vue';
 //import func from '../../vue-temp/vue-editor-bridge';
 import Vue from 'vue'
+import CreateIncidentFormVue from './CreateIncidentForm.vue';
 
 
 export default {
     created() {
         this.getFieldsOptions();
-        this.getIncident(this.incident_id);
+		this.getIncident(this.incident_id);
     },
 
     props: {
         incident_id: {
             type: Number,
         },
-    },
+	},
 
     data() {
         return {
@@ -598,7 +602,7 @@ export default {
                                     "<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
                                 type: 'success',
                             });
-                        })
+						})
                 } else {
                     /*console.log('error');
                     return false;*/
@@ -656,7 +660,16 @@ export default {
                 .description_contournement[0].required
                 ? 'Aucun contournement'
                 : '';
-        },
+		},
+		
+		dupliquer(){
+			console.log(this.incident_id)
+			window.location.href="/#/new-incident/id="+this.incident_id
+			if (this.incident_id!=undefined)
+			{
+				console.log("OK")
+			}
+		},
 
         async envoyerMail() {
             // Only needed if you don't have a real mail account for testing
@@ -854,7 +867,7 @@ export default {
                         .indexOf(queryString.toLowerCase()) != -1
                 );
             };
-        },
+		},
         ////////////////////////////////////////
 
         // Récupère les informations d'un incident pour l'insérer dans le formulaire
@@ -956,4 +969,10 @@ export default {
 
 label.el-form-item__label
 	line-height: 15px
+
+th:first-child .cell
+	&::before
+		content: "* "
+		color: red
+
 </style>

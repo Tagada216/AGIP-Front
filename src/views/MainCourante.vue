@@ -12,12 +12,6 @@
                     </download-excel>
                 </button>
             </el-tooltip>
-
-            <el-tooltip class="item" effect="light" content="Dupliquer" placement="bottom-end">
-                <button class="header-btn" @click="dupliquer()">
-                    <i class="fas fa-file"></i>
-                </button>
-            </el-tooltip>
         </base-header>
         <splitpanes watch-slots class="default-theme" horizontal>
             <div splitpanes-size="0" splitpanes-max="0"></div>
@@ -46,7 +40,6 @@
 import Grid from '@/components/Grid.vue';
 import Splitpanes from 'splitpanes';
 import UpdateIncidentForm from '@/components/MyUpdateIncidentForm';
-import methods from '@/components/MyUpdateIncidentForm';
 import 'splitpanes/dist/splitpanes.css';
 import Axios from 'axios';
 import JsonExcel from 'vue-json-excel';
@@ -59,7 +52,7 @@ export default {
 			curID: 1,
 			exportFileName: "Main Courante"
 		};
-    },
+	},
 
     components: {
         Grid,
@@ -80,8 +73,8 @@ export default {
             return response.data;
         },
 
-        dupliquer() {
-            //window.location.href = '/#/new-incident';
+        duplicate() {
+			
 		},
 		
 		startDownload(){
@@ -93,10 +86,8 @@ export default {
 			const now = new Date()
 			return `Main Courante ${now.toLocaleDateString().replace(/\//g,'-')} ${now.toLocaleTimeString()}`
 			
-        },
-        
-       
-    },
+		},
+	},
 }
 
 </script>

@@ -1,10 +1,10 @@
 <template>
     <div class="home">
         <base-header title="Accueil" />
-        <img alt="Vue logo" src="../assets/Logo AGIPRO et subtitle.svg" />
-        <h1 class="welcomeHeader">Bienvenue dans AGIPRO</h1>
+        <img alt="Vue logo" src="../assets/Logo AGIPRO et subtitle_v2.svg" />
+        <h1 class="welcomeHeader">Bienvenue dans AGIPROS</h1>
         <p>
-            AGIPRO pour Applicatif de Gestion des Incidents et des PROblèmes,
+            AGIPROS pour Action terrain prioritaire Gestion des Incidents des PROblèmes et Securiprod,
             <br />
             est une plateforme destinée à simplifier et fiabiliser les
             proccessus <br />
