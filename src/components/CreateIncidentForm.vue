@@ -440,12 +440,10 @@ export default {
                     }
 
                     for (var i = 0; i < this.form.references.length; i++) {
-                        if (
-                            this.form.references.length >= 1 &&
-                            this.form.references[i].reference == ''
-                        ) {
+						if (this.form.references.length >= 1 && this.form.references[i].reference == '')
+						{
                             this.form.references[i].reference = 'A venir';
-                        }
+						}
                     }
 
                     console.log(this.form);

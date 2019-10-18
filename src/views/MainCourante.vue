@@ -12,6 +12,11 @@
                     </download-excel>
                 </button>
             </el-tooltip>
+			<el-tooltip class="item" effect="light" content="Dupliquer" placement="bottom-end">
+				<bouton class="header-btn">
+					<i class="fas fa-file"></i>
+				</bouton>
+			</el-tooltip>
         </base-header>
         <splitpanes watch-slots class="default-theme" horizontal>
             <div splitpanes-size="0" splitpanes-max="0"></div>
@@ -81,7 +86,6 @@ export default {
         	this.exportFileName = this.getExportTitle()
 		},
 
-		// 
 		getExportTitle(){
 			const now = new Date()
 			return `Main Courante ${now.toLocaleDateString().replace(/\//g,'-')} ${now.toLocaleTimeString()}`
