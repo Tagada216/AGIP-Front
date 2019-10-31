@@ -13,7 +13,7 @@
                 </button>
             </el-tooltip>
 			<el-tooltip class="item" effect="light" content="Dupliquer" placement="bottom-end">
-				<bouton class="header-btn">
+				<bouton class="header-btn" @click="duplicate()">
 					<i class="fas fa-file"></i>
 				</bouton>
 			</el-tooltip>
@@ -49,6 +49,7 @@ import 'splitpanes/dist/splitpanes.css';
 import Axios from 'axios';
 import JsonExcel from 'vue-json-excel';
 import { constants } from 'crypto';
+import methods from '@/components/MyUpdateIncidentForm';
 
 export default {
 
@@ -76,10 +77,15 @@ export default {
                 'http://localhost:5000/api/main-courante/formated'
             )
             return response.data;
-        },
+		},
 
-        duplicate() {
-			
+		duplicate(){
+			console.log(this.curID)
+			window.location.href="/#/new-incident/id="+this.curID
+			if (this.curID!=undefined)
+			{
+				console.log("ID non existant")
+			}	
 		},
 		
 		startDownload(){

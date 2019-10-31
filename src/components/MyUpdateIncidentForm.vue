@@ -62,14 +62,16 @@
                     </el-form-item>
 
                     <el-form-item label="Faux incident ?">
-                        <el-switch
-                            style="display: block"
-                            v-model="form.is_faux_incident"
-                            active-color="#13ce66"
-                            inactive-color="#ff4949"
-                            active-text="Oui"
-                            inactive-text="Non"
-                        ></el-switch>
+						<el-col :span="3.5">
+							<el-switch
+								style="display: block"
+								v-model="form.is_faux_incident"
+								active-color="#13ce66"
+								inactive-color="#ff4949"
+								active-text="Oui"
+								inactive-text="Non"
+							></el-switch>
+						</el-col>
                     </el-form-item>
 
                     <el-form-item label="Fin de l'incident">
@@ -206,18 +208,19 @@
                         ></el-input>
                     </el-form-item>
 
-                    <el-form-item label="Un contournement existe ?">
-                        <el-switch
-                            style="display: block"
-                            v-model="form.is_contournement"
-                            active-color="#13ce66"
-                            inactive-color="#ff4949"
-                            active-text="Oui"
-                            inactive-text="Non"
-                            @change="setContournementRule()"
-                        ></el-switch>
-                    </el-form-item>
-
+					<el-form-item label="Un contournement existe ?">
+						<el-col :span="3.5">
+							<el-switch
+								style="display: block"
+								v-model="form.is_contournement"
+								active-color="#13ce66"
+								inactive-color="#ff4949"
+								active-text="Oui"
+								inactive-text="Non"
+								@change="setContournementRule()"
+							></el-switch>
+						</el-col>
+					</el-form-item>
                     <el-form-item
                         label="Description du contournement"
                         prop="description_contournement"
@@ -371,8 +374,8 @@
                 >Envoyer un mail</el-button
             >
 			<el-button type="primary" @click="dupliquer()"
-                >Dupliquer</el-button
-            >
+				>Dupliquer</el-button
+			>
         </el-form-item>
     </el-form>
 </template>
@@ -389,6 +392,7 @@ import CreateIncidentFormVue from './CreateIncidentForm.vue';
 
 
 export default {
+
     created() {
         this.getFieldsOptions();
 		this.getIncident(this.incident_id);
@@ -432,7 +436,7 @@ export default {
                 date_detection: '',
                 date_communication_TDC: '',
                 date_qualification_p01: '',
-                date_premiere_com: '',
+				date_premiere_com: '',
             },
 
             // Règles de validation pour le formulaire
@@ -521,7 +525,9 @@ export default {
             refToDelete: '',
             refToDeleteApp: '',
         };
-    },
+	},
+
+	
     methods: {
         // Cette méthode est lancée quand un champ d'appli impacté s'est vu selectionné une appli parmis les propositions
         // Quand tel est le cas, on insere les données de l'appli (CI et trigramme) pour pouvoir la relier en BDD
@@ -617,6 +623,7 @@ export default {
             });
         },
 
+
         ////////////////////////////////////////
         // Il faudra voir pour dedoublonner ces fonctions mais c'est pas urgent
         ////////////////////////////////////////
@@ -662,16 +669,15 @@ export default {
                 : '';
 		},
 
-		// Crée l'url avec l'id de l'incident sélectionné 
-		dupliquer(){
+		dupliquer() {
 			console.log(this.incident_id)
 			window.location.href="/#/new-incident/id="+this.incident_id
 			if (this.incident_id!=undefined)
 			{
-				console.log("OK")
-			}
+				console.log("ID non existant")
+			}	
 		},
-
+	
         async envoyerMail() {
             // Only needed if you don't have a real mail account for testing
             let testAccount = await nodemailer.createTestAccount();

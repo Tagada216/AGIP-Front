@@ -63,14 +63,16 @@
                     </el-form-item>
 
                     <el-form-item label="Faux incident ?">
-                        <el-switch
-                            style="display: block"
-                            v-model="form.is_faux_incident"
-                            active-color="#13ce66"
-                            inactive-color="#ff4949"
-                            active-text="Oui"
-                            inactive-text="Non"
-                        ></el-switch>
+						<el-col :span="3.5">
+							<el-switch
+								style="display: block"
+								v-model="form.is_faux_incident"
+								active-color="#13ce66"
+								inactive-color="#ff4949"
+								active-text="Oui"
+								inactive-text="Non"
+							></el-switch>
+						</el-col>
                     </el-form-item>
 
                     <el-form-item label="Fin de l'incident">
@@ -153,15 +155,17 @@
                     </el-form-item>
 
                     <el-form-item label="Un contournement existe ?">
-                        <el-switch
-                            style="display: block"
-                            v-model="form.is_contournement"
-                            active-color="#13ce66"
-                            inactive-color="#ff4949"
-                            active-text="Oui"
-                            inactive-text="Non"
-                            @change="setContournementRule()"
-                        ></el-switch>
+						<el-col :span="3.5">
+							<el-switch
+								style="display: block"
+								v-model="form.is_contournement"
+								active-color="#13ce66"
+								inactive-color="#ff4949"
+								active-text="Oui"
+								inactive-text="Non"
+								@change="setContournementRule()"
+							></el-switch>
+						</el-col>
                     </el-form-item>
 
                     <el-form-item
