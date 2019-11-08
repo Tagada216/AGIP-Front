@@ -12,12 +12,11 @@
                     </download-excel>
                 </button>
             </el-tooltip>
-
-            <el-tooltip class="item" effect="light" content="Dupliquer" placement="bottom-end">
-                <button class="header-btn" @click="dupliquer()">
-                    <i class="fas fa-file"></i>
-                </button>
-            </el-tooltip>
+			<el-tooltip class="item" effect="light" content="Dupliquer" placement="bottom-end">
+				<bouton class="header-btn" @click="duplicate()">
+					<i class="fas fa-file"></i>
+				</bouton>
+			</el-tooltip>
         </base-header>
         <splitpanes watch-slots class="default-theme" horizontal>
             <div splitpanes-size="0" splitpanes-max="0"></div>
@@ -46,11 +45,11 @@
 import Grid from '@/components/Grid.vue';
 import Splitpanes from 'splitpanes';
 import UpdateIncidentForm from '@/components/MyUpdateIncidentForm';
-import methods from '@/components/MyUpdateIncidentForm';
 import 'splitpanes/dist/splitpanes.css';
 import Axios from 'axios';
 import JsonExcel from 'vue-json-excel';
 import { constants } from 'crypto';
+import methods from '@/components/MyUpdateIncidentForm';
 
 export default {
 
@@ -59,7 +58,7 @@ export default {
 			curID: 1,
 			exportFileName: "Main Courante"
 		};
-    },
+	},
 
     components: {
         Grid,
@@ -78,25 +77,27 @@ export default {
                 'http://localhost:5000/api/main-courante/formated'
             )
             return response.data;
-        },
+		},
 
-        dupliquer() {
-            //window.location.href = '/#/new-incident';
+		duplicate(){
+			console.log(this.curID)
+			window.location.href="/#/new-incident/id="+this.curID
+			if (this.curID!=undefined)
+			{
+				console.log("ID non existant")
+			}	
 		},
 		
 		startDownload(){
         	this.exportFileName = this.getExportTitle()
 		},
 
-		// 
 		getExportTitle(){
 			const now = new Date()
 			return `Main Courante ${now.toLocaleDateString().replace(/\//g,'-')} ${now.toLocaleTimeString()}`
 			
-        },
-        
-       
-    },
+		},
+	},
 }
 
 </script>

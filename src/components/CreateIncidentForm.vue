@@ -63,14 +63,16 @@
                     </el-form-item>
 
                     <el-form-item label="Faux incident ?">
-                        <el-switch
-                            style="display: block"
-                            v-model="form.is_faux_incident"
-                            active-color="#13ce66"
-                            inactive-color="#ff4949"
-                            active-text="Oui"
-                            inactive-text="Non"
-                        ></el-switch>
+						<el-col :span="3.5">
+							<el-switch
+								style="display: block"
+								v-model="form.is_faux_incident"
+								active-color="#13ce66"
+								inactive-color="#ff4949"
+								active-text="Oui"
+								inactive-text="Non"
+							></el-switch>
+						</el-col>
                     </el-form-item>
 
                     <el-form-item label="Fin de l'incident">
@@ -153,15 +155,17 @@
                     </el-form-item>
 
                     <el-form-item label="Un contournement existe ?">
-                        <el-switch
-                            style="display: block"
-                            v-model="form.is_contournement"
-                            active-color="#13ce66"
-                            inactive-color="#ff4949"
-                            active-text="Oui"
-                            inactive-text="Non"
-                            @change="setContournementRule()"
-                        ></el-switch>
+						<el-col :span="3.5">
+							<el-switch
+								style="display: block"
+								v-model="form.is_contournement"
+								active-color="#13ce66"
+								inactive-color="#ff4949"
+								active-text="Oui"
+								inactive-text="Non"
+								@change="setContournementRule()"
+							></el-switch>
+						</el-col>
                     </el-form-item>
 
                     <el-form-item
@@ -268,10 +272,20 @@
 import confirmationVue from './confirmation.vue';
 import MyUpdateIncidentForm from './MyUpdateIncidentForm.vue';
 import { thisExpression } from 'babel-types';
+import Axios from 'axios';
+import { win32 } from 'path';
 export default {
-    components: { MyUpdateIncidentForm },
+	components: { MyUpdateIncidentForm },
+	
     created() {
-        this.getFieldsOptions();
+		this.getFieldsOptions();
+		this.duplicate();
+	},
+	
+	props: {
+        incident_id: {
+            type: Number,
+        },
     },
 
     data() {
@@ -430,12 +444,10 @@ export default {
                     }
 
                     for (var i = 0; i < this.form.references.length; i++) {
-                        if (
-                            this.form.references.length >= 1 &&
-                            this.form.references[i].reference == ''
-                        ) {
+						if (this.form.references.length >= 1 && this.form.references[i].reference == '')
+						{
                             this.form.references[i].reference = 'A venir';
-                        }
+						}
                     }
 
                     console.log(this.form);
@@ -471,6 +483,68 @@ export default {
                 }
             });
         },
+
+		// Permet de dupliquer l'incident sélectionné dans la main courante
+		duplicate()
+		{
+			// On récupère l'id de l'incident situé après le '=' dans l'url 
+			var test = window.location.href.indexOf('=')
+			if(test!=-1)
+			{
+				var idIncident=window.location.href.substr(test+1)
+				console.log(idIncident)
+			}
+
+			// On récupère les informations de l'incident à dupliquer et on les affiche dans les champs correspondant
+			if(idIncident!=undefined)
+			{
+				Axios.get('http://localhost:5000/api/main-courante/' + idIncident).then(
+					response => {
+						this.form.incident_id=idIncident
+						this.form.description=response.data[0].description
+						this.form.date_debut = response.data[0].date_debut;
+                		this.form.date_fin = response.data[0].date_fin;
+                		this.form.description_impact = response.data[0].description_impact;
+                		this.form.statut_id = response.data[0].statut;
+						this.form.priorite_id = response.data[0].priorite;
+						this.form.is_faux_incident = response.data[0].is_faux_incident
+                    	? true
+                    	: false;
+                		this.form.is_contournement = response.data[0].is_contournement
+                    	? true
+                    	: false;
+                		this.form.description_contournement = response.data[0].description_contournement
+                		this.form.enseigne_impactee = [];
+						this.form.references = [];
+						this.form.application_impactee = [];
+
+						for (const ens_id of response.data[0].id_enseigne.split('/')) {
+							this.form.enseigne_impactee.push(parseInt(ens_id));
+						}
+
+						for (
+							let index = 0;
+							index < response.data[0].reference_id.split('/').length;
+							index++
+						) {
+							const id = response.data[0].reference_id.split('/')[index];
+							const ref = response.data[0].reference.split('/')[index];
+							this.form.references.push({
+								reference_id: id,
+								reference: ref,
+							});
+						}
+						
+						for (const app of response.data[0].display_name.split('|||')) {
+							console.log({display_name: app });
+							
+							this.form.application_impactee.push({display_name: app })
+						}
+						
+						console.log(this.form.application_impactee);
+						})
+			}
+		},
 
         ////////////////////////////////////////
         // Il faudra voir pour dedoublonner ces fonctions mais c'est pas urgent

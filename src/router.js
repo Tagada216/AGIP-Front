@@ -36,5 +36,9 @@ export default new Router({
             path: '/problemes',
             component: () => import('./views/demo.vue'),
         },
+        {
+            path: '/new-incident/id=:id',
+            component: () => import('./views/NewIncident.vue'),
+        },
     ],
 });
