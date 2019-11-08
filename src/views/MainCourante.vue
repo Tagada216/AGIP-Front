@@ -13,9 +13,9 @@
                 </button>
             </el-tooltip>
 			<el-tooltip class="item" effect="light" content="Dupliquer" placement="bottom-end">
-				<bouton class="header-btn" @click="duplicate()">
+				<button class="header-btn" @click="duplicate()">
 					<i class="fas fa-file"></i>
-				</bouton>
+				</button>
 			</el-tooltip>
         </base-header>
         <splitpanes watch-slots class="default-theme" horizontal>

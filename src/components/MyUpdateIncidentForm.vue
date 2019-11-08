@@ -16,6 +16,7 @@
                             <template slot-scope="scope">
                                 <el-input
                                     id="reference"
+									disabled
                                     v-model="
                                         form.references[scope.$index].reference
                                     "
