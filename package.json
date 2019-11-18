@@ -20,6 +20,7 @@
     "core-js": "^2.6.5",
     "element-ui": "^2.10.1",
     "nodemailer": "^6.3.0",
+    "read-excel-file": "^4.0.4",
     "splitpanes": "^1.14.2",
     "sqlite3": "^4.0.8",
     "ssf": "^0.10.2",
