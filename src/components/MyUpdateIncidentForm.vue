@@ -377,6 +377,7 @@
 			<el-button type="primary" @click="dupliquer()"
 				>Dupliquer</el-button
 			>
+			<input type="file" id="input" @click="importer()"/>
         </el-form-item>
     </el-form>
 </template>
@@ -390,13 +391,18 @@ import Axios from 'axios';
 //import func from '../../vue-temp/vue-editor-bridge';
 import Vue from 'vue'
 import CreateIncidentFormVue from './CreateIncidentForm.vue';
-
+import { readFile, watch } from 'fs';
+import { importSpecifier } from 'babel-types';
+import readXlsxFile from 'read-excel-file'
+import { setTimeout } from 'timers';
+import { constants } from 'crypto';
 
 export default {
 
     created() {
-        this.getFieldsOptions();
+		this.getFieldsOptions();
 		this.getIncident(this.incident_id);
+
     },
 
     props: {
@@ -438,8 +444,8 @@ export default {
                 date_communication_TDC: '',
                 date_qualification_p01: '',
 				date_premiere_com: '',
-            },
-
+			},
+		
             // Règles de validation pour le formulaire
             rules: {
                 date_debut: [
@@ -594,15 +600,12 @@ export default {
                         }
                     }
 
-                    console.log(this.form);
-
                     this.$http
                         .put(
                             'http://localhost:5000/api/main-courante',
                             this.form
                         )
                         .then(result => {
-                            //console.log("meh");
                             this.$message({
                                 dangerouslyUseHTMLString: true,
                                 message:
@@ -621,14 +624,138 @@ export default {
                     });
                     return false;
                 }
-            });
-        },
+			});
+		},
+		
+		///////Partie Agence/////////
+		importer()
+		{
+			const input = document.getElementById('input')
+			input.addEventListener('change', () => {
+				readXlsxFile(input.files[0]).then((rows) => {
+						console.log(input.files[0].name)
+						Axios.get(
+                		'http://localhost:5000/api/reference'
+            			).then(response => {
+							for(var p=0;p<=response.data.length;p++)
+							{
+								for(const row of rows)
+								{								
+									if(((response.data[p]).reference.includes(row[0]))==true)
+									{
+										this.getIncident((response.data[p]).incident_id)
+										console.log((response.data[p]).incident_id) //id des incidents en fonction de la référence
+										Axios.get('http://localhost:5000/api/main-courante/').then(
+										response => {
+											var date=row[1]+''
+											var dateFin=row[2]+''
+											var mois=""
+											if(row[4].includes("isolée")==true)
+											{
+												this.form.description="Depuis le "+ date[8]+date[9]+"/"+date[4]+date[5]+date[6]+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]+ ", indisponibilité du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-11)+" ("+row[5]+" utilisateurs)"
+											}
+											if(row[4].includes("dégradée")==true)
+											{
+												this.form.description="Depuis le "+ date[8]+date[9]+"/"+date[4]+date[5]+date[6]+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23] + ", dégradation du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-13)+" ("+row[5]+" utilisateurs)"
+											}
 
+											if((input.files[0].name).includes("CDN" || "cdn"))
+											{
+												//cocher l'enseigne CDN
+											}
+											if((input.files[0].name).includes("BDDF" || "bddf"))
+											{
+												//cocher l'enseigne BDDF
+											}
+											if((input.files[0].name).includes("BPF" || "bpf"))
+											{
+												//cocher l'enseigne BPF
+											}
+
+											this.form.description_impact=row[5]
+											this.form.application_impactee.push({display_name: "Infrastructure Réseau Banque de Détail"})
+											this.form.cause = row[8]
+											this.remoteEnum.priorites=row[6]
+											//statut
+											if(date[4]+date[5]+date[6]=="Jan")
+											{
+												mois="01"
+											}
+											if(date[4]+date[5]+date[6]=="Feb")
+											{
+												mois="02"
+											}
+											if(date[4]+date[5]+date[6]=="Mar")
+											{
+												mois="03"
+											}
+											if(date[4]+date[5]+date[6]=="Apr")
+											{
+												mois="04"
+											}
+											if(date[4]+date[5]+date[6]=="May")
+											{
+												mois="05"
+											}
+											if(date[4]+date[5]+date[6]=="Jun")
+											{
+												mois="06"
+											}
+											if(date[4]+date[5]+date[6]=="Jul")
+											{
+												mois="07"
+											}
+											if(date[4]+date[5]+date[6]=="Aug")
+											{
+												mois="08"
+											}
+											if(date[4]+date[5]+date[6]=="Sep")
+											{
+												mois="09"
+											}
+											if(date[4]+date[5]+date[6]=="Oct")
+											{
+												mois="10"
+											}
+											if(date[4]+date[5]+date[6]=="Nov")
+											{
+												mois="11"
+											}
+											if(date[4]+date[5]+date[6]=="Dec")
+											{
+												mois="12"
+											}
+											////// La date et l'heure récupérées ne sont pas les bonnes (14h en plus) 
+											this.form.date_debut=date[11]+date[12]+date[13]+date[14]+"-"+mois+"-"+date[8]+date[9]+" "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]
+											this.form.date_fin=dateFin[11]+dateFin[12]+dateFin[13]+dateFin[14]+"-"+mois+"-"+dateFin[8]+dateFin[9]+" "+dateFin[16]+dateFin[17]+dateFin[18]+dateFin[19]+dateFin[20]+dateFin[21]+dateFin[22]+dateFin[23]
+											this.$http
+											.put(
+												'http://localhost:5000/api/main-courante',
+												this.form
+											)
+											.then(result => {
+												this.$message({
+													dangerouslyUseHTMLString: true,
+													message:
+														"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+													type: 'success',
+												});
+											})
+										})
+									}
+								}
+							}
+						})
+				})
+			})
+		},
 
         ////////////////////////////////////////
         // Il faudra voir pour dedoublonner ces fonctions mais c'est pas urgent
         ////////////////////////////////////////
-        // Les handler pour la table et le modal des references
+		// Les handler pour la table et le modal des references
+		////////////////////////////////////////
+
         confirmDelete() {
             this.form.references.splice(this.indexToDelete, 1);
             this.delConfirmationModalVisible = false;
@@ -671,12 +798,13 @@ export default {
 		},
 
 		dupliquer() {
-			console.log(this.incident_id)
 			window.location.href="/#/new-incident/id="+this.incident_id
-			if (this.incident_id!=undefined)
+			if (this.incident_id==undefined)
 			{
 				console.log("ID non existant")
-			}	
+			} else {
+				console.log(this.incident_id)
+			}
 		},
 	
         async envoyerMail() {

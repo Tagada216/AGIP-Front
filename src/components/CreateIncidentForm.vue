@@ -450,7 +450,8 @@ export default {
 						}
                     }
 
-                    console.log(this.form);
+					console.log(this.form);
+					
 
                     this.$http
                         .post(
