@@ -379,6 +379,270 @@
 			>
 			<input type="file" id="input" @click="importer()"/>
         </el-form-item>
+
+		<!-- Modal pour la partie agence -->
+
+		<el-dialog title="Adresse d'expédition" :visible.sync="dialogFormVisible">
+			<el-form ref="form" :model="form" :rules="rules" label-position="top">
+				<el-row :gutter="20">
+					<el-col :span="6">
+						<!-- Références incident -->
+						<el-card>
+							<div slot="header">
+								<h4 class="card-header">Référence(s) de l'incident</h4>
+							</div>
+							<el-table :data="form.references" border>
+								<el-table-column label="Référence">
+									<template slot-scope="scope">
+										<el-input
+											id="reference"
+											disabled
+											v-model="
+												form.references[scope.$index].reference
+											"
+										></el-input>
+									</template>
+								</el-table-column>
+								<el-table-column width="60">
+									<template slot="header">
+										<el-button
+											type="primary"
+											icon="el-icon-plus"
+											circle
+											@click="handleCreate()"
+										/>
+									</template>
+									<template slot-scope="scope">
+										<el-button
+											type="danger"
+											icon="el-icon-delete"
+											circle
+											@click="handleDelete(scope.$index)"
+										/>
+									</template>
+								</el-table-column>
+							</el-table>
+						</el-card>
+						<!-- Fin Références incident -->
+
+						<!-- Horodatages -->
+						<el-card>
+							<div slot="header">
+								<h4 class="card-header">Horodatages de l'incident</h4>
+							</div>
+
+							<el-form-item label="Début de l'incident" prop="date_debut">
+								<el-date-picker
+									id="date_debut"
+									v-model="form.date_debut"
+									type="datetime"
+									placeholder="Selectionnez l'horodatage"
+									format="dd/MM/yyyy HH:mm:ss"
+									value-format="yyyy-MM-dd HH:mm:ss"
+								></el-date-picker>
+							</el-form-item>
+
+							<el-form-item label="Fin de l'incident">
+								<el-date-picker
+									v-model="form.date_fin"
+									type="datetime"
+									placeholder="Selectionnez l'horodatage"
+									format="dd/MM/yyyy HH:mm:ss"
+									value-format="yyyy-MM-dd HH:mm:ss"
+									:disabled="form.is_faux_incident"
+								/>
+							</el-form-item>
+						</el-card>
+						<!-- Fin Horodatage -->
+					</el-col>
+
+					<!-- Info Générales -->
+					<el-col :span="18">
+						<!-- Infos générales incident -->
+						<el-card>
+							<div slot="header">
+								<h4 class="card-header">
+									Informations générales de l'incident
+								</h4>
+							</div>
+
+							<el-row :gutter="20">
+								<el-col :span="6">
+									<el-form-item label="Priorité" prop="priorite_id">
+										<el-select
+											id="priorite_id"
+											v-model="form.priorite_id"
+										>
+											<el-option
+												v-for="item in remoteEnum.priorites"
+												:key="item.id"
+												:label="item.priorite"
+												:value="item.id"
+											></el-option>
+										</el-select>
+									</el-form-item>
+								</el-col>
+
+								<el-col :span="6">
+									<el-form-item label="Statut" prop="statut_id">
+										<el-select
+											id="statut_id"
+											v-model="form.statut_id"
+										>
+											<el-option
+												v-for="item in remoteEnum.statut"
+												:key="item.id"
+												:label="item.nom"
+												:value="item.id"
+											></el-option>
+										</el-select>
+									</el-form-item>
+								</el-col>
+							</el-row>
+
+							<el-form-item
+								label="Enseigne(s) impactée(s)"
+								prop="enseigne_impactee"
+							>
+								<el-checkbox-group v-model="form.enseigne_impactee">
+									<el-checkbox
+										id="enseigne"
+										v-for="enseigne in remoteEnum.enseignes"
+										:label="enseigne.id"
+										:key="enseigne.id"
+										v-if="!enseigne.is_deprecated"
+										>{{ enseigne.nom }}</el-checkbox
+									>
+								</el-checkbox-group>
+							</el-form-item>
+
+							<el-form-item label="Description" prop="description">
+								<el-input
+									id="description"
+									type="textarea"
+									:autosize="{ minRows: 2, maxRows: 8 }"
+									placeholder="Description"
+									v-model="form.description"
+								></el-input>
+							</el-form-item>
+
+							<el-form-item label="Impact" prop="description_impact">
+								<el-input
+									id="description_impact"
+									type="textarea"
+									:autosize="{ minRows: 4, maxRows: 8 }"
+									placeholder="Impact"
+									v-model="form.description_impact"
+								></el-input>
+							</el-form-item>
+
+							<el-table :data="form.application_impactee" border>
+								<el-table-column
+									label="Application(s) impactée(s)"
+									prop="application_impactee"
+								>
+									<template slot-scope="scope">
+										<el-autocomplete
+											placeholder="Application impactée"
+											v-model="
+												form.application_impactee[scope.$index]
+													.display_name
+											"
+											:fetch-suggestions="getMatchingApplications"
+											value-key="display_name"
+											@select="appSelected"
+										></el-autocomplete>
+									</template>
+								</el-table-column>
+								<el-table-column width="60">
+									<template slot="header">
+										<el-button
+											type="primary"
+											icon="el-icon-plus"
+											circle
+											@click="handleCreateApp()"
+										/>
+									</template>
+									<template slot-scope="scope">
+										<el-button
+											type="danger"
+											icon="el-icon-delete"
+											circle
+											@click="handleDeleteApp(scope.$index)"
+										/>
+									</template>
+								</el-table-column>
+								<template slot="empty">
+									<span class="arrayFormEmpty">Aucune donnée</span>
+								</template>
+							</el-table>
+
+							<el-form-item label="Cause">
+								<el-input
+									id="cause"
+									type="textarea"
+									:autosize="{ minRows: 4, maxRows: 8 }"
+									placeholder="Cause"
+									v-model="form.cause"
+								></el-input>
+							</el-form-item>
+						</el-card>
+						<!-- Fin Infos générales incident -->
+					</el-col>
+				</el-row>
+
+				<!-- Modal de confirmation de suppression d'une reférence problème -->
+				<el-dialog
+					title="Demande de confirmation"
+					:visible.sync="delConfirmationModalVisible"
+					width="40%"
+					center
+				>
+					<span
+						>Etes vous sur de vouloir supprimer la référence :
+						{{ refToDelete }}</span
+					>
+					<span slot="footer" class="dialog-footer">
+						<el-button @click="delConfirmationModalVisible = false"
+							>Annuler</el-button
+						>
+						<el-button type="danger" @click="confirmDelete()"
+							>Confirmer</el-button
+						>
+					</span>
+				</el-dialog>
+				<!-- Fin Modal de confirmation de suppression d'une reférence problème -->
+
+				<!-- Modal de confirmation de suppression d'une application impactée -->
+				<el-dialog
+					title="Demande de confirmation"
+					:visible.sync="delConfirmationModalVisibleApp"
+					width="70%"
+					center
+				>
+					<span
+						>Etes vous sur de vouloir supprimer l'application :
+						{{ refToDeleteApp }}</span
+					>
+					<span slot="footer" class="dialog-footer">
+						<el-button @click="delConfirmationModalVisibleApp = false"
+							>Annuler</el-button
+						>
+						<el-button type="danger" @click="confirmDeleteApp()"
+							>Confirmer</el-button
+						>
+					</span>
+				</el-dialog>
+				<!-- Fin Modal de confirmation de suppression d'une application impactée-->
+
+				<el-form-item style="text-align: center">
+					<el-button type="primary" @click="onSubmit()"
+						>Sauvegarder</el-button
+					>
+				</el-form-item>
+				</el-form>
+		</el-dialog>
+		<!-- Fin modal -->		
     </el-form>
 </template>
 
@@ -392,7 +656,7 @@ import Axios from 'axios';
 import Vue from 'vue'
 import CreateIncidentFormVue from './CreateIncidentForm.vue';
 import { readFile, watch } from 'fs';
-import { importSpecifier } from 'babel-types';
+import { importSpecifier, thisTypeAnnotation } from 'babel-types';
 import readXlsxFile from 'read-excel-file'
 import { setTimeout } from 'timers';
 import { constants } from 'crypto';
@@ -530,7 +794,8 @@ export default {
             indexRefToDelete: 0,
             indexRefToDeleteApp: 0,
             refToDelete: '',
-            refToDeleteApp: '',
+			refToDeleteApp: '',
+			dialogFormVisible:false
         };
 	},
 
@@ -598,7 +863,7 @@ export default {
                         {
                             this.form.references[i].reference="A venir"
                         }
-                    }
+					}
 
                     this.$http
                         .put(
@@ -637,16 +902,143 @@ export default {
 						Axios.get(
                 		'http://localhost:5000/api/reference'
             			).then(response => {
+							// On parcourt tous les enregistrements de la main courante
 							for(var p=0;p<=response.data.length;p++)
 							{
+								// On parcourt toutes les lignes du fichier Excel
 								for(const row of rows)
-								{								
+								{	
+									// On vérifie que les différentes références du fichier Excel sont présentes dans la main courante					
 									if(((response.data[p]).reference.includes(row[0]))==true)
-									{
+									{			
+										// Si l'état de l'incident est "En cours"								
+										if(row[7].includes("En cours")==true)
+										{
+										this.incident_id=(response.data[p]).incident_id
+										this.curID=(response.data[p]).incident_id
+										
+										console.log(this.curID + " En cours")
+										
+										// Permet de récupérer les informations de l'incident
 										this.getIncident((response.data[p]).incident_id)
-										console.log((response.data[p]).incident_id) //id des incidents en fonction de la référence
 										Axios.get('http://localhost:5000/api/main-courante/').then(
 										response => {
+											var date=row[1]+''
+											var dateFin=row[2]+''
+											var mois=""
+
+											// ----- Début des différentes modifs à faire
+											if(row[4].includes("isolée")==true)
+											{
+												this.form.description="Depuis le "+ date[8]+date[9]+"/"+date[4]+date[5]+date[6]+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]+ ", indisponibilité du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-11)+" ("+row[5]+" utilisateurs)"
+											}
+											if(row[4].includes("dégradée")==true)
+											{
+												this.form.description="Depuis le "+ date[8]+date[9]+"/"+date[4]+date[5]+date[6]+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23] + ", dégradation du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-13)+" ("+row[5]+" utilisateurs)"
+											}
+
+											/*if((input.files[0].name).includes("CDN" || "cdn"))
+											{
+												//cocher l'enseigne CDN
+											}
+											if((input.files[0].name).includes("BDDF" || "bddf"))
+											{
+												//cocher l'enseigne BDDF
+											}
+											if((input.files[0].name).includes("BPF" || "bpf"))
+											{
+												//cocher l'enseigne BPF
+											}*/
+
+											this.form.description_impact=row[5]
+											this.form.application_impactee.push({display_name: "Infrastructure Réseau Banque de Détail"})
+											this.form.cause = row[8]
+											this.remoteEnum.priorites=row[6]
+											//(statut)
+
+											// Afin d'afficher la date dans le format voulu soit JJ/MM/AAAA
+											if(date[4]+date[5]+date[6]=="Jan")
+											{
+												mois="01"
+											}
+											if(date[4]+date[5]+date[6]=="Feb")
+											{
+												mois="02"
+											}
+											if(date[4]+date[5]+date[6]=="Mar")
+											{
+												mois="03"
+											}
+											if(date[4]+date[5]+date[6]=="Apr")
+											{
+												mois="04"
+											}
+											if(date[4]+date[5]+date[6]=="May")
+											{
+												mois="05"
+											}
+											if(date[4]+date[5]+date[6]=="Jun")
+											{
+												mois="06"
+											}
+											if(date[4]+date[5]+date[6]=="Jul")
+											{
+												mois="07"
+											}
+											if(date[4]+date[5]+date[6]=="Aug")
+											{
+												mois="08"
+											}
+											if(date[4]+date[5]+date[6]=="Sep")
+											{
+												mois="09"
+											}
+											if(date[4]+date[5]+date[6]=="Oct")
+											{
+												mois="10"
+											}
+											if(date[4]+date[5]+date[6]=="Nov")
+											{
+												mois="11"
+											}
+											if(date[4]+date[5]+date[6]=="Dec")
+											{
+												mois="12"
+											}
+											////// La date et l'heure récupérées ne sont pas les bonnes (14h en plus) 
+											this.form.date_debut=date[11]+date[12]+date[13]+date[14]+"-"+mois+"-"+date[8]+date[9]+" "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]
+											this.form.date_fin=dateFin[11]+dateFin[12]+dateFin[13]+dateFin[14]+"-"+mois+"-"+dateFin[8]+dateFin[9]+" "+dateFin[16]+dateFin[17]+dateFin[18]+dateFin[19]+dateFin[20]+dateFin[21]+dateFin[22]+dateFin[23]
+
+
+											// ----- Fin des modifs
+											// Sauvegarde automatique car pas besoin de modif à la main
+											this.$http
+												.put(
+													'http://localhost:5000/api/main-courante',
+													this.form
+												)
+												.then(result => {
+													this.$message({
+														dangerouslyUseHTMLString: true,
+														message:
+															"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+														type: 'success',													
+													});
+												})
+											})
+										}
+
+										// Sinon si l'état de l'incident est "Clos"
+										else if(row[7].includes("Clos")==true)
+										{
+											this.dialogFormVisible=true
+											this.incident_id=(response.data[p]).incident_id
+											this.curID=(response.data[p]).incident_id
+											this.getIncident((response.data[p]).incident_id)
+											console.log(this.curID)
+											console.log("Clos")
+											Axios.get('http://localhost:5000/api/main-courante/').then(
+											response => {
 											var date=row[1]+''
 											var dateFin=row[2]+''
 											var mois=""
@@ -659,7 +1051,7 @@ export default {
 												this.form.description="Depuis le "+ date[8]+date[9]+"/"+date[4]+date[5]+date[6]+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23] + ", dégradation du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-13)+" ("+row[5]+" utilisateurs)"
 											}
 
-											if((input.files[0].name).includes("CDN" || "cdn"))
+											/*if((input.files[0].name).includes("CDN" || "cdn"))
 											{
 												//cocher l'enseigne CDN
 											}
@@ -670,7 +1062,7 @@ export default {
 											if((input.files[0].name).includes("BPF" || "bpf"))
 											{
 												//cocher l'enseigne BPF
-											}
+											}*/
 
 											this.form.description_impact=row[5]
 											this.form.application_impactee.push({display_name: "Infrastructure Réseau Banque de Détail"})
@@ -728,21 +1120,10 @@ export default {
 											////// La date et l'heure récupérées ne sont pas les bonnes (14h en plus) 
 											this.form.date_debut=date[11]+date[12]+date[13]+date[14]+"-"+mois+"-"+date[8]+date[9]+" "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]
 											this.form.date_fin=dateFin[11]+dateFin[12]+dateFin[13]+dateFin[14]+"-"+mois+"-"+dateFin[8]+dateFin[9]+" "+dateFin[16]+dateFin[17]+dateFin[18]+dateFin[19]+dateFin[20]+dateFin[21]+dateFin[22]+dateFin[23]
-											this.$http
-											.put(
-												'http://localhost:5000/api/main-courante',
-												this.form
-											)
-											.then(result => {
-												this.$message({
-													dangerouslyUseHTMLString: true,
-													message:
-														"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-													type: 'success',
-												});
 											})
-										})
+										}
 									}
+
 								}
 							}
 						})
