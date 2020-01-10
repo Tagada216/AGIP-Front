@@ -17,6 +17,11 @@
 					<i class="fas fa-file"></i>
 				</button>
 			</el-tooltip>
+			<el-tooltip class="item" effect="light" content="COSIP" placement="bottom-end">
+                <button class="header-btn" @click="cosip()">
+					C
+                </button>
+            </el-tooltip>
         </base-header>
         <splitpanes watch-slots class="default-theme" horizontal>
             <div splitpanes-size="0" splitpanes-max="0"></div>
@@ -86,6 +91,16 @@ export default {
 			{
 				console.log("ID non existant")
 			}	
+		},
+
+		cosip() {
+			window.location.href='/#/cosip/id='+this.curID
+			if (this.incident_id==undefined)
+			{
+				console.log("ID non existant")
+			} else {
+				console.log(this.incident_id)
+			}
 		},
 		
 		startDownload(){

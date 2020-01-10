@@ -16,7 +16,6 @@
                             <template slot-scope="scope">
                                 <el-input
                                     id="reference"
-									disabled
                                     v-model="
                                         form.references[scope.$index].reference
                                     "
@@ -377,12 +376,48 @@
 			<el-button type="primary" @click="dupliquer()"
 				>Dupliquer</el-button
 			>
-			<input type="file" id="input" @click="importer()"/>
+			<el-button type="primary" @click="cosip()">Cosip</el-button>
+			<input type="file" id="input" @click="importer()" style="margin-left:10px;"/>
         </el-form-item>
 
 		<!-- Modal pour la partie agence -->
+		<el-dialog title="Agences isolées" :visible.sync="dialogFormVisibleAgence">
+			<el-input v-model="form.ref">Référence : </el-input>
+			<el-row :gutter="20">
+               <el-col :span="6">
+                    <el-form-item label="Priorité" prop="priorite_id">
+                        <el-select
+                            id="priorite_id"
+                             v-model="form.priorite_id"
+                        >
+                       <el-option
+                            v-for="item in remoteEnum.priorites"
+                            :key="item.id"
+                        	:label="item.priorite"
+                            :value="item.id"
+                        ></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
 
-		<el-dialog title="Adresse d'expédition" :visible.sync="dialogFormVisible">
+                        <el-col :span="6">
+                            <el-form-item label="Statut" prop="statut_id">
+                                <el-select
+                                    id="statut_id"
+                                    v-model="form.statut_id"
+                                >
+                                    <el-option
+                                        v-for="item in remoteEnum.statut"
+                                        :key="item.id"
+                                        :label="item.nom"
+                                        :value="item.id"
+                                    ></el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+		</el-dialog>
+		<el-dialog title="Agences isolées" :visible.sync="dialogFormVisible">
 			<el-form ref="form" :model="form" :rules="rules" label-position="top">
 				<el-row :gutter="20">
 					<el-col :span="6">
@@ -599,7 +634,7 @@
 					center
 				>
 					<span
-						>Etes vous sur de vouloir supprimer la référence :
+						>Etes-vous sûr de vouloir supprimer la référence :
 						{{ refToDelete }}</span
 					>
 					<span slot="footer" class="dialog-footer">
@@ -621,7 +656,7 @@
 					center
 				>
 					<span
-						>Etes vous sur de vouloir supprimer l'application :
+						>Etes-vous sûr de vouloir supprimer l'application :
 						{{ refToDeleteApp }}</span
 					>
 					<span slot="footer" class="dialog-footer">
@@ -682,7 +717,10 @@ export default {
                 priorites: [],
                 statut: [],
                 enseignes: [],
-                application_impactee: [],
+				application_impactee: [],
+
+				prioritesClos:[],
+				statutClos:[],
             },
 
             // Données du formulaire
@@ -708,6 +746,40 @@ export default {
                 date_communication_TDC: '',
                 date_qualification_p01: '',
 				date_premiere_com: '',
+
+				ref:'',
+				priorite_idClos: '', //
+				statut_idClos:'',
+			},
+
+			test: {
+				priorites: [],
+                statut: [],
+                enseignes: [],
+				application_impactee: [],
+				incident_id: 0,
+                references: [], //
+                is_faux_incident: false, //
+                date_debut: '', //
+                date_fin: null, //
+                description: '', //
+                cause: '',
+                origine: '',
+                action_retablissement: '',
+                plan_action: '',
+                description_impact: '', //
+                description_contournement: 'Aucun contournement', //
+                is_contournement: false, //
+                priorite_id: '', //
+                statut_id: '', //
+                enseigne_impactee: [],
+                application_impactee: [],
+                date_detection: '',
+                date_communication_TDC: '',
+                date_qualification_p01: '',
+				date_premiere_com: '',
+
+				ref:''
 			},
 		
             // Règles de validation pour le formulaire
@@ -795,7 +867,8 @@ export default {
             indexRefToDeleteApp: 0,
             refToDelete: '',
 			refToDeleteApp: '',
-			dialogFormVisible:false
+			dialogFormVisible:false,
+			dialogFormVisibleAgence:false
         };
 	},
 
@@ -810,7 +883,7 @@ export default {
 
         onSubmit() {
             this.$refs['form'].validate(valid => {
-                if (valid) {
+                if (valid) { 
                     /*// On vérifie qu'il y a au moins une référence
                     if (this.form.references.length == 0) {
                         alert('Aucune donnée dans les références');
@@ -865,7 +938,7 @@ export default {
                         }
 					}
 
-                    this.$http
+                    /*this.$http
                         .put(
                             'http://localhost:5000/api/main-courante',
                             this.form
@@ -877,8 +950,29 @@ export default {
                                     "<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
                                 type: 'success',
                             });
+						})*/
+
+						console.log(this.incident_id)
+
+						this.curID=this.incident_id
+
+						console.log(this.curID)
+
+						this.$http
+							.put('http://localhost:5000/api/main-courante', 
+							this.form
+						)
+						.then(result => {
+                            this.$message({
+                                dangerouslyUseHTMLString: true,
+                                message:
+                                    "<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+                                type: 'success',
+							});
 						})
-                } else {
+
+					}
+                else {
                     /*console.log('error');
                     return false;*/
                     this.$message({
@@ -888,7 +982,7 @@ export default {
                     type: 'error',
                     });
                     return false;
-                }
+				}
 			});
 		},
 		
@@ -898,35 +992,35 @@ export default {
 			const input = document.getElementById('input')
 			input.addEventListener('change', () => {
 				readXlsxFile(input.files[0]).then((rows) => {
-						console.log(input.files[0].name)
 						Axios.get(
                 		'http://localhost:5000/api/reference'
             			).then(response => {
-							// On parcourt tous les enregistrements de la main courante
+							// On parcourt toutes les références de la main courante
 							for(var p=0;p<=response.data.length;p++)
 							{
-								// On parcourt toutes les lignes du fichier Excel
+								// On parcourt toutes les lignes du fichier Excel des agences
 								for(const row of rows)
 								{	
-									// On vérifie que les différentes références du fichier Excel sont présentes dans la main courante					
+									// On vérifie que les différentes références du fichier Excel des agences sont présentes dans la main courante					
 									if(((response.data[p]).reference.includes(row[0]))==true)
-									{			
+									{		
 										// Si l'état de l'incident est "En cours"								
 										if(row[7].includes("En cours")==true)
 										{
 										this.incident_id=(response.data[p]).incident_id
 										this.curID=(response.data[p]).incident_id
 										
-										console.log(this.curID + " En cours")
+										console.log(row[0] + " En cours")
+										console.log(this.incident_id)
 										
 										// Permet de récupérer les informations de l'incident
-										this.getIncident((response.data[p]).incident_id)
-										Axios.get('http://localhost:5000/api/main-courante/').then(
+										this.getIncident(this.incident_id)
+										Axios.get('http://localhost:5000/api/main-courante').then(
 										response => {
+											//Date de début
 											var date=row[1]+''
 											var dateFin=row[2]+''
 											var mois=""
-
 											// ----- Début des différentes modifs à faire
 											if(row[4].includes("isolée")==true)
 											{
@@ -954,6 +1048,7 @@ export default {
 											this.form.application_impactee.push({display_name: "Infrastructure Réseau Banque de Détail"})
 											this.form.cause = row[8]
 											this.remoteEnum.priorites=row[6]
+
 											//(statut)
 
 											// Afin d'afficher la date dans le format voulu soit JJ/MM/AAAA
@@ -961,47 +1056,47 @@ export default {
 											{
 												mois="01"
 											}
-											if(date[4]+date[5]+date[6]=="Feb")
+											else if(date[4]+date[5]+date[6]=="Feb")
 											{
 												mois="02"
 											}
-											if(date[4]+date[5]+date[6]=="Mar")
+											else if(date[4]+date[5]+date[6]=="Mar")
 											{
 												mois="03"
 											}
-											if(date[4]+date[5]+date[6]=="Apr")
+											else if(date[4]+date[5]+date[6]=="Apr")
 											{
 												mois="04"
 											}
-											if(date[4]+date[5]+date[6]=="May")
+											else if(date[4]+date[5]+date[6]=="May")
 											{
 												mois="05"
 											}
-											if(date[4]+date[5]+date[6]=="Jun")
+											else if(date[4]+date[5]+date[6]=="Jun")
 											{
 												mois="06"
 											}
-											if(date[4]+date[5]+date[6]=="Jul")
+											else if(date[4]+date[5]+date[6]=="Jul")
 											{
 												mois="07"
 											}
-											if(date[4]+date[5]+date[6]=="Aug")
+											else if(date[4]+date[5]+date[6]=="Aug")
 											{
 												mois="08"
 											}
-											if(date[4]+date[5]+date[6]=="Sep")
+											else if(date[4]+date[5]+date[6]=="Sep")
 											{
 												mois="09"
 											}
-											if(date[4]+date[5]+date[6]=="Oct")
+											else if(date[4]+date[5]+date[6]=="Oct")
 											{
 												mois="10"
 											}
-											if(date[4]+date[5]+date[6]=="Nov")
+											else if(date[4]+date[5]+date[6]=="Nov")
 											{
 												mois="11"
 											}
-											if(date[4]+date[5]+date[6]=="Dec")
+											else
 											{
 												mois="12"
 											}
@@ -1009,10 +1104,9 @@ export default {
 											this.form.date_debut=date[11]+date[12]+date[13]+date[14]+"-"+mois+"-"+date[8]+date[9]+" "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]
 											this.form.date_fin=dateFin[11]+dateFin[12]+dateFin[13]+dateFin[14]+"-"+mois+"-"+dateFin[8]+dateFin[9]+" "+dateFin[16]+dateFin[17]+dateFin[18]+dateFin[19]+dateFin[20]+dateFin[21]+dateFin[22]+dateFin[23]
 
-
 											// ----- Fin des modifs
 											// Sauvegarde automatique car pas besoin de modif à la main
-											this.$http
+											/*this.$http
 												.put(
 													'http://localhost:5000/api/main-courante',
 													this.form
@@ -1022,105 +1116,124 @@ export default {
 														dangerouslyUseHTMLString: true,
 														message:
 															"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-														type: 'success',													
+														type: 'success',
 													});
-												})
+												})*/
 											})
 										}
-
 										// Sinon si l'état de l'incident est "Clos"
-										else if(row[7].includes("Clos")==true)
+										else //if(row[7].includes("Clos")==true)
 										{
-											this.dialogFormVisible=true
+											this.incident_id=(response.data[p]).incident_id
+											console.log(row[0] + " Clos")
+											console.log(this.incident_id)
+											let tableau = []
+											tableau=row
+
+											//this.dialogFormVisibleAgence=true;
+											//this.form.ref=tableau[0]
+							
+
+											/*this.dialogFormVisible=true
 											this.incident_id=(response.data[p]).incident_id
 											this.curID=(response.data[p]).incident_id
+
+											console.log((response.data[p]).reference + " " + this.incident_id)
+
+											// Permet de récupérer les informations de l'incident
 											this.getIncident((response.data[p]).incident_id)
-											console.log(this.curID)
-											console.log("Clos")
 											Axios.get('http://localhost:5000/api/main-courante/').then(
 											response => {
-											var date=row[1]+''
-											var dateFin=row[2]+''
-											var mois=""
-											if(row[4].includes("isolée")==true)
-											{
-												this.form.description="Depuis le "+ date[8]+date[9]+"/"+date[4]+date[5]+date[6]+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]+ ", indisponibilité du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-11)+" ("+row[5]+" utilisateurs)"
-											}
-											if(row[4].includes("dégradée")==true)
-											{
-												this.form.description="Depuis le "+ date[8]+date[9]+"/"+date[4]+date[5]+date[6]+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23] + ", dégradation du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-13)+" ("+row[5]+" utilisateurs)"
-											}
+												var date=row[1]+''
+												var dateFin=row[2]+''
+												var mois=""
 
-											/*if((input.files[0].name).includes("CDN" || "cdn"))
-											{
-												//cocher l'enseigne CDN
-											}
-											if((input.files[0].name).includes("BDDF" || "bddf"))
-											{
-												//cocher l'enseigne BDDF
-											}
-											if((input.files[0].name).includes("BPF" || "bpf"))
-											{
-												//cocher l'enseigne BPF
-											}*/
+												// ----- Début des différentes modifs à faire
+												if(row[4].includes("isolée")==true)
+												{
+													this.form.description="Depuis le "+ date[8]+date[9]+"/"+date[4]+date[5]+date[6]+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]+ ", indisponibilité du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-11)+" ("+row[5]+" utilisateurs)"
+												}
+												if(row[4].includes("dégradée")==true)
+												{
+													this.form.description="Depuis le "+ date[8]+date[9]+"/"+date[4]+date[5]+date[6]+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23] + ", dégradation du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-13)+" ("+row[5]+" utilisateurs)"
+												}
 
-											this.form.description_impact=row[5]
-											this.form.application_impactee.push({display_name: "Infrastructure Réseau Banque de Détail"})
-											this.form.cause = row[8]
-											this.remoteEnum.priorites=row[6]
-											//statut
-											if(date[4]+date[5]+date[6]=="Jan")
-											{
-												mois="01"
-											}
-											if(date[4]+date[5]+date[6]=="Feb")
-											{
-												mois="02"
-											}
-											if(date[4]+date[5]+date[6]=="Mar")
-											{
-												mois="03"
-											}
-											if(date[4]+date[5]+date[6]=="Apr")
-											{
-												mois="04"
-											}
-											if(date[4]+date[5]+date[6]=="May")
-											{
-												mois="05"
-											}
-											if(date[4]+date[5]+date[6]=="Jun")
-											{
-												mois="06"
-											}
-											if(date[4]+date[5]+date[6]=="Jul")
-											{
-												mois="07"
-											}
-											if(date[4]+date[5]+date[6]=="Aug")
-											{
-												mois="08"
-											}
-											if(date[4]+date[5]+date[6]=="Sep")
-											{
-												mois="09"
-											}
-											if(date[4]+date[5]+date[6]=="Oct")
-											{
-												mois="10"
-											}
-											if(date[4]+date[5]+date[6]=="Nov")
-											{
-												mois="11"
-											}
-											if(date[4]+date[5]+date[6]=="Dec")
-											{
-												mois="12"
-											}
-											////// La date et l'heure récupérées ne sont pas les bonnes (14h en plus) 
-											this.form.date_debut=date[11]+date[12]+date[13]+date[14]+"-"+mois+"-"+date[8]+date[9]+" "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]
-											this.form.date_fin=dateFin[11]+dateFin[12]+dateFin[13]+dateFin[14]+"-"+mois+"-"+dateFin[8]+dateFin[9]+" "+dateFin[16]+dateFin[17]+dateFin[18]+dateFin[19]+dateFin[20]+dateFin[21]+dateFin[22]+dateFin[23]
-											})
+												/*if((input.files[0].name).includes("CDN" || "cdn"))
+												{
+													//cocher l'enseigne CDN
+												}
+												if((input.files[0].name).includes("BDDF" || "bddf"))
+												{
+													//cocher l'enseigne BDDF
+												}
+												if((input.files[0].name).includes("BPF" || "bpf"))
+												{
+													//cocher l'enseigne BPF
+												}*/
+
+												/*this.form.description_impact=row[5]
+												this.form.application_impactee.push({display_name: "Infrastructure Réseau Banque de Détail"})
+												this.form.cause = row[8]
+												this.remoteEnum.priorites=row[6]
+												//(statut)
+
+												// Afin d'afficher la date dans le format voulu soit JJ/MM/AAAA
+												if(date[4]+date[5]+date[6]=="Jan")
+												{
+													mois="01"
+												}
+												if(date[4]+date[5]+date[6]=="Feb")
+												{
+													mois="02"
+												}
+												if(date[4]+date[5]+date[6]=="Mar")
+												{
+													mois="03"
+												}
+												if(date[4]+date[5]+date[6]=="Apr")
+												{
+													mois="04"
+												}
+												if(date[4]+date[5]+date[6]=="May")
+												{
+													mois="05"
+												}
+												if(date[4]+date[5]+date[6]=="Jun")
+												{
+													mois="06"
+												}
+												if(date[4]+date[5]+date[6]=="Jul")
+												{
+													mois="07"
+												}
+												if(date[4]+date[5]+date[6]=="Aug")
+												{
+													mois="08"
+												}
+												if(date[4]+date[5]+date[6]=="Sep")
+												{
+													mois="09"
+												}
+												if(date[4]+date[5]+date[6]=="Oct")
+												{
+													mois="10"
+												}
+												if(date[4]+date[5]+date[6]=="Nov")
+												{
+													mois="11"
+												}
+												if(date[4]+date[5]+date[6]=="Dec")
+												{
+													mois="12"
+												}
+												////// La date et l'heure récupérées ne sont pas les bonnes (14h en plus) 
+												this.form.date_debut=date[11]+date[12]+date[13]+date[14]+"-"+mois+"-"+date[8]+date[9]+" "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]
+												this.form.date_fin=dateFin[11]+dateFin[12]+dateFin[13]+dateFin[14]+"-"+mois+"-"+dateFin[8]+dateFin[9]+" "+dateFin[16]+dateFin[17]+dateFin[18]+dateFin[19]+dateFin[20]+dateFin[21]+dateFin[22]+dateFin[23]
+
+
+												// ----- Fin des modifs
+												})*/
+											
 										}
 									}
 
@@ -1180,6 +1293,16 @@ export default {
 
 		dupliquer() {
 			window.location.href="/#/new-incident/id="+this.incident_id
+			if (this.incident_id==undefined)
+			{
+				console.log("ID non existant")
+			} else {
+				console.log(this.incident_id)
+			}
+		},
+
+		cosip() {
+			window.location.href='/#/cosip/id='+this.incident_id
 			if (this.incident_id==undefined)
 			{
 				console.log("ID non existant")
@@ -1447,9 +1570,6 @@ export default {
                 }
 				
 				console.log(this.form.application_impactee);
-				
-				
-
             });
         },
     },
