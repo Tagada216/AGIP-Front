@@ -201,17 +201,17 @@
 							<h4 class="card-header">Enseignes impactées</h4>
 						</div>
 						<el-form-item label="Enseigne(s) impactée(s)" prop="enseigne_impactee">
-							<el-checkbox-group v-model="form.enseigne_impactee" style="text-align:left; margin-left:5px;">
+							<el-checkbox-group @change="verifCheckEnseignesImpactees" v-model="form.enseigne_impactee" style="text-align:left; margin-left:5px;">
 								<el-checkbox
-									@change="verifCheckEnseignesImpactees()"
 									v-for="enseigne in remoteEnum.enseignes"
 									:label="enseigne.id"
 									:key="enseigne.id"
 									v-if="!enseigne.is_deprecated"
 								>{{ enseigne.nom }}</el-checkbox>
 							</el-checkbox-group>
-							<el-tabs type="border-card">
-								<el-tab-pane label="BDDF">
+							<el-tabs type="border-card" v-model="activeName">
+								<el-tab-pane label="BDDF" name="tabBDDF">
+									<el-form-item v-show="formulaireBDDF">
 										<el-row :gutter="20">
 										<el-col :span="6">
 											<el-form-item label="Priorité" prop="priorite_idBDDF">
@@ -385,8 +385,10 @@
 											<span class="arrayFormEmpty">Aucune donnée</span>
 										</template>
 									</el-table>
+									</el-form-item>
 								</el-tab-pane>
-								<el-tab-pane label="CDN">
+								<el-tab-pane label="CDN" name="tabCDN">
+									<el-form-item v-show="formulaireCDN">
 										<el-row :gutter="20">
 										<el-col :span="6">
 											<el-form-item label="Priorité" prop="priorite_idCDN">
@@ -555,8 +557,10 @@
 											<span class="arrayFormEmpty">Aucune donnée</span>
 										</template>
 									</el-table>
+									</el-form-item>
 								</el-tab-pane>
-								<el-tab-pane label="BPF">
+								<el-tab-pane label="BPF" name="tabBPF">
+									<el-form-item v-show="formulaireBPF">
 										<el-row :gutter="20">
 										<el-col :span="6">
 											<el-form-item label="Priorité" prop="priorite_idBPF">
@@ -596,9 +600,9 @@
 									<el-row :gutter="20">
 										<el-col :span="6">
 											<template>
-												<el-checkbox>Impact Réseau</el-checkbox>
+												<el-checkbox @change="validateImpactReseauBPF" v-model="impactReseauBPF">Impact Réseau</el-checkbox>
 											</template>
-												<el-card>
+												<el-card v-show="cardImpactReseauBPF">
 													<el-row :gutter="20" style="margin-bottom:10px;">
 														<el-col :span="12">
 															Durée d'indisponibilité
@@ -632,9 +636,9 @@
 										</el-col>
 										<el-col :span="6">
 											<template>
-												<el-checkbox>Impact Client</el-checkbox>
+												<el-checkbox @change="validateImpactClientBPF" v-model="impactClientBPF">Impact Client</el-checkbox>
 											</template>
-											<el-card id="cardClientBDDF">
+											<el-card v-show="cardImpactClientBPF">
 												<el-row :gutter="20" style="margin-bottom:10px;">
 													<el-col style="text-align:center">Durées d'indisponibilité (HH:MM)</el-col>
 												</el-row>
@@ -730,6 +734,7 @@
 											<span class="arrayFormEmpty">Aucune donnée</span>
 										</template>
 									</el-table>
+									</el-form-item>
 								</el-tab-pane>
 							</el-tabs>
 						</el-form-item>
@@ -933,14 +938,47 @@ export default {
             indexRefToDeleteApp: 0,
             refToDelete: '',
 			refToDeleteApp: '',
+
+			// Les lignes suivantes servent à gérer l'apparition de certains éléments lorsqu'on coche des checkbox
 			cardImpactReseauBDDF:false,
 			cardImpactClientBDDF:false,
 			cardImpactReseauCDN:false,
 			cardImpactClientCDN:false,
+			cardImpactReseauBPF:false,
+			cardImpactClientBPF:false,
+			formulaireBPF:false,
+			formulaireBDDF:false,
+			formulaireCDN:false,
+
+			activeName:null
         };
 	},
 
     methods: {
+
+		validateImpactReseauBPF(){
+			if(this.impactReseauBPF==true)
+			{
+				console.log("Coché")
+				this.cardImpactReseauBPF=true;
+			}
+			else{
+				console.log("pas coché")
+				this.cardImpactReseauBPF=false;
+			}
+		},
+
+		validateImpactClientBPF(){
+			if(this.impactClientBPF==true)
+			{
+				console.log("Coché")
+				this.cardImpactClientBPF=true;
+			}
+			else{
+				console.log("pas coché")
+				this.cardImpactClientBPF=false;
+			}
+		},
 
 		validateImpactReseauBDDF(){
 			if(this.impactReseauBDDF==true)
@@ -993,14 +1031,40 @@ export default {
 		},
 
 		verifCheckEnseignesImpactees(){
-			if(this.form.enseigne_impactee==true)
-			{
-				console.log("coché")
-			}
-			else{
-				console.log("pas coché")
-			}
 
+			if(this.form.enseigne_impactee[0]==1 || this.form.enseigne_impactee[1]==1 || this.form.enseigne_impactee[2]==1)
+			{
+				console.log("BDDF")
+				this.formulaireBDDF=true
+				this.activeName="tabBDDF"
+			}
+			else
+			{
+				this.formulaireBDDF=false
+			}
+			
+			if(this.form.enseigne_impactee[0]==2 || this.form.enseigne_impactee[1]==2 || this.form.enseigne_impactee[2]==2)
+			{
+				console.log("CDN")
+				this.formulaireCDN=true
+				this.activeName="tabCDN"
+			}
+			else
+			{
+				this.formulaireCDN=false
+			}	
+
+			if(this.form.enseigne_impactee[0]==3 || this.form.enseigne_impactee[1]==3 || this.form.enseigne_impactee[2]==3)
+			{
+				console.log("BPF")
+				this.formulaireBPF=true
+				this.activeName="tabBPF"
+
+			}
+			else
+			{
+				this.formulaireBPF=false
+			}
 		},
 
 		cosip(){

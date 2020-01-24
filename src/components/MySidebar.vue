@@ -97,7 +97,7 @@ export default {
 				{
 					href:'/cosip',
 					title:'COSIP',
-					icon: 'fas fa-calendar-week',
+					icon: 'fas fa-tasks',
 				},
                 {
                     header: true,
