@@ -40,5 +40,13 @@ export default new Router({
             path: '/new-incident/id=:id',
             component: () => import('./views/NewIncident.vue'),
         },
+        {
+            path: '/cosip',
+            component: () => import('./views/FicheIncident.vue'),
+        },
+        {
+            path: '/cosip/id=:id',
+            component: () => import('./views/FicheIncident.vue'),
+        },
     ],
 });

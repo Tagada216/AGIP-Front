@@ -93,11 +93,17 @@ export default {
                     href: '/problemes',
                     title: 'Liste des problèmes',
                     icon: 'fas fa-hands-helping',
-                },
+				},
+				{
+					href:'/cosip',
+					title:'COSIP',
+					icon: 'fas fa-tasks',
+				},
                 {
                     header: true,
                     title: 'Reportings',
-                },
+				},
+
                 {
                     href: '/statistique',
                     title: 'Statistiques',

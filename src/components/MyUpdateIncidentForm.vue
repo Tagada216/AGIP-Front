@@ -16,7 +16,6 @@
                             <template slot-scope="scope">
                                 <el-input
                                     id="reference"
-									disabled
                                     v-model="
                                         form.references[scope.$index].reference
                                     "
@@ -377,7 +376,124 @@
 			<el-button type="primary" @click="dupliquer()"
 				>Dupliquer</el-button
 			>
+			<el-button type="primary" @click="cosip()">Cosip</el-button>
+			<input type="file" id="input" @click="importer()" style="margin-left:10px;"/>
         </el-form-item>
+
+		<!-- Modal pour la partie agence -->
+		<el-dialog title="Agences isolées" :visible.sync="dialogFormVisibleAgence">
+			<el-form ref="agence" :model="agence" label-position="top">
+				<el-row :gutter="20">
+					<el-col :span="6">
+						<!-- Références incident -->
+						<el-card>
+							<div slot="header">
+								<h4 class="card-header">Référence(s) de l'incident</h4>
+							</div>
+							<el-input
+								v-model="agence.references_agence"
+							></el-input>
+						</el-card>
+						<!-- Fin Références incident -->
+
+						<!-- Horodatages -->
+						<el-card>
+							<div slot="header">
+								<h4 class="card-header">Horodatages de l'incident</h4>
+							</div>
+
+							<el-form-item label="Début de l'incident" prop="date_debut_agence">
+								<el-date-picker
+									id="date_debut_agence"
+									v-model="agence.date_debut_agence"
+									type="datetime"
+									placeholder="Selectionnez l'horodatage"
+									format="dd/MM/yyyy HH:mm:ss"
+									value-format="yyyy-MM-dd HH:mm:ss"
+								></el-date-picker>
+							</el-form-item>
+
+							<el-form-item label="Fin de l'incident">
+								<el-date-picker
+									v-model="agence.date_fin_agence"
+									type="datetime"
+									placeholder="Selectionnez l'horodatage"
+									format="dd/MM/yyyy HH:mm:ss"
+									value-format="yyyy-MM-dd HH:mm:ss"
+								/>
+							</el-form-item>
+						</el-card>
+						<!-- Fin Horodatage -->
+					</el-col>
+				<el-col :span="18">
+					<el-card>
+						<div slot="header">
+							<h4 class="card-header">
+								Informations générales de l'incident
+							</h4>
+						</div>
+						<el-row :gutter="20">
+							<el-col :span="6">
+								<el-form-item label="Priorité" prop="priorite_agence">
+									<el-select
+										id="priorite_agence"
+										v-model="agence.priorite_agence"
+									>
+									<el-option
+										v-for="item in remoteEnum.priorites"
+										:key="item.id"
+										:label="item.priorite"
+										:value="item.id"
+									></el-option>
+									</el-select>
+								</el-form-item>
+							</el-col>
+							<el-col :span="6">
+								<el-form-item label="Statut" prop="statut_agence">
+									<el-select
+										id="statut_agence"
+										v-model="agence.statut_agence"
+									>
+										<el-option
+											v-for="item in remoteEnum.statut"
+											:key="item.id"
+											:label="item.nom"
+											:value="item.id"
+										></el-option>
+									</el-select>
+								</el-form-item>
+							</el-col>
+						</el-row>
+						<el-form-item label="Description" prop="description_agence">
+							<el-input
+								type="textarea"
+								:autosize="{ minRows: 2, maxRows: 8 }"
+								placeholder="Description"
+								v-model="agence.description_agence"
+							></el-input>
+						</el-form-item>
+						<el-form-item label="Impact" prop="impact_agence">
+							<el-input
+								type="textarea"
+								:autosize="{ minRows: 2, maxRows: 8 }"
+								placeholder="Impact"
+								v-model="agence.impact_agence"
+							></el-input>
+						</el-form-item>
+						<el-form-item label="Cause" prop="cause_agence">
+							<el-input
+								type="textarea"
+								:autosize="{ minRows: 2, maxRows: 8 }"
+								placeholder="Cause"
+								v-model="agence.cause_agence"
+							></el-input>
+						</el-form-item>
+					</el-card>
+				</el-col>
+				</el-row>
+			</el-form>
+		</el-dialog>
+		<!-- Fin modal -->		
     </el-form>
 </template>
 
@@ -390,13 +506,18 @@ import Axios from 'axios';
 //import func from '../../vue-temp/vue-editor-bridge';
 import Vue from 'vue'
 import CreateIncidentFormVue from './CreateIncidentForm.vue';
-
+import { readFile, watch } from 'fs';
+import { importSpecifier, thisTypeAnnotation, identifier } from 'babel-types';
+import readXlsxFile from 'read-excel-file'
+import { setTimeout } from 'timers';
+import { constants } from 'crypto';
 
 export default {
 
     created() {
-        this.getFieldsOptions();
+		this.getFieldsOptions();
 		this.getIncident(this.incident_id);
+
     },
 
     props: {
@@ -412,8 +533,21 @@ export default {
                 priorites: [],
                 statut: [],
                 enseignes: [],
-                application_impactee: [],
-            },
+				application_impactee: [],
+			},
+			
+			agence:{
+				description_agence:'',
+				cause_agence:'',
+				impact_agence:'',
+				statut_agence:'',
+				priorite_agence:'',
+				application_agence:[],
+				enseigne_agence:[],
+				references_agence:[],
+				date_debut_agence:'',
+				date_fin_agence:'',
+			},
 
             // Données du formulaire
             form: {
@@ -438,8 +572,8 @@ export default {
                 date_communication_TDC: '',
                 date_qualification_p01: '',
 				date_premiere_com: '',
-            },
-
+			},
+		
             // Règles de validation pour le formulaire
             rules: {
                 date_debut: [
@@ -524,7 +658,9 @@ export default {
             indexRefToDelete: 0,
             indexRefToDeleteApp: 0,
             refToDelete: '',
-            refToDeleteApp: '',
+			refToDeleteApp: '',
+			dialogFormVisible:false,
+			dialogFormVisibleAgence:false
         };
 	},
 
@@ -539,7 +675,7 @@ export default {
 
         onSubmit() {
             this.$refs['form'].validate(valid => {
-                if (valid) {
+                if (valid) { 
                     /*// On vérifie qu'il y a au moins une référence
                     if (this.form.references.length == 0) {
                         alert('Aucune donnée dans les références');
@@ -592,25 +728,43 @@ export default {
                         {
                             this.form.references[i].reference="A venir"
                         }
-                    }
+					}
 
-                    console.log(this.form);
-
-                    this.$http
+                    /*this.$http
                         .put(
                             'http://localhost:5000/api/main-courante',
                             this.form
                         )
                         .then(result => {
-                            //console.log("meh");
                             this.$message({
                                 dangerouslyUseHTMLString: true,
                                 message:
                                     "<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
                                 type: 'success',
                             });
+						})*/
+
+						console.log(this.incident_id)
+
+						this.curID=this.incident_id
+
+						console.log(this.curID)
+
+						this.$http
+							.put('http://localhost:5000/api/main-courante', 
+							this.form
+						)
+						.then(result => {
+                            this.$message({
+                                dangerouslyUseHTMLString: true,
+                                message:
+                                    "<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+                                type: 'success',
+							});
 						})
-                } else {
+
+					}
+                else {
                     /*console.log('error');
                     return false;*/
                     this.$message({
@@ -620,15 +774,346 @@ export default {
                     type: 'error',
                     });
                     return false;
-                }
-            });
-        },
+				}
+			});
+		},
+		
+		///////Partie Agence/////////
+		importer()
+		{
+			const input = document.getElementById('input')
+			input.addEventListener('change', () => {
+				readXlsxFile(input.files[0]).then((rows) => {
+						Axios.get(
+                		'http://localhost:5000/api/reference'
+            			).then(response => {
+							// On parcourt toutes les références de la main courante
+							for(var p=0;p<=response.data.length;p++)
+							{
+								// On parcourt toutes les lignes du fichier Excel des agences
+								for(const row of rows)
+								{	
+									// On vérifie que les différentes références du fichier Excel des agences sont présentes dans la main courante					
+									if(((response.data[p]).reference.includes(row[0]))==true)
+									{		
+										// Si l'état de l'incident est "En cours"								
+										if(row[7].includes("En cours")==true)
+										{
+										this.incident_id=(response.data[p]).incident_id
+										this.curID=(response.data[p]).incident_id
+										
+										console.log(row[0] + " En cours")
+										console.log(this.incident_id)
+				
+										// Permet de récupérer les informations de l'incident
+										this.getIncident(this.incident_id)
+										Axios.get('http://localhost:5000/api/main-courante').then(
+										response => {
+											//Date de début
+											var date=row[1]+''
+											var dateFin=row[2]+''
+											var mois=""
+											// ----- Début des différentes modifs à faire
+											if(row[4].includes("isolée")==true)
+											{
+												this.form.description="Depuis le "+ date[8]+date[9]+"/"+date[4]+date[5]+date[6]+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]+ ", indisponibilité du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-11)+" ("+row[5]+" utilisateurs)"
+											}
+											if(row[4].includes("dégradée")==true)
+											{
+												this.form.description="Depuis le "+ date[8]+date[9]+"/"+date[4]+date[5]+date[6]+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23] + ", dégradation du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-13)+" ("+row[5]+" utilisateurs)"
+											}
 
+											/*if((input.files[0].name).includes("CDN" || "cdn"))
+											{
+												//cocher l'enseigne CDN
+											}
+											if((input.files[0].name).includes("BDDF" || "bddf"))
+											{
+												//cocher l'enseigne BDDF
+											}
+											if((input.files[0].name).includes("BPF" || "bpf"))
+											{
+												//cocher l'enseigne BPF
+											}*/
+
+											this.form.description_impact=row[5]
+											this.form.application_impactee.push({display_name: "Infrastructure Réseau Banque de Détail"})
+											this.form.cause = row[8]
+											this.remoteEnum.priorites=row[6]
+
+											//(statut)
+
+											// Afin d'afficher la date dans le format voulu soit JJ/MM/AAAA
+											if(date[4]+date[5]+date[6]=="Jan")
+											{
+												mois="01"
+											}
+											else if(date[4]+date[5]+date[6]=="Feb")
+											{
+												mois="02"
+											}
+											else if(date[4]+date[5]+date[6]=="Mar")
+											{
+												mois="03"
+											}
+											else if(date[4]+date[5]+date[6]=="Apr")
+											{
+												mois="04"
+											}
+											else if(date[4]+date[5]+date[6]=="May")
+											{
+												mois="05"
+											}
+											else if(date[4]+date[5]+date[6]=="Jun")
+											{
+												mois="06"
+											}
+											else if(date[4]+date[5]+date[6]=="Jul")
+											{
+												mois="07"
+											}
+											else if(date[4]+date[5]+date[6]=="Aug")
+											{
+												mois="08"
+											}
+											else if(date[4]+date[5]+date[6]=="Sep")
+											{
+												mois="09"
+											}
+											else if(date[4]+date[5]+date[6]=="Oct")
+											{
+												mois="10"
+											}
+											else if(date[4]+date[5]+date[6]=="Nov")
+											{
+												mois="11"
+											}
+											else
+											{
+												mois="12"
+											}
+											////// La date et l'heure récupérées ne sont pas les bonnes (14h en plus) 
+											this.form.date_debut=date[11]+date[12]+date[13]+date[14]+"-"+mois+"-"+date[8]+date[9]+" "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]
+											this.form.date_fin=dateFin[11]+dateFin[12]+dateFin[13]+dateFin[14]+"-"+mois+"-"+dateFin[8]+dateFin[9]+" "+dateFin[16]+dateFin[17]+dateFin[18]+dateFin[19]+dateFin[20]+dateFin[21]+dateFin[22]+dateFin[23]
+
+											console.log("/////////////")
+											console.log(this.curID)
+											console.log(this.incident_id)
+											// ----- Fin des modifs
+											// Sauvegarde automatique car pas besoin de modif à la main
+											/*this.$http
+												.put(
+													'http://localhost:5000/api/main-courante',
+													this.form
+												)
+												.then(result => {
+													this.$message({
+														dangerouslyUseHTMLString: true,
+														message:
+															"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+														type: 'success',
+													});
+												})*/
+											})
+											console.log("test")
+										}
+										// Sinon si l'état de l'incident est "Clos"
+										else //if(row[7].includes("Clos")==true)
+										{
+											this.incident_id=(response.data[p]).incident_id
+											this.curID=(response.data[p]).incident_id
+											console.log(row[0] + " Clos")
+											let tableau = []
+											tableau=row
+											var date=tableau[1]+''
+											var dateFin=tableau[2]+''
+											var mois=""
+											this.dialogFormVisibleAgence=true;
+
+											Axios.get('http://localhost:5000/api/main-courante').then(
+												response => {
+													if(tableau[4].includes("isolée")==true)
+													{
+														this.agence.description_agence="Depuis le "+ date[8]+date[9]+"/"+date[4]+date[5]+date[6]+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]+ ", indisponibilité du réseau de données et de la téléphonie à l'agence "+tableau[4].substring(0,tableau[4].length-11)+" ("+tableau[5]+" utilisateurs)"
+													}
+													if(tableau[4].includes("dégradée")==true)
+													{
+														this.agence.description_agence="Depuis le "+ date[8]+date[9]+"/"+date[4]+date[5]+date[6]+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23] + ", dégradation du réseau de données et de la téléphonie à l'agence "+tableau[4].substring(0,tableau[4].length-13)+" ("+tableau[5]+" utilisateurs)"
+													}
+													this.agence.references_agence=tableau[0]
+													this.agence.cause_agence=tableau[8]
+													this.agence.impact_agence=tableau[5]
+													this.agence.priorite_agence=tableau[6]
+													this.agence.statut_agence="Résolu"
+
+													if(date[4]+date[5]+date[6]=="Jan")
+													{
+														mois="01"
+													}
+													else if(date[4]+date[5]+date[6]=="Feb")
+													{
+														mois="02"
+													}
+													else if(date[4]+date[5]+date[6]=="Mar")
+													{
+														mois="03"
+													}
+													else if(date[4]+date[5]+date[6]=="Apr")
+													{
+														mois="04"
+													}
+													else if(date[4]+date[5]+date[6]=="May")
+													{
+														mois="05"
+													}
+													else if(date[4]+date[5]+date[6]=="Jun")
+													{
+														mois="06"
+													}
+													else if(date[4]+date[5]+date[6]=="Jul")
+													{
+														mois="07"
+													}
+													else if(date[4]+date[5]+date[6]=="Aug")
+													{
+														mois="08"
+													}
+													else if(date[4]+date[5]+date[6]=="Sep")
+													{
+														mois="09"
+													}
+													else if(date[4]+date[5]+date[6]=="Oct")
+													{
+														mois="10"
+													}
+													else if(date[4]+date[5]+date[6]=="Nov")
+													{
+														mois="11"
+													}
+													else
+													{
+														mois="12"
+													}
+													////// La date et l'heure récupérées ne sont pas les bonnes (14h en plus) 
+													this.agence.date_debut_agence=date[11]+date[12]+date[13]+date[14]+"-"+mois+"-"+date[8]+date[9]+" "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]
+													this.agence.date_fin_agence=dateFin[11]+dateFin[12]+dateFin[13]+dateFin[14]+"-"+mois+"-"+dateFin[8]+dateFin[9]+" "+dateFin[16]+dateFin[17]+dateFin[18]+dateFin[19]+dateFin[20]+dateFin[21]+dateFin[22]+dateFin[23]
+												}
+											)
+
+											/*this.dialogFormVisible=true
+											this.incident_id=(response.data[p]).incident_id
+											this.curID=(response.data[p]).incident_id
+
+											console.log((response.data[p]).reference + " " + this.incident_id)
+
+											// Permet de récupérer les informations de l'incident
+											this.getIncident((response.data[p]).incident_id)
+											Axios.get('http://localhost:5000/api/main-courante/').then(
+											response => {
+
+
+												// ----- Début des différentes modifs à faire
+												if(row[4].includes("isolée")==true)
+												{
+													this.form.description="Depuis le "+ date[8]+date[9]+"/"+date[4]+date[5]+date[6]+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]+ ", indisponibilité du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-11)+" ("+row[5]+" utilisateurs)"
+												}
+												if(row[4].includes("dégradée")==true)
+												{
+													this.form.description="Depuis le "+ date[8]+date[9]+"/"+date[4]+date[5]+date[6]+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23] + ", dégradation du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-13)+" ("+row[5]+" utilisateurs)"
+												}
+
+												/*if((input.files[0].name).includes("CDN" || "cdn"))
+												{
+													//cocher l'enseigne CDN
+												}
+												if((input.files[0].name).includes("BDDF" || "bddf"))
+												{
+													//cocher l'enseigne BDDF
+												}
+												if((input.files[0].name).includes("BPF" || "bpf"))
+												{
+													//cocher l'enseigne BPF
+												}*/
+
+												/*this.form.description_impact=row[5]
+												this.form.application_impactee.push({display_name: "Infrastructure Réseau Banque de Détail"})
+												this.form.cause = row[8]
+												this.remoteEnum.priorites=row[6]
+												//(statut)
+
+												// Afin d'afficher la date dans le format voulu soit JJ/MM/AAAA
+												if(date[4]+date[5]+date[6]=="Jan")
+												{
+													mois="01"
+												}
+												if(date[4]+date[5]+date[6]=="Feb")
+												{
+													mois="02"
+												}
+												if(date[4]+date[5]+date[6]=="Mar")
+												{
+													mois="03"
+												}
+												if(date[4]+date[5]+date[6]=="Apr")
+												{
+													mois="04"
+												}
+												if(date[4]+date[5]+date[6]=="May")
+												{
+													mois="05"
+												}
+												if(date[4]+date[5]+date[6]=="Jun")
+												{
+													mois="06"
+												}
+												if(date[4]+date[5]+date[6]=="Jul")
+												{
+													mois="07"
+												}
+												if(date[4]+date[5]+date[6]=="Aug")
+												{
+													mois="08"
+												}
+												if(date[4]+date[5]+date[6]=="Sep")
+												{
+													mois="09"
+												}
+												if(date[4]+date[5]+date[6]=="Oct")
+												{
+													mois="10"
+												}
+												if(date[4]+date[5]+date[6]=="Nov")
+												{
+													mois="11"
+												}
+												if(date[4]+date[5]+date[6]=="Dec")
+												{
+													mois="12"
+												}
+												////// La date et l'heure récupérées ne sont pas les bonnes (14h en plus) 
+												this.form.date_debut=date[11]+date[12]+date[13]+date[14]+"-"+mois+"-"+date[8]+date[9]+" "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]
+												this.form.date_fin=dateFin[11]+dateFin[12]+dateFin[13]+dateFin[14]+"-"+mois+"-"+dateFin[8]+dateFin[9]+" "+dateFin[16]+dateFin[17]+dateFin[18]+dateFin[19]+dateFin[20]+dateFin[21]+dateFin[22]+dateFin[23]
+
+
+												// ----- Fin des modifs
+												})*/
+											
+										}
+									}
+
+								}
+							}
+						})
+				})
+			})
+		},
 
         ////////////////////////////////////////
         // Il faudra voir pour dedoublonner ces fonctions mais c'est pas urgent
         ////////////////////////////////////////
-        // Les handler pour la table et le modal des references
+		// Les handler pour la table et le modal des references
+		////////////////////////////////////////
+
         confirmDelete() {
             this.form.references.splice(this.indexToDelete, 1);
             this.delConfirmationModalVisible = false;
@@ -671,12 +1156,23 @@ export default {
 		},
 
 		dupliquer() {
-			console.log(this.incident_id)
 			window.location.href="/#/new-incident/id="+this.incident_id
-			if (this.incident_id!=undefined)
+			if (this.incident_id==undefined)
 			{
 				console.log("ID non existant")
-			}	
+			} else {
+				console.log(this.incident_id)
+			}
+		},
+
+		cosip() {
+			window.location.href='/#/cosip/id='+this.incident_id
+			if (this.incident_id==undefined)
+			{
+				console.log("ID non existant")
+			} else {
+				console.log(this.incident_id)
+			}
 		},
 	
         async envoyerMail() {
@@ -938,9 +1434,6 @@ export default {
                 }
 				
 				console.log(this.form.application_impactee);
-				
-				
-
             });
         },
     },
