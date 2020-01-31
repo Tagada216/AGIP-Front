@@ -8,26 +8,28 @@ dom.watch();
 // https://fontawesome.com/icons?d=gallery&s=solid&m=free
 // Par rapport au site il faut prefixer par "fa" et ajouter le nom de l'icone en camelCase.
 import {
-    faHome, //https://fontawesome.com/icons/home?style=solid
-    faPen, //https://fontawesome.com/icons/pen?style=solid
-    faFile, // etc.
-    faArchive,
-    faHandsHelping,
-    faChartBar,
-    faBookOpen,
-    faSearch,
-    faFileExcel,
+	faHome, //https://fontawesome.com/icons/home?style=solid
+	faPen, //https://fontawesome.com/icons/pen?style=solid
+	faFile, // etc.
+	faArchive,
+	faHandsHelping,
+	faChartBar,
+	faBookOpen,
+	faSearch,
+	faFileExcel,
+	faTasks,
 } from '@fortawesome/free-solid-svg-icons';
 
 library.add(
-    faPen,
-    faFile,
-    faArchive,
-    faHome,
-    faHandsHelping,
-    faChartBar,
-    faBookOpen,
-    faSearch,
-    faFileExcel
+	faPen,
+	faFile,
+	faArchive,
+	faHome,
+	faHandsHelping,
+	faChartBar,
+	faBookOpen,
+	faSearch,
+	faFileExcel,
+	faTasks
 );
 ///////////////////////////////////////////////////////////////////////////////
