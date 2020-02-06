@@ -14,7 +14,7 @@
         <br />
         <br />
         <h1>Notre outil de supervision</h1>
-        <a href="https://moncockpit.safe.socgen/#/"
+        <a href="https://moncockpit.safe.socgen/#/" onclick="window.open(this.href); return false;"
             ><img alt="Vue logo" src="../assets/cockpit-icon-cropped.png"
         /></a>
 

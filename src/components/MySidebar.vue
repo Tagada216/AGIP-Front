@@ -74,7 +74,12 @@ export default {
                     href: '/main-courante',
                     title: 'Main courante',
                     icon: 'fas fa-book-open',
-                },
+				},
+				{
+					href: '/cosip',
+					title: 'COSIP',
+					icon: 'fas fa-tasks',
+				},
                 // {
                 //     href: '/fichier-rouge',
                 //     title: 'Fichier Rouge',
@@ -93,11 +98,6 @@ export default {
                     href: '/problemes',
                     title: 'Liste des problèmes',
                     icon: 'fas fa-hands-helping',
-				},
-				{
-					href:'/cosip',
-					title:'COSIP',
-					icon: 'fas fa-tasks',
 				},
                 {
                     header: true,

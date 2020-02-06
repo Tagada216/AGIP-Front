@@ -42,6 +42,7 @@
 						<el-input
 							id="mois_cosip"
 							placeholder="Mois"
+							v-model="form.mois_cosip"
 						></el-input>
                     </el-form-item>
 
@@ -49,6 +50,7 @@
 						<el-input
 							id="semaine_cosip"
 							placeholder="Semaine COSIP"
+							v-model="form.semaine_cosip"
 						></el-input>
 					</el-form-item>
 
@@ -145,7 +147,7 @@
 										label="Problème ?"
 										prop="probleme"
 									>
-										<el-input placeholder="Problème" id="probleme"></el-input>
+										<el-input id="probleme" placeholder="Problème" v-model="form.probleme"></el-input>
 									</el-form-item>
 								</el-col>
 							</el-row>
@@ -756,7 +758,7 @@
 						</el-col>
 						<el-col :span="12">
 							<el-form-item label="/">
-								<el-input></el-input>
+								<el-input v-model="form.slash"></el-input>
 							</el-form-item>
 						</el-col>
 					</el-row>
@@ -766,6 +768,7 @@
                             type="textarea"
                             :autosize="{ minRows: 4, maxRows: 8 }"
                             placeholder="Commentaire"
+							v-model="form.commentaire"
 						></el-input>
 					</el-form-item>
                 </el-card>
@@ -841,6 +844,13 @@ export default {
     created() {
 		this.getFieldsOptions();
 		this.cosip();
+		this.validateImpactReseauBPF()
+		this.validateImpactClientBPF()
+		this.validateImpactReseauBDDF()
+		this.validateImpactClientBDDF()
+		this.validateImpactReseauCDN()
+		this.validateImpactClientCDN()
+		this.verifCheckEnseignesImpactees()
     },
 
     props: {
@@ -925,7 +935,10 @@ export default {
 				application_impactee: [],
 				responsabilite_id:'',
 				numChangement:'',
-
+				mois_cosip:'',
+				semaine_cosip:'',
+				commentaire:'',
+				slash:''
 			},
 
 			rules:{},
@@ -1131,7 +1144,7 @@ export default {
 						
 						console.log(this.form.application_impactee);
 						})
-			}
+				}
 		},
         // Cette méthode est lancée quand un champ d'appli impacté s'est vu selectionné une appli parmis les propositions
         // Quand tel est le cas, on insere les données de l'appli (CI et trigramme) pour pouvoir la relier en BDD

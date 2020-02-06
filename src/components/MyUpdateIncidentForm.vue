@@ -464,12 +464,30 @@
 								</el-form-item>
 							</el-col>
 						</el-row>
+						<el-form-item label="Enseigne(s) impactée(s)" prop="enseigne_agence">
+							<el-checkbox-group v-model="agence.enseigne_agence">
+								<el-checkbox
+									id="enseigne"
+									v-for="enseigne in remoteEnum.enseignes"
+									:label="enseigne.id"
+									:key="enseigne.id"
+									v-if="!enseigne.is_deprecated"
+									>{{ enseigne.nom }}
+								</el-checkbox>
+                        	</el-checkbox-group>
+						</el-form-item>
 						<el-form-item label="Description" prop="description_agence">
 							<el-input
 								type="textarea"
 								:autosize="{ minRows: 2, maxRows: 8 }"
 								placeholder="Description"
 								v-model="agence.description_agence"
+							></el-input>
+						</el-form-item>
+						<el-form-item label="Application impactée" prop="application_agence">
+							<el-input 
+								placeholder="Application impactée"
+								v-model="agence.application_agence"
 							></el-input>
 						</el-form-item>
 						<el-form-item label="Impact" prop="impact_agence">
@@ -491,6 +509,10 @@
 					</el-card>
 				</el-col>
 				</el-row>
+				<el-form-item style="text-align: center">
+					<el-button type="primary" @click="onSubmitAgence()"
+					>Sauvegarder</el-button>
+        		</el-form-item>
 			</el-form>
 		</el-dialog>
 		<!-- Fin modal -->		
@@ -656,11 +678,11 @@ export default {
             delConfirmationModalVisibleApp: false,
             messageConfirmation: true,
             indexRefToDelete: 0,
-            indexRefToDeleteApp: 0,
+			indexRefToDeleteApp: 0,
             refToDelete: '',
 			refToDeleteApp: '',
 			dialogFormVisible:false,
-			dialogFormVisibleAgence:false
+			dialogFormVisibleAgence:false,
         };
 	},
 
@@ -777,6 +799,36 @@ export default {
 				}
 			});
 		},
+
+		onSubmitAgence() {
+            this.$refs['agence'].validate(valid => {
+                if (valid) {
+					this.curID=this.incident_id
+					console.log(this.curID)
+					console.log(this.incident_id)
+					this.$http
+						.put('http://localhost:5000/api/main-courante',this.agence
+						)
+						.then(result => {
+                            this.$message({
+                                dangerouslyUseHTMLString: true,
+                                message:
+                                    "<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+                                type: 'success',
+							});
+						})
+				}
+                else {
+                    this.$message({
+                    dangerouslyUseHTMLString: true,
+                    message:
+                        "<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Tous les <strong>Champs requis</strong> n'ont pas été remplis.</p>",
+                    type: 'error',
+                    });
+                    return false;
+				}
+			});
+		},
 		
 		///////Partie Agence/////////
 		importer()
@@ -795,7 +847,7 @@ export default {
 								{	
 									// On vérifie que les différentes références du fichier Excel des agences sont présentes dans la main courante					
 									if(((response.data[p]).reference.includes(row[0]))==true)
-									{		
+									{	
 										// Si l'état de l'incident est "En cours"								
 										if(row[7].includes("En cours")==true)
 										{
@@ -804,7 +856,6 @@ export default {
 										
 										console.log(row[0] + " En cours")
 										console.log(this.incident_id)
-				
 										// Permet de récupérer les informations de l'incident
 										this.getIncident(this.incident_id)
 										Axios.get('http://localhost:5000/api/main-courante').then(
@@ -823,18 +874,18 @@ export default {
 												this.form.description="Depuis le "+ date[8]+date[9]+"/"+date[4]+date[5]+date[6]+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23] + ", dégradation du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-13)+" ("+row[5]+" utilisateurs)"
 											}
 
-											/*if((input.files[0].name).includes("CDN" || "cdn"))
+											if((input.files[0].name).includes("CDN" || "cdn"))
 											{
-												//cocher l'enseigne CDN
+												this.agence.enseigne_agence.push(2)
 											}
 											if((input.files[0].name).includes("BDDF" || "bddf"))
 											{
-												//cocher l'enseigne BDDF
+												this.agence.enseigne_agence.push(1)
 											}
 											if((input.files[0].name).includes("BPF" || "bpf"))
 											{
-												//cocher l'enseigne BPF
-											}*/
+												this.agence.enseigne_agence.push(3)
+											}
 
 											this.form.description_impact=row[5]
 											this.form.application_impactee.push({display_name: "Infrastructure Réseau Banque de Détail"})
@@ -900,6 +951,7 @@ export default {
 											console.log(this.curID)
 											console.log(this.incident_id)
 											// ----- Fin des modifs
+
 											// Sauvegarde automatique car pas besoin de modif à la main
 											/*this.$http
 												.put(
@@ -929,7 +981,6 @@ export default {
 											var dateFin=tableau[2]+''
 											var mois=""
 											this.dialogFormVisibleAgence=true;
-
 											Axios.get('http://localhost:5000/api/main-courante').then(
 												response => {
 													if(tableau[4].includes("isolée")==true)
@@ -945,6 +996,23 @@ export default {
 													this.agence.impact_agence=tableau[5]
 													this.agence.priorite_agence=tableau[6]
 													this.agence.statut_agence="Résolu"
+													
+
+													if((input.files[0].name).includes("CDN" || "cdn"))
+													{
+														this.agence.enseigne_agence.push(2)
+													}
+													if((input.files[0].name).includes("BDDF" || "bddf"))
+													{
+														this.agence.enseigne_agence.push(1)
+													}
+													if((input.files[0].name).includes("BPF" || "bpf"))
+													{
+														this.agence.enseigne_agence.push(3)
+													}
+
+													this.agence.application_agence="Infrastructure Réseau Banque de Détail"
+
 
 													if(date[4]+date[5]+date[6]=="Jan")
 													{
@@ -994,110 +1062,12 @@ export default {
 													{
 														mois="12"
 													}
+
 													////// La date et l'heure récupérées ne sont pas les bonnes (14h en plus) 
 													this.agence.date_debut_agence=date[11]+date[12]+date[13]+date[14]+"-"+mois+"-"+date[8]+date[9]+" "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]
 													this.agence.date_fin_agence=dateFin[11]+dateFin[12]+dateFin[13]+dateFin[14]+"-"+mois+"-"+dateFin[8]+dateFin[9]+" "+dateFin[16]+dateFin[17]+dateFin[18]+dateFin[19]+dateFin[20]+dateFin[21]+dateFin[22]+dateFin[23]
 												}
 											)
-
-											/*this.dialogFormVisible=true
-											this.incident_id=(response.data[p]).incident_id
-											this.curID=(response.data[p]).incident_id
-
-											console.log((response.data[p]).reference + " " + this.incident_id)
-
-											// Permet de récupérer les informations de l'incident
-											this.getIncident((response.data[p]).incident_id)
-											Axios.get('http://localhost:5000/api/main-courante/').then(
-											response => {
-
-
-												// ----- Début des différentes modifs à faire
-												if(row[4].includes("isolée")==true)
-												{
-													this.form.description="Depuis le "+ date[8]+date[9]+"/"+date[4]+date[5]+date[6]+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]+ ", indisponibilité du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-11)+" ("+row[5]+" utilisateurs)"
-												}
-												if(row[4].includes("dégradée")==true)
-												{
-													this.form.description="Depuis le "+ date[8]+date[9]+"/"+date[4]+date[5]+date[6]+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23] + ", dégradation du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-13)+" ("+row[5]+" utilisateurs)"
-												}
-
-												/*if((input.files[0].name).includes("CDN" || "cdn"))
-												{
-													//cocher l'enseigne CDN
-												}
-												if((input.files[0].name).includes("BDDF" || "bddf"))
-												{
-													//cocher l'enseigne BDDF
-												}
-												if((input.files[0].name).includes("BPF" || "bpf"))
-												{
-													//cocher l'enseigne BPF
-												}*/
-
-												/*this.form.description_impact=row[5]
-												this.form.application_impactee.push({display_name: "Infrastructure Réseau Banque de Détail"})
-												this.form.cause = row[8]
-												this.remoteEnum.priorites=row[6]
-												//(statut)
-
-												// Afin d'afficher la date dans le format voulu soit JJ/MM/AAAA
-												if(date[4]+date[5]+date[6]=="Jan")
-												{
-													mois="01"
-												}
-												if(date[4]+date[5]+date[6]=="Feb")
-												{
-													mois="02"
-												}
-												if(date[4]+date[5]+date[6]=="Mar")
-												{
-													mois="03"
-												}
-												if(date[4]+date[5]+date[6]=="Apr")
-												{
-													mois="04"
-												}
-												if(date[4]+date[5]+date[6]=="May")
-												{
-													mois="05"
-												}
-												if(date[4]+date[5]+date[6]=="Jun")
-												{
-													mois="06"
-												}
-												if(date[4]+date[5]+date[6]=="Jul")
-												{
-													mois="07"
-												}
-												if(date[4]+date[5]+date[6]=="Aug")
-												{
-													mois="08"
-												}
-												if(date[4]+date[5]+date[6]=="Sep")
-												{
-													mois="09"
-												}
-												if(date[4]+date[5]+date[6]=="Oct")
-												{
-													mois="10"
-												}
-												if(date[4]+date[5]+date[6]=="Nov")
-												{
-													mois="11"
-												}
-												if(date[4]+date[5]+date[6]=="Dec")
-												{
-													mois="12"
-												}
-												////// La date et l'heure récupérées ne sont pas les bonnes (14h en plus) 
-												this.form.date_debut=date[11]+date[12]+date[13]+date[14]+"-"+mois+"-"+date[8]+date[9]+" "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]
-												this.form.date_fin=dateFin[11]+dateFin[12]+dateFin[13]+dateFin[14]+"-"+mois+"-"+dateFin[8]+dateFin[9]+" "+dateFin[16]+dateFin[17]+dateFin[18]+dateFin[19]+dateFin[20]+dateFin[21]+dateFin[22]+dateFin[23]
-
-
-												// ----- Fin des modifs
-												})*/
-											
 										}
 									}
 
@@ -1141,6 +1111,22 @@ export default {
         },
         handleCreateApp() {
             this.form.application_impactee.push({ display_name: '' });
+		},
+
+		//
+		confirmDeleteAppAgence() {
+            this.agence.application_agence.splice(this.indexRefToDeleteAppAgence, 1);
+            this.delConfirmationModalVisibleApp = false;
+        },
+        handleDeleteAppAgence(index) {
+            this.indexRefToDeleteAppAgence = index;
+            this.refToDeleteAppAgence = this.agence.application_agence[
+                index
+            ].application_agence;
+            this.delConfirmationModalVisibleApp = true;
+        },
+        handleCreateAppAgence() {
+            this.agence.application_agence.push({ display_name_agence: '' });
         },
         ////////////////////////////////////////
 
@@ -1411,7 +1397,7 @@ export default {
 				this.form.application_impactee = [];
 
                 for (const ens_id of response.data[0].id_enseigne.split('/')) {
-                    this.form.enseigne_impactee.push(parseInt(ens_id));
+					this.form.enseigne_impactee.push(parseInt(ens_id));
                 }
 
                 for (
