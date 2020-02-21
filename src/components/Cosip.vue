@@ -84,7 +84,7 @@
 							<el-form-item label="Statut" prop="statut_id">
 								<el-select
 									id="statut_id"
-									v-model="value"
+									v-model="form.statut_id"
 								>
 									<el-option
 										v-for="item in options"
@@ -218,7 +218,6 @@
 										<el-col :span="6">
 											<el-form-item label="Priorité" prop="priorite_idBDDF">
 												<el-select
-													id="priorite_idBDDF"
 													v-model="form.priorite_idBDDF"
 												>
 													<el-option
@@ -261,7 +260,7 @@
 															Durée d'indisponibilité
 														</el-col>
 														<el-col :span="12">
-															<el-input placeholder="HH:MM"></el-input>
+															<el-input placeholder="HH:MM" v-model="form.indispoBDDF"></el-input>
 														</el-col>
 													</el-row>
 													<el-row :gutter="20" style="margin-bottom:10px;">
@@ -269,7 +268,7 @@
 															Nombre d'utilisateurs
 														</el-col>
 														<el-col :span="12">
-															<el-input></el-input>
+															<el-input v-model="form.nbUtilisateurBDDF"></el-input>
 														</el-col>
 													</el-row>
 													<el-row :gutter="20" style="margin-bottom:10px;">
@@ -277,7 +276,7 @@
 															Taux d'indisponibilité
 														</el-col>
 														<el-col :span="12">
-															<el-input placeholder="%"></el-input>
+															<el-input placeholder="%" v-model="form.tauxIndispoBDDF"></el-input>
 														</el-col>
 													</el-row>
 													<el-row :gutter="20" style="margin-bottom:10px;">
@@ -300,7 +299,7 @@
 														Logitelnet/SCAD
 													</el-col>
 													<el-col :span="12">
-														<el-input></el-input>
+														<el-input v-model="form.logitelBDDF"></el-input>
 													</el-col>
 												</el-row>
 												<el-row :gutter="20" style="margin-bottom:10px;">
@@ -308,7 +307,7 @@
 														3955/3933
 													</el-col>
 													<el-col :span="12">
-														<el-input></el-input>
+														<el-input v-model="form.chiffreBDDF"></el-input>
 													</el-col>
 												</el-row>
 												<el-row :gutter="20" style="margin-bottom:10px;">
@@ -316,7 +315,7 @@
 														DAB
 													</el-col>
 													<el-col :span="12">
-														<el-input></el-input>
+														<el-input v-model="form.dabBDDF"></el-input>
 													</el-col>
 												</el-row>
 												<el-row :gutter="20" style="margin-bottom:10px;">
@@ -324,7 +323,7 @@
 														Progeliance net/EIPRO
 													</el-col>
 													<el-col :span="12">
-														<el-input></el-input>
+														<el-input v-model="form.progelianceBDDF"></el-input>
 													</el-col>
 												</el-row>
 												<el-row :gutter="20" style="margin-bottom:10px;">
@@ -332,7 +331,7 @@
 														ETECE
 													</el-col>
 													<el-col :span="12">
-														<el-input></el-input>
+														<el-input v-model="form.eteceBDDF"></el-input>
 													</el-col>
 												</el-row>
 											</el-card>
@@ -344,7 +343,7 @@
 											type="textarea"
 											:autosize="{ minRows: 4, maxRows: 8 }"
 											placeholder="Impact"
-											v-model="form.description_impacBDDF"
+											v-model="form.description_impactBDDF"
 										></el-input>
 									</el-form-item>
 									<el-table :data="form.application_impactee" border style="margin-bottom:20px;">
@@ -438,7 +437,7 @@
 														Durée d'indisponibilité
 													</el-col>
 													<el-col :span="12">
-														<el-input placeholder="HH:MM"></el-input>
+														<el-input placeholder="HH:MM" v-model="form.indispoCDN"></el-input>
 													</el-col>
 												</el-row>
 												<el-row :gutter="20" style="margin-bottom:10px;">
@@ -446,7 +445,7 @@
 														Nombre d'utilisateurs
 													</el-col>
 													<el-col :span="12">
-														<el-input></el-input>
+														<el-input v-model="form.nbUtilisateurCDN"></el-input>
 													</el-col>
 												</el-row>
 												<el-row :gutter="20" style="margin-bottom:10px;">
@@ -454,7 +453,7 @@
 														Taux d'indisponibilité
 													</el-col>
 													<el-col :span="12">
-														<el-input placeholder="%"></el-input>
+														<el-input placeholder="%" v-model="form.tauxIndispoCDN"></el-input>
 													</el-col>
 												</el-row>
 												<el-row :gutter="20" style="margin-bottom:10px;">
@@ -480,7 +479,7 @@
 														DAB
 													</el-col>
 													<el-col :span="12">
-														<el-input></el-input>
+														<el-input v-model="form.dabCDN"></el-input>
 													</el-col>
 												</el-row>
 												<el-row :gutter="20" style="margin-bottom:10px;">
@@ -488,7 +487,7 @@
 														Internet client
 													</el-col>
 													<el-col :span="12">
-														<el-input></el-input>
+														<el-input v-model="form.internetClientCDN"></el-input>
 													</el-col>
 												</el-row>
 												<el-row :gutter="20" style="margin-bottom:10px;">
@@ -496,7 +495,7 @@
 														Internet mobile
 													</el-col>
 													<el-col :span="12">
-														<el-input></el-input>
+														<el-input v-model="form.internetMobileCDN"></el-input>
 													</el-col>
 												</el-row>
 												<el-row :gutter="20" style="margin-bottom:10px;">
@@ -504,7 +503,7 @@
 														ETECE
 													</el-col>
 													<el-col :span="12">
-														<el-input></el-input>
+														<el-input v-model="form.eteceCDN"></el-input>
 													</el-col>
 												</el-row>
 											</el-card>
@@ -610,7 +609,7 @@
 															Durée d'indisponibilité
 														</el-col>
 														<el-col :span="12">
-															<el-input placeholder="HH:MM"></el-input>
+															<el-input placeholder="HH:MM" v-model="form.indispoBPF"></el-input>
 														</el-col>
 													</el-row>
 													<el-row :gutter="20" style="margin-bottom:10px;">
@@ -618,7 +617,7 @@
 															Nombre d'utilisateurs
 														</el-col>
 														<el-col :span="12">
-															<el-input></el-input>
+															<el-input v-model="form.nbUtilisateurBPF"></el-input>
 														</el-col>
 													</el-row>
 													<el-row :gutter="20" style="margin-bottom:10px;">
@@ -626,7 +625,7 @@
 															Taux d'indisponibilité
 														</el-col>
 														<el-col :span="12">
-															<el-input placeholder="%"></el-input>
+															<el-input placeholder="%" v-model="form.tauxIndispoBPF"></el-input>
 														</el-col>
 													</el-row>
 													<el-row :gutter="20" style="margin-bottom:10px;">
@@ -649,7 +648,7 @@
 														Logitelnet/SCAD
 													</el-col>
 													<el-col :span="12">
-														<el-input></el-input>
+														<el-input v-model="form.logitelBPF"></el-input>
 													</el-col>
 												</el-row>
 												<el-row :gutter="20" style="margin-bottom:10px;">
@@ -657,7 +656,7 @@
 														3955/3933
 													</el-col>
 													<el-col :span="12">
-														<el-input></el-input>
+														<el-input v-model="form.chiffreBPF"></el-input>
 													</el-col>
 												</el-row>
 												<el-row :gutter="20" style="margin-bottom:10px;">
@@ -665,7 +664,7 @@
 														DAB
 													</el-col>
 													<el-col :span="12">
-														<el-input></el-input>
+														<el-input v-model="form.dabBPF"></el-input>
 													</el-col>
 												</el-row>
 												<el-row :gutter="20" style="margin-bottom:10px;">
@@ -673,7 +672,7 @@
 														Progeliance net/EIPRO
 													</el-col>
 													<el-col :span="12">
-														<el-input></el-input>
+														<el-input v-model="form.progelianceBPF"></el-input>
 													</el-col>
 												</el-row>
 												<el-row :gutter="20" style="margin-bottom:10px;">
@@ -681,7 +680,7 @@
 														ETECE
 													</el-col>
 													<el-col :span="12">
-														<el-input></el-input>
+														<el-input v-model="form.eteceBPF"></el-input>
 													</el-col>
 												</el-row>
 											</el-card>
@@ -931,6 +930,7 @@ export default {
                 is_contournement: false, //
 				priorite_idCDN: '', //
 				priorite_idBDDF: '', //
+				priorite_idBPF:'',
                 enseigne_impactee: [],
 				application_impactee: [],
 				responsabilite_id:'',
@@ -938,7 +938,43 @@ export default {
 				mois_cosip:'',
 				semaine_cosip:'',
 				commentaire:'',
-				slash:''
+				slash:'',
+				statut_id:'',
+
+				// Impact Réseau BDDF
+				indispoBDDF:'',
+				nbUtilisateurBDDF:'',
+				tauxIndispoBDDF:'',
+
+				// Impact Client BDDF
+				logitelBDDF:'',
+				chiffreBDDF:'',
+				dabBDDF:'',
+				progelianceBDDF:'',
+				eteceBDDF:'',
+
+				// Impact Réseau BPF
+				indispoBPF:'',
+				nbUtilisateurBPF:'',
+				tauxIndispoBPF:'',
+
+				// Impact Client BPF
+				logitelBPF:'',
+				chiffreBPF:'',
+				dabBPF:'',
+				progelianceBPF:'',
+				eteceBPF:'',
+
+				// Impact Réseau CDN
+				indispoCDN:'',
+				nbUtilisateurCDN:'',
+				tauxIndispoCDN:'',
+
+				// Impact Client
+				dabCDN:'',
+				internetClientCDN:'',
+				internetMobileCDN:'',
+				eteceCDN:''
 			},
 
 			rules:{},
@@ -1043,8 +1079,8 @@ export default {
 			}
 		},
 
-		verifCheckEnseignesImpactees(){
-
+		verifCheckEnseignesImpactees()
+		{
 			if(this.form.enseigne_impactee[0]==1 || this.form.enseigne_impactee[1]==1 || this.form.enseigne_impactee[2]==1)
 			{
 				console.log("BDDF")
@@ -1086,7 +1122,6 @@ export default {
 			if(test!=-1)
 			{
 				var idIncident=window.location.href.substr(test+1)
-				console.log(idIncident)
 			}
 
 			// On récupère les informations de l'incident à dupliquer et on les affiche dans les champs correspondant
@@ -1094,14 +1129,14 @@ export default {
 			{
 				Axios.get('http://localhost:5000/api/main-courante/' + idIncident).then(
 					response => {
+						console.log(response.data[0].statut)
 						this.form.incident_id=idIncident
 						this.form.description=response.data[0].description
+						//this.form.description_impact=response.data[0].description_impact
+						this.form.priorite_id=response.data[0].priorite
 						this.form.date_debut = response.data[0].date_debut;
                 		this.form.date_fin = response.data[0].date_fin;
-						this.form.description_impactCDN = response.data[0].description_impact;
-						this.form.description_impactBDDF = response.data[0].description_impact;
-                		this.form.statut_id = response.data[0].statut;
-						this.form.priorite_id = response.data[0].priorite;
+                		//this.form.statut_id = response.data[0].statut;
 						this.form.is_faux_incident = response.data[0].is_faux_incident
                     	? true
                     	: false;
@@ -1117,7 +1152,44 @@ export default {
 						this.form.action_retablissement=response.data[0].action_retablissement
 						this.form.date_premiere_com = response.data[0].date_premier_com;
 						this.form.cause = response.data[0].cause;
-		                this.form.date_detection = response.data[0].date_detection;
+						this.form.date_detection = response.data[0].date_detection;
+						const dateDebut = new Date(response.data[0].date_debut);
+						var numeroMois = dateDebut.getMonth()+1
+
+						this.form.description_impactCDN=response.data[0].description_impact
+						this.form.description_impactBDDF=response.data[0].description_impact
+						this.form.description_impactBPF=response.data[0].description_impact
+
+						this.form.priorite_idCDN=response.data[0].priorite
+						this.form.priorite_idBDDF=response.data[0].priorite
+						this.form.priorite_idBPF=response.data[0].priorite
+						
+
+
+						// Ajout d'un 0 devant le mois si celui-ci est inférieur strict à 10
+						if(numeroMois<10)
+						{
+							numeroMois="0"+numeroMois
+						}
+
+						this.form.mois_cosip=dateDebut.getFullYear()+"/"+numeroMois;
+
+
+						//Calcul du numéro de la semaine en fonction de la date de début
+						var jour = dateDebut.getDay();
+						dateDebut.setDate(dateDebut.getDate() - (jour + 6) % 7 + 3);
+						var ms = dateDebut.valueOf();
+						dateDebut.setMonth(0)
+						dateDebut.setDate(4)
+						var semaineCosip = Math.round((ms - dateDebut.valueOf()) / (7*864e5))+1
+						//Fin du calcul
+
+						this.form.semaine_cosip=dateDebut.getFullYear()+"/S"+semaineCosip
+
+						if(response.data[0].statut==5)
+						{
+							this.form.statut_id="Terminé"
+						}
 
 						for (const ens_id of response.data[0].id_enseigne.split('/')) {
 							this.form.enseigne_impactee.push(parseInt(ens_id));
@@ -1141,7 +1213,6 @@ export default {
 							
 							this.form.application_impactee.push({display_name: app })
 						}
-						
 						console.log(this.form.application_impactee);
 						})
 				}

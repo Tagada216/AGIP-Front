@@ -274,6 +274,197 @@
         <el-form-item style="text-align: center">
             <el-button type="primary" @click="submit()">Sauvegarder</el-button>
         </el-form-item>
+
+
+		<!-- Partie Agence -->
+		<!-- <el-dialog
+			title="Agences isolées"
+			:visible.sync="ajoutIncidentsAgencesVisible"
+			width="80%"
+			center
+		>
+			<el-form ref="agence" :model="agence" :rules="rules" label-position="top">
+					<el-row :gutter="20">
+						<el-col :span="6">
+
+							<el-card>
+								<div slot="header">
+									<h4 class="card-header">Référence(s) de l'incident</h4>
+								</div>
+								<el-input
+									v-model="agence.references"
+								></el-input>
+							</el-card>
+
+							<el-card>
+								<div slot="header">
+									<h4 class="card-header">Horodatages de l'incident</h4>
+								</div>
+
+								<el-form-item label="Début de l'incident" prop="date_debut">
+									<el-date-picker
+										v-model="agence.date_debut"
+										type="datetime"
+										placeholder="Selectionnez l'horodatage"
+										format="dd/MM/yyyy HH:mm:ss"
+										value-format="yyyy-MM-dd HH:mm:ss"
+									></el-date-picker>
+								</el-form-item>
+
+								<el-form-item label="Faux incident ?">
+									<el-col :span="3.5">
+										<el-switch
+											style="display: block"
+											v-model="agence.is_faux_incident"
+											active-color="#13ce66"
+											inactive-color="#ff4949"
+											active-text="Oui"
+											inactive-text="Non"
+										></el-switch>
+									</el-col>
+								</el-form-item>
+
+								<el-form-item label="Fin de l'incident">
+									<el-date-picker
+										v-model="agence.date_fin"
+										type="datetime"
+										placeholder="Selectionnez l'horodatage"
+										format="dd/MM/yyyy HH:mm:ss"
+										value-format="yyyy-MM-dd HH:mm:ss"
+										:disabled="agence.is_faux_incident"
+									/>
+								</el-form-item>
+							</el-card>
+
+						</el-col>
+
+
+						<el-col :span="18">
+
+							<el-card>
+								<div slot="header">
+									<h4 class="card-header">Informations générales de l'incident</h4>
+								</div>
+
+								<el-row :gutter="20">
+									<el-col :span="6">
+										<el-form-item label="Priorité" prop="priorite_id">
+											<el-select v-model="agence.priorite_id">
+												<el-option
+													v-for="item in remoteEnum.priorites"
+													:key="item.id"
+													:label="item.priorite"
+													:value="item.id"
+												></el-option>
+											</el-select>
+										</el-form-item>
+									</el-col>
+
+									<el-col :span="6">
+										<el-form-item label="Statut" prop="statut_id">
+											<el-select v-model="agence.statut_id">
+												<el-option
+													v-for="item in remoteEnum.statut"
+													:key="item.id"
+													:label="item.nom"
+													:value="item.id"
+												></el-option>
+											</el-select>
+										</el-form-item>
+									</el-col>
+								</el-row>
+
+								<el-form-item label="Enseigne(s) impactée(s)" prop="enseigne_impactee">
+									<el-select v-model="agence.enseigne_impactee">
+										<el-option
+											v-for="enseigne in remoteEnum.enseignes"
+											:label="enseigne.nom"
+											:key="enseigne.id"
+											:value="enseigne.id"
+										></el-option>
+									</el-select>
+								</el-form-item>
+
+								<el-form-item label="Description" prop="description">
+									<el-input
+										type="textarea"
+										:autosize="{ minRows: 2, maxRows: 8 }"
+										placeholder="Description"
+										v-model="agence.description"
+									></el-input>
+								</el-form-item>
+
+								<el-form-item label="Impact" prop="description_impact">
+									<el-input
+										type="textarea"
+										:autosize="{ minRows: 4, maxRows: 8 }"
+										placeholder="Impact"
+										v-model="agence.description_impact"
+									></el-input>
+								</el-form-item>
+
+								<el-form-item label="Un contournement existe ?">
+									<el-col :span="3.5">
+										<el-switch
+											style="display: block"
+											v-model="agence.is_contournement"
+											active-color="#13ce66"
+											inactive-color="#ff4949"
+											active-text="Oui"
+											inactive-text="Non"
+											@change="setContournementRule()"
+										></el-switch>
+									</el-col>
+								</el-form-item>
+
+								<el-form-item
+									label="Description du contournement"
+									prop="description_contournement"
+								>
+									<el-input
+										type="textarea"
+										:autosize="{ minRows: 4, maxRows: 8 }"
+										placeholder="Contournement"
+										v-model="agence.description_contournement"
+										:disabled="!agence.is_contournement"
+									></el-input>
+								</el-form-item>
+								<el-table :data="agence.application_impactee" border>
+									<el-table-column
+										label="Application(s) impactée(s)"
+										prop="application_impactee"
+									>
+										<template slot-scope="scope">
+											<el-autocomplete
+												placeholder="Application impactée"
+												v-model="
+													agence.application_impactee[scope.$index]
+														.display_name 
+												"
+												:fetch-suggestions="getMatchingApplications"
+												value-key="display_name"
+												@select="appSelected"
+											></el-autocomplete>
+										</template>
+									</el-table-column>
+								</el-table>
+								<el-form-item
+									label="Cause"
+									prop="cause"
+								>
+									<el-input
+										type="textarea"
+										:autosize="{minRows:4, maxRows:8}"
+										placeholder="Cause"
+										v-model="agence.cause"
+									></el-input>
+								</el-form-item>
+							</el-card>
+						</el-col>
+					</el-row>
+			</el-form>
+		</el-dialog> -->
+		<!-- Fin partie agence -->
     </el-form>
 </template>
 
@@ -284,6 +475,7 @@ import { thisExpression } from 'babel-types';
 import Axios from 'axios';
 import { win32 } from 'path';
 import readXlsxFile from 'read-excel-file'
+import { Loading } from 'element-ui';
 export default {
 	components: { MyUpdateIncidentForm },
 	
@@ -322,10 +514,27 @@ export default {
                 statut_id: '', //
                 enseigne_impactee: [],
                 application_impactee: [],
+			},
+			
+			// Données du formulaire agence
+            agence: {
+                references: '', //
+                is_faux_incident: false, //
+                date_debut: '', //
+                date_fin: null, //
+                description: '', //
+                description_impact: '', //
+                description_contournement: 'Aucun contournement', //
+                is_contournement: false, //
+                priorite_id: '', //
+                statut_id: '', //
+                enseigne_impactee: '',
+				application_impactee: [],
+				cause:'',
             },
 
             // Règles de validation pour le formulaire
-            rules: {
+           rules: {
                 date_debut: [
                     {
                         required: true,
@@ -392,7 +601,8 @@ export default {
             indexRefToDelete: 0,
             indexRefToDeleteApp: 0,
             refToDelete: '',
-            refToDeleteApp: '',
+			refToDeleteApp: '',
+			ajoutIncidentsAgencesVisible: false,
         };
     },
     methods: {
@@ -503,161 +713,221 @@ export default {
 				readXlsxFile(input.files[0]).then((rows) => {
 					for(const row of rows)
 					{
-						/// Penser à vérifier que les références présentes dans le fichier excel n'existent pas encore dans la main courante
-
 						// Si le statut est en cours on ajoute l'incident dans la main courante
 						if(row[7].includes("En cours"))
 						{
+							//this.ajoutIncidentsAgencesVisible=true
 							Axios.get('http://localhost:5000/api/main-courante').then(
-							response => {
-							//Date de début
-							var date=row[1]+''
-							var dateFin=row[2]+''
-							var mois=""
-							// ----- Début des différentes modifs à faire
+								response => {
+									//Date de début
+									var date=row[1]+''
+									var dateFin=row[2]+''
+									var mois=""
+									var moisFin=""
+									// ----- Début des différentes modifs à faire
 
-							this.form.references.push({reference: row[0]})
+									this.agence.references=row[0]
 
-							if((input.files[0].name).includes("CDN" || "cdn"))
-							{
-								this.form.enseigne_impactee.push(2)
-							}
-							if((input.files[0].name).includes("BDDF" || "bddf"))
-							{
-								this.form.enseigne_impactee.push(1)
-							}
-							if((input.files[0].name).includes("BPF" || "bpf"))
-							{
-								this.form.enseigne_impactee.push(3)
-							}
+									if((input.files[0].name).includes("CDN" || "cdn"))
+									{
+										this.agence.enseigne_impactee=2
+									}
+									if((input.files[0].name).includes("BDDF" || "bddf"))
+									{
+										this.agence.enseigne_impactee=1
+									}
+									if((input.files[0].name).includes("BPF" || "bpf"))
+									{
+										this.agence.enseigne_impactee=3
+									}
 
-							this.form.description_impact=row[5]
-							this.form.application_impactee.push({display_name: "Infrastructure Réseau Banque de Détail"})
-							//this.form.cause = row[8]
-
-							////////////// Statut ///////////////
-							if(row[7].includes("En cours")==true)
-							{
-								this.form.statut_id=2
-							}
-
-							if(row[7].includes("Clos")==true)
-							{
-								this.form.statut_id=5
-							}
-							////////////////////////////////////
-
-
-							////////// Priorité /////////////
-							if(row[6].includes("P0")==true)
-							{
-								this.form.priorite_id=1
-							}
+									this.agence.description_impact=row[5]
 											
-							if(row[6].includes("P1")==true)
-							{
-								this.form.priorite_id=2
-							}
-											
-							if(row[6].includes("P2")==true)
-							{
-								this.form.priorite_id=3
-							}
-											
-							if(row[6].includes("P3")==true)
-							{
-								this.form.priorite_id=4
-							}
-											
-							if(row[6].includes("P4")==true)
-							{
-								this.form.priorite_id=5
-							}
-							//////////////////////////////////
+									if(this.agence.application_impactee.length>=1)
+									{
+										console.log("L'application est déjà présente dans le champ application impactée")
+									}
+									else{
+										this.agence.application_impactee.push({display_name: "Infrastructure Réseau Banque de Détail"})
+									}
 
-							// Afin d'afficher la date dans le format voulu soit JJ/MM/AAAA
-							if(date[4]+date[5]+date[6]=="Jan")
-							{
-								mois="01"
-							}
-							else if(date[4]+date[5]+date[6]=="Feb")
-							{
-								mois="02"
-							}
-							else if(date[4]+date[5]+date[6]=="Mar")
-							{
-								mois="03"
-							}
-							else if(date[4]+date[5]+date[6]=="Apr")
-							{
-								mois="04"
-							}
-							else if(date[4]+date[5]+date[6]=="May")
-							{
-								mois="05"
-							}
-							else if(date[4]+date[5]+date[6]=="Jun")
-							{
-								mois="06"
-							}
-							else if(date[4]+date[5]+date[6]=="Jul")
-							{
-								mois="07"
-							}
-							else if(date[4]+date[5]+date[6]=="Aug")
-							{
-								mois="08"
-							}
-							else if(date[4]+date[5]+date[6]=="Sep")
-							{
-								mois="09"
-							}
-							else if(date[4]+date[5]+date[6]=="Oct")
-							{
-								mois="10"
-							}
-							else if(date[4]+date[5]+date[6]=="Nov")
-							{
-								mois="11"
-							}
-							else
-							{
-								mois="12"
-							}
+									this.agence.cause = row[8]
 
-							if(row[4].includes("isolée")==true)
-							{
-								this.form.description="Depuis le "+ date[8]+date[9]+"/"+mois+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]+ ", indisponibilité du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-11)+" ("+row[5]+" utilisateurs)"
-							}
-							if(row[4].includes("dégradée")==true)
-							{
-								this.form.description="Depuis le "+ date[8]+date[9]+"/"+mois+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23] + ", dégradation du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-13)+" ("+row[5]+" utilisateurs)"
-							}
-							
-							////// La date et l'heure récupérées ne sont pas les bonnes (14h en plus) 
-							this.form.date_debut=date[11]+date[12]+date[13]+date[14]+"-"+mois+"-"+date[8]+date[9]+" "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]
-							this.form.date_fin=dateFin[11]+dateFin[12]+dateFin[13]+dateFin[14]+"-"+mois+"-"+dateFin[8]+dateFin[9]+" "+dateFin[16]+dateFin[17]+dateFin[18]+dateFin[19]+dateFin[20]+dateFin[21]+dateFin[22]+dateFin[23]
-					
-							//this.submit()
+									////////////// Statut ///////////////
+									if(row[7].includes("En cours")==true)
+									{
+										this.agence.statut_id=2
+									}
 
-							this.$http
-								.post(
-									'http://localhost:5000/api/main-courante',
-									this.form
-								)
-								.then(result => {
-									this.$message({
-										dangerouslyUseHTMLString: true,
-										message:
-											"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-										type: 'success',
+									if(row[7].includes("Clos")==true)
+									{
+										this.agence.statut_id=5
+									}
+									////////////////////////////////////
+
+
+									////////// Priorité /////////////
+									if(row[6].includes("P0")==true)
+									{
+										this.agence.priorite_id=1
+									}
+															
+									if(row[6].includes("P1")==true)
+									{
+										this.agence.priorite_id=2
+									}
+															
+									if(row[6].includes("P2")==true)
+									{
+										this.agence.priorite_id=3
+									}
+															
+									if(row[6].includes("P3")==true)
+									{
+										this.agence.priorite_id=4
+									}
+															
+									if(row[6].includes("P4")==true)
+									{
+										this.agence.priorite_id=5
+									}
+									//////////////////////////////////
+
+									// Afin d'afficher la date dans le format voulu soit JJ/MM/AAAA
+									if(date[4]+date[5]+date[6]=="Jan")
+									{
+										mois="01"
+									}
+									else if(date[4]+date[5]+date[6]=="Feb")
+									{
+										mois="02"
+									}
+									else if(date[4]+date[5]+date[6]=="Mar")
+									{
+										mois="03"
+									}
+									else if(date[4]+date[5]+date[6]=="Apr")
+									{
+										mois="04"
+									}
+									else if(date[4]+date[5]+date[6]=="May")
+									{
+										mois="05"
+									}
+									else if(date[4]+date[5]+date[6]=="Jun")
+									{
+										mois="06"
+									}
+									else if(date[4]+date[5]+date[6]=="Jul")
+									{
+										mois="07"
+									}
+									else if(date[4]+date[5]+date[6]=="Aug")
+									{
+										mois="08"
+									}
+									else if(date[4]+date[5]+date[6]=="Sep")
+									{
+										mois="09"
+									}
+									else if(date[4]+date[5]+date[6]=="Oct")
+									{
+										mois="10"
+									}
+									else if(date[4]+date[5]+date[6]=="Nov")
+									{
+										mois="11"
+									}
+									else
+									{
+										mois="12"
+									}
+
+
+									// Afin d'afficher la date dans le format voulu soit JJ/MM/AAAA
+									if(dateFin[4]+dateFin[5]+dateFin[6]=="Jan")
+									{
+										moisFin="01"
+									}
+									else if(dateFin[4]+dateFin[5]+dateFin[6]=="Feb")
+									{
+										moisFin="02"
+									}
+									else if(dateFin[4]+dateFin[5]+dateFin[6]=="Mar")
+									{
+										moisFin="03"
+									}
+									else if(dateFin[4]+dateFin[5]+dateFin[6]=="Apr")
+									{
+										moisFin="04"
+									}
+									else if(dateFin[4]+dateFin[5]+dateFin[6]=="May")
+									{
+										moisFin="05"
+									}
+									else if(dateFin[4]+dateFin[5]+dateFin[6]=="Jun")
+									{
+										moisFin="06"
+									}
+									else if(dateFin[4]+dateFin[5]+dateFin[6]=="Jul")
+									{
+										moisFin="07"
+									}
+									else if(dateFin[4]+dateFin[5]+dateFin[6]=="Aug")
+									{
+										moisFin="08"
+									}
+									else if(dateFin[4]+dateFin[5]+dateFin[6]=="Sep")
+									{
+										moisFin="09"
+									}
+									else if(dateFin[4]+dateFin[5]+dateFin[6]=="Oct")
+									{
+										moisFin="10"
+									}
+									else if(dateFin[4]+dateFin[5]+dateFin[6]=="Nov")
+									{
+										moisFin="11"
+									}
+									else
+									{
+										moisFin="12"
+									}
+
+									if(row[4].includes("isolée")==true)
+									{
+										this.agence.description="Depuis le "+ date[8]+date[9]+"/"+mois+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]+ ", indisponibilité du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-11)+" ("+row[5]+" utilisateurs)"
+									}
+									if(row[4].includes("dégradée")==true)
+									{
+										this.agence.description="Depuis le "+ date[8]+date[9]+"/"+mois+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23] + ", dégradation du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-13)+" ("+row[5]+" utilisateurs)"
+									}
+											
+									////// La date et l'heure récupérées ne sont pas les bonnes (14h en plus)
+									this.agence.date_debut=date[11]+date[12]+date[13]+date[14]+"-"+mois+"-"+date[8]+date[9]+" "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]
+									this.agence.date_fin=dateFin[11]+dateFin[12]+dateFin[13]+dateFin[14]+"-"+moisFin+"-"+dateFin[8]+dateFin[9]+" "+dateFin[16]+dateFin[17]+dateFin[18]+dateFin[19]+dateFin[20]+dateFin[21]+dateFin[22]+dateFin[23]
+
+									let loadingInstance = Loading.service({ fullscreen: true});
+									this.$http
+									.post(
+										'http://localhost:5000/api/main-courante-agence',
+										this.agence
+									)
+									.then(result => {
+										this.$message({
+											dangerouslyUseHTMLString: true,
+											message:
+												"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+											type: 'success',
+										});
+										loadingInstance.close();
 									});
-								});
-							})
+
+								})
 						}
-					}						
+					}
 				})
-			})
+			})					
 		},
 
 		// Permet de dupliquer l'incident sélectionné dans la main courante

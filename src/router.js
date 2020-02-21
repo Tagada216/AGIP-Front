@@ -48,5 +48,9 @@ export default new Router({
 			path: '/cosip/id=:id',
 			component: () => import('./views/FicheIncident.vue'),
 		},
+		{
+			path: '/maj-agence/id=:id',
+			component: () => import('./views/Agence.vue'),
+		},
 	],
-})
+});

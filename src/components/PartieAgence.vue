@@ -5,6 +5,12 @@
     -->
     <el-form ref="form" :model="form" :rules="rules" label-position="top">
         <el-row :gutter="20">
+			<el-card>
+				<div slot="header">
+					<h4 class="card-header">Agences isolées</h4>
+				</div>
+				<input type="file" id="input" @click="importer()" style="margin-left:10px;"/>
+			</el-card>
             <el-col :span="6">
                 <!-- Références incident -->
                 <el-card>
@@ -126,15 +132,6 @@
                     </el-form-item>
                 </el-card>
                 <!-- Fin Horodatage -->
-				
-				<!-- Agences isolées -->
-				<el-card>
-					<div slot="header">
-						<h4 class="card-header">Agences isolées</h4>
-					</div>
-					<input type="file" id="input" @click="importer()" style="margin-left:10px;"/>
-				</el-card>
-				<!-- Fin agences isolées-->
             </el-col>
 
             <!-- Info Générales -->
@@ -379,38 +376,26 @@
             <el-button type="primary" @click="onSubmit()"
                 >Sauvegarder</el-button
             >
-            <el-button type="primary" @click="envoyerMail()"
-                >Envoyer un mail</el-button
-            >
-			<el-button type="primary" @click="dupliquer()"
-				>Dupliquer</el-button
-			>
-			<el-button type="primary" @click="cosip()">Cosip</el-button>
-        </el-form-item>	
+        </el-form-item>
     </el-form>
 </template>
 
 <script>
 import Axios from 'axios';
-// import { scrypt } from 'crypto';
-// import { escape } from 'querystring';
-// import { open } from 'fs';
-// import confirmationVue from './confirmation.vue';
-//import func from '../../vue-temp/vue-editor-bridge';
 import Vue from 'vue'
 import CreateIncidentFormVue from './CreateIncidentForm.vue';
 import { readFile, watch } from 'fs';
-import { importSpecifier, thisTypeAnnotation, identifier } from 'babel-types';
+import { importSpecifier, thisTypeAnnotation } from 'babel-types';
 import readXlsxFile from 'read-excel-file'
 import { setTimeout } from 'timers';
 import { constants } from 'crypto';
+import { Loading } from 'element-ui';
 
 export default {
 
     created() {
 		this.getFieldsOptions();
-		this.getIncident(this.incident_id);
-
+		this.agence();
     },
 
     props: {
@@ -421,18 +406,60 @@ export default {
 
     data() {
         return {
+
+			checkedImpactBDDF: false,
+
+			options: [{
+				value:'Diagnostic',
+				label:'Diagnostic'
+			},
+			{
+				value:'Résolution',
+				label:'Résolution'
+			},
+			{
+				value:'Rétablissement',
+				label:'Rétablissement'
+			},
+			{
+				value:'Terminé',
+				label:'Terminé'
+			}],
+
+			optionsImpactAvere: [{
+				value:'Elevé',
+				label:'Elevé'
+			},
+			{
+				value:'Moyen',
+				label:'Moyen'
+			},
+			{
+				value:'Faible',
+				label:'Faible'
+			}],
+
+			value:'',
+
+			valueImpactCDN:'',
+			valueImpactBDDF:'',
+			valueImpactBPF:'',
+
+			radio:0,
             // Données énumérées venant de l'API
             remoteEnum: {
                 priorites: [],
                 statut: [],
                 enseignes: [],
 				application_impactee: [],
-			},
+				responsabilite:[],
+            },
 
             // Données du formulaire
             form: {
+				references: [], //
+				reference:'',
                 incident_id: 0,
-                references: [], //
                 is_faux_incident: false, //
                 date_debut: '', //
                 date_fin: null, //
@@ -440,119 +467,36 @@ export default {
                 cause: '',
                 origine: '',
                 action_retablissement: '',
-                plan_action: '',
-                description_impact: '', //
+				plan_action: '',
+				description_impact:'',
                 description_contournement: 'Aucun contournement', //
-                is_contournement: false, //
-                priorite_id: '', //
-                statut_id: '', //
+				is_contournement: false, //
+				priorite_id:'',
                 enseigne_impactee: [],
-                application_impactee: [],
-                date_detection: '',
-                date_communication_TDC: '',
-                date_qualification_p01: '',
-				date_premiere_com: '',
+				application_impactee: [],
+				statut_id:'',
+				date_communication_TDC:'',
+				date_detection:'',
+				date_qualification_p01:'',
+				date_premiere_com:'',
 			},
-		
-            // Règles de validation pour le formulaire
-            rules: {
-                date_debut: [
-                    {
-                        required: true,
-                        message: 'Champ non rempli',
-                        trigger: 'change',
-                    },
-                ],
-                description: [
-                    {
-                        required: true,
-                        message: 'Champ non rempli',
-                        trigger: 'blur',
-                    },
-                ],
-                description_impact: [
-                    {
-                        required: true,
-                        message: 'Champ non rempli',
-                        trigger: 'blur',
-                    },
-                ],
-                description_contournement: [
-                    {
-                        required: false,
-                        message: 'Champ non rempli',
-                        trigger: 'blur',
-                    },
-                ],
-                plan_action: [
-                    {
-                        required: false,
-                        message: "Plan d'action",
-                        trigger: 'blur',
-                    },
-                ],
 
-                action_retablissement: [
-                    {
-                        required: false,
-                        message: 'Action de rétablissement',
-                        trigger: 'blur',
-                    },
-                ],
-
-                priorite_id: [
-                    {
-                        required: true,
-                        message: 'Champ non rempli',
-                        trigger: 'change',
-                    },
-                ],
-                statut_id: [
-                    {
-                        required: true,
-                        message: 'Champ non rempli',
-                        trigger: 'change',
-                    },
-                ],
-                enseigne_impactee: [
-                    {
-                        type: 'array',
-                        required: true,
-                        message: 'Aucune selection',
-                        trigger: 'change',
-                    },
-                ],
-                applicationImpactee: [
-                    {
-                        required: true,
-                        message: 'Champ non rempli',
-                        trigger: 'blur',
-                    },
-                ],
-            },
+			rules:{},
 
             // Les lignes suivantes sont des variables nécessaires au modal de suppression
             delConfirmationModalVisible: false,
             delConfirmationModalVisibleApp: false,
             messageConfirmation: true,
             indexRefToDelete: 0,
-			indexRefToDeleteApp: 0,
+            indexRefToDeleteApp: 0,
             refToDelete: '',
 			refToDeleteApp: '',
-			dialogFormVisible:false,
+
         };
 	},
 
-	
     methods: {
-        // Cette méthode est lancée quand un champ d'appli impacté s'est vu selectionné une appli parmis les propositions
-        // Quand tel est le cas, on insere les données de l'appli (CI et trigramme) pour pouvoir la relier en BDD
-        appSelected(appSelection){
-            const appIndex = this.form.application_impactee.map(el => el.display_name).indexOf(appSelection.display_name)
-            this.form.application_impactee[appIndex] = appSelection
-        },
-
-        onSubmit() {
+		onSubmit() {
             this.$refs['form'].validate(valid => {
                 if (valid) { 
                     /*// On vérifie qu'il y a au moins une référence
@@ -609,14 +553,22 @@ export default {
                         }
 					}
 
-						console.log(this.incident_id)
+					// On récupère l'id de l'incident situé après le '=' dans l'url 
+					var test = window.location.href.indexOf('=')
+					if(test!=-1)
+					{
+						var idIncident=window.location.href.substr(test+1)
+					}
 
-						this.curID=this.incident_id
+						console.log("id récupéré = "+idIncident)
 
-						console.log(this.curID)
+						this.curID=idIncident
 
+						console.log("curID = "+this.curID)
+
+						let loadingInstance = Loading.service({ fullscreen: true});
 						this.$http
-							.put('http://localhost:5000/api/main-courante', 
+							.put('http://localhost:5000/api/main-courante-agence', 
 							this.form
 						)
 						.then(result => {
@@ -626,7 +578,11 @@ export default {
                                     "<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
                                 type: 'success',
 							});
+							loadingInstance.close();
+							window.close(this)
 						})
+
+						/// FERMER L ONGLET UNE FOIS LA SAUVEGARDE TERMINEE
 
 					}
                 else {
@@ -642,50 +598,285 @@ export default {
 				}
 			});
 		},
-		
-		///////Partie Agence/////////
+
+		agence(){
+			// On récupère l'id de l'incident situé après le '=' dans l'url 
+			var test = window.location.href.indexOf('=')
+			if(test!=-1)
+			{
+				var idIncident=window.location.href.substr(test+1)
+				console.log(idIncident)
+			}
+
+			// On récupère les informations de l'incident à dupliquer et on les affiche dans les champs correspondant
+			if(idIncident!=undefined)
+			{
+				Axios.get('http://localhost:5000/api/main-courante/' + idIncident).then(
+					response => {
+						this.form.incident_id=idIncident
+						this.form.description=response.data[0].description
+						this.form.description_impact=response.data[0].description_impact
+						this.form.priorite_id=response.data[0].priorite
+						this.form.date_debut = response.data[0].date_debut;
+                		this.form.date_fin = response.data[0].date_fin;
+                		this.form.statut_id = response.data[0].statut;
+						this.form.is_faux_incident = response.data[0].is_faux_incident
+                    	? true
+                    	: false;
+                		this.form.is_contournement = response.data[0].is_contournement
+                    	? true
+                    	: false;
+                		this.form.description_contournement = response.data[0].description_contournement
+                		this.form.enseigne_impactee = [];
+						this.form.references = [];
+						this.form.application_impactee = [];
+						this.form.plan_action=response.data[0].plan_action
+						this.form.origine=response.data[0].origine
+						this.form.action_retablissement=response.data[0].action_retablissement
+						this.form.date_premiere_com = response.data[0].date_premier_com;
+						this.form.cause = response.data[0].cause;
+						this.form.date_detection = response.data[0].date_detection;
+					 	this.form.date_communication_TDC = response.data[0].date_communication_tdc;
+                		this.form.date_qualification_p01 = response.data[0].date_qualif_p01;
+						
+						for (const ens_id of response.data[0].id_enseigne.split('/')) {
+							this.form.enseigne_impactee.push(parseInt(ens_id));
+						}
+
+						for (
+							let index = 0;
+							index < response.data[0].reference_id.split('/').length;
+							index++
+						) {
+							const id = response.data[0].reference_id.split('/')[index];
+							const ref = response.data[0].reference.split('/')[index];
+							this.form.references.push({
+								reference_id: id,
+								reference: ref,
+							});
+						}
+						
+						for (const app of response.data[0].display_name.split('|||')) {
+							console.log({display_name: app });
+							
+							this.form.application_impactee.push({display_name: app })
+						}
+						
+						console.log(this.form.application_impactee);
+						})
+				}
+		},
+
+		///////Partie Agence Incidents Clos (MAJ)/////////
 		importer()
 		{
 			const input = document.getElementById('input')
 			input.addEventListener('change', () => {
 				readXlsxFile(input.files[0]).then((rows) => {
-						Axios.get(
-                		'http://localhost:5000/api/reference'
-            			).then(response => {
-							// On parcourt toutes les références de la main courante
-							for(var p=0;p<=response.data.length;p++)
-							{
-								// On parcourt toutes les lignes du fichier Excel des agences
-								for(const row of rows)
-								{	
-									// On vérifie que les différentes références du fichier Excel des agences sont présentes dans la main courante					
-									if(((response.data[p]).reference.includes(row[0]))==true)
-									{	
-										// Si l'état de l'incident est "En cours"								
-										if(row[7].includes("En cours")==true)
-										{
-											this.incident_id=(response.data[p]).incident_id
-											this.curID=(response.data[p]).incident_id
-											
-											console.log(row[0] + " En cours")
-											console.log(this.incident_id)
-										}
-										// Sinon si l'état de l'incident est "Clos"
-										else
-										{
-											this.incident_id=(response.data[p]).incident_id
-											this.curID=(response.data[p]).incident_id
-											window.open('/#/maj-agence/id='+this.incident_id)
-											console.log(row[0] + " Clos")
-										}
-									}
+					for(const row of rows)
+					{
+						if(this.form.references[0].reference==row[0])
+						{
+							//Date de début
+							var date=row[1]+''
+							var dateFin=row[2]+''
+							var mois=""
+							var moisFin=""
+							// ----- Début des différentes modifs à faire
 
-								}
+							/*if((input.files[0].name).includes("CDN" || "cdn"))
+							{
+								this.agence.enseigne_impactee=2
 							}
-						})
+							if((input.files[0].name).includes("BDDF" || "bddf"))
+							{
+								this.agence.enseigne_impactee=1
+							}
+							if((input.files[0].name).includes("BPF" || "bpf"))
+							{
+								this.agence.enseigne_impactee=3
+							}*/
+
+							this.form.description_impact=row[5]
+							
+							console.log(this.form.application_impactee)
+
+							if(this.form.application_impactee.length>=1 && this.form.application_impactee[0].display_name.includes("Infrastructure Réseau Banque de Détail"))
+							{
+								console.log("L'application est déjà présente dans le champ application impactée")
+							}
+							else{
+								this.form.application_impactee.push({display_name: "Infrastructure Réseau Banque de Détail"})
+							}
+
+							this.form.cause = row[8]
+
+							////////////// Statut ///////////////
+							if(row[7].includes("En cours")==true)
+							{
+								this.form.statut_id=2
+							}
+
+							if(row[7].includes("Clos")==true)
+							{
+								this.form.statut_id=5
+							}
+							////////////////////////////////////
+
+
+							////////// Priorité /////////////
+							if(row[6].includes("P0")==true)
+							{
+								this.form.priorite_id=1
+							}
+															
+							if(row[6].includes("P1")==true)
+							{
+								this.form.priorite_id=2
+							}
+															
+							if(row[6].includes("P2")==true)
+							{
+								this.form.priorite_id=3
+							}
+															
+							if(row[6].includes("P3")==true)
+							{
+								this.form.priorite_id=4
+							}
+															
+							if(row[6].includes("P4")==true)
+							{
+								this.form.priorite_id=5
+							}
+							//////////////////////////////////
+
+							// Afin d'afficher la date dans le format voulu soit JJ/MM/AAAA
+							if(date[4]+date[5]+date[6]=="Jan")
+							{
+								mois="01"
+							}
+							else if(date[4]+date[5]+date[6]=="Feb")
+							{
+								mois="02"
+							}
+							else if(date[4]+date[5]+date[6]=="Mar")
+							{
+								mois="03"
+							}
+							else if(date[4]+date[5]+date[6]=="Apr")
+							{
+								mois="04"
+							}
+							else if(date[4]+date[5]+date[6]=="May")
+							{
+								mois="05"
+							}
+							else if(date[4]+date[5]+date[6]=="Jun")
+							{
+								mois="06"
+							}
+							else if(date[4]+date[5]+date[6]=="Jul")
+							{
+								mois="07"
+							}
+							else if(date[4]+date[5]+date[6]=="Aug")
+							{
+								mois="08"
+							}
+							else if(date[4]+date[5]+date[6]=="Sep")
+							{
+								mois="09"
+							}
+							else if(date[4]+date[5]+date[6]=="Oct")
+							{
+								mois="10"
+							}
+							else if(date[4]+date[5]+date[6]=="Nov")
+							{
+								mois="11"
+							}
+							else
+							{
+								mois="12"
+							}
+
+
+							// Afin d'afficher la date dans le format voulu soit JJ/MM/AAAA
+							if(dateFin[4]+dateFin[5]+dateFin[6]=="Jan")
+							{
+								moisFin="01"
+							}
+							else if(dateFin[4]+dateFin[5]+dateFin[6]=="Feb")
+							{
+								moisFin="02"
+							}
+							else if(dateFin[4]+dateFin[5]+dateFin[6]=="Mar")
+							{
+								moisFin="03"
+							}
+							else if(dateFin[4]+dateFin[5]+dateFin[6]=="Apr")
+							{
+								moisFin="04"
+							}
+							else if(dateFin[4]+dateFin[5]+dateFin[6]=="May")
+							{
+								moisFin="05"
+							}
+							else if(dateFin[4]+dateFin[5]+dateFin[6]=="Jun")
+							{
+								moisFin="06"
+							}
+							else if(dateFin[4]+dateFin[5]+dateFin[6]=="Jul")
+							{
+								moisFin="07"
+							}
+							else if(dateFin[4]+dateFin[5]+dateFin[6]=="Aug")
+							{
+								moisFin="08"
+							}
+							else if(dateFin[4]+dateFin[5]+dateFin[6]=="Sep")
+							{
+								moisFin="09"
+							}
+							else if(dateFin[4]+dateFin[5]+dateFin[6]=="Oct")
+							{
+								moisFin="10"
+							}
+							else if(dateFin[4]+dateFin[5]+dateFin[6]=="Nov")
+							{
+								moisFin="11"
+							}
+							else
+							{
+								moisFin="12"
+							}
+
+							if(row[4].includes("isolée")==true)
+							{
+								this.form.description="Depuis le "+ date[8]+date[9]+"/"+mois+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]+ ", indisponibilité du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-11)+" ("+row[5]+" utilisateurs)"
+							}
+							if(row[4].includes("dégradée")==true)
+							{
+								this.form.description="Depuis le "+ date[8]+date[9]+"/"+mois+"/"+date[11]+date[12]+date[13]+date[14]+" à "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23] + ", dégradation du réseau de données et de la téléphonie à l'agence "+row[4].substring(0,row[4].length-13)+" ("+row[5]+" utilisateurs)"
+							}
+											
+							////// La date et l'heure récupérées ne sont pas les bonnes (14h en plus)
+							this.form.date_debut=date[11]+date[12]+date[13]+date[14]+"-"+mois+"-"+date[8]+date[9]+" "+date[16]+date[17]+date[18]+date[19]+date[20]+date[21]+date[22]+date[23]
+							this.form.date_fin=dateFin[11]+dateFin[12]+dateFin[13]+dateFin[14]+"-"+moisFin+"-"+dateFin[8]+dateFin[9]+" "+dateFin[16]+dateFin[17]+dateFin[18]+dateFin[19]+dateFin[20]+dateFin[21]+dateFin[22]+dateFin[23]
+
+							//this.form.application_impactee.push({display_name: "Infrastructure Réseau Banque de Détail"})
+						}
+					}
 				})
 			})
 		},
+        // Cette méthode est lancée quand un champ d'appli impacté s'est vu selectionné une appli parmis les propositions
+        // Quand tel est le cas, on insere les données de l'appli (CI et trigramme) pour pouvoir la relier en BDD
+        appSelected(appSelection){
+            const appIndex = this.form.application_impactee.map(el => el.display_name).indexOf(appSelection.display_name)
+            this.form.application_impactee[appIndex] = appSelection
+        },
 
         ////////////////////////////////////////
         // Il faudra voir pour dedoublonner ces fonctions mais c'est pas urgent
@@ -720,186 +911,8 @@ export default {
         },
         handleCreateApp() {
             this.form.application_impactee.push({ display_name: '' });
-		},
-
-		//
-		confirmDeleteAppAgence() {
-            this.agence.application_agence.splice(this.indexRefToDeleteAppAgence, 1);
-            this.delConfirmationModalVisibleApp = false;
-        },
-        handleDeleteAppAgence(index) {
-            this.indexRefToDeleteAppAgence = index;
-            this.refToDeleteAppAgence = this.agence.application_agence[
-                index
-            ].application_agence;
-            this.delConfirmationModalVisibleApp = true;
-        },
-        handleCreateAppAgence() {
-            this.agence.application_agence.push({ display_name_agence: '' });
         },
         ////////////////////////////////////////
-
-        // Fonction pour activer le "required" du champ "Description Contournement" en fonction du selecteur OUI/NON
-        setContournementRule() {
-            this.rules.description_contournement[0].required = !this.rules
-                .description_contournement[0].required;
-
-            this.form.description_contournement = !this.rules
-                .description_contournement[0].required
-                ? 'Aucun contournement'
-                : '';
-		},
-
-		dupliquer() {
-			window.location.href="/#/new-incident/id="+this.incident_id
-			if (this.incident_id==undefined)
-			{
-				console.log("ID non existant")
-			} else {
-				console.log(this.incident_id)
-			}
-		},
-
-		cosip() {
-			window.location.href='/#/cosip/id='+this.incident_id
-			if (this.incident_id==undefined)
-			{
-				console.log("ID non existant")
-			} else {
-				console.log(this.incident_id)
-			}
-		},
-	
-        async envoyerMail() {
-            // Only needed if you don't have a real mail account for testing
-            let testAccount = await nodemailer.createTestAccount();
-
-            // create reusable transporter object using the default SMTP transport
-            let transporter = nodemailer.createTransport({
-                host: 'smtp.ethereal.email',
-                port: 587,
-                secure: false, // true for 465, false for other ports
-                auth: {
-                    user: testAccount.user, // generated ethereal user
-                    pass: testAccount.pass // generated ethereal password
-                }
-            });
-
-            // send mail with defined transport object
-            let info = await transporter.sendMail({
-                from: '"Fred Foo 👻" <foo@example.com>', // sender address
-                to: 'bar@example.com, baz@example.com', // list of receivers
-                subject: 'Hello ✔', // Subject line
-                text: 'Hello world?', // plain text body
-                html: '<b>Hello world?</b>' // html body
-            });
-
-            console.log('Message sent: %s', info.messageId);
-            // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-            // Preview only available when sending through an Ethereal account
-            console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-            // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-
-
-
-            //Récupération des différents champs
-
-            // var description = document.getElementById('description').value;
-            // var description_impact = document.getElementById(
-            //     'description_impact'
-            // ).value;
-            // var priorite_id = document.getElementById('priorite_id').value;
-            // var enseigne = document.getElementById('enseigne').value;
-            // //var ref=document.getElementById('reference').value
-            // var date_debut = document.getElementById('date_debut').value;
-            // var cause = document.getElementById('cause').value;
-            // var origine = document.getElementById('origine').value;
-            // var action_retablissement = document.getElementById(
-            //     'action_retablissement'
-            // ).value;
-            // var plan_action = document.getElementById('plan_action').value;
-            // var enseigne = this.form.enseigne_impactee;
-            // var ref = this.form.references;
-            // //Définition des adresses mail, de l'objet et du contenu du mail
-
-            // var adresseMail = 'lucie.varlet@socgen.com';
-            // var obj =
-            //     '[Incident ' +
-            //     priorite_id +
-            //     '][' +
-            //     enseigne +
-            //     '][Annonce][' +
-            //     ref +
-            //     '][][' +
-            //     date_debut +
-            //     ']';
-            // var formatedBody =
-            //     'INCIDENT TRAITE EN ' +
-            //     priorite_id +
-            //     '\n \nDescription\n' +
-            //     description +
-            //     '\n \nEnseigne impactée\n' +
-            //     enseigne +
-            //     '\nVisible du client final : \nListe détaillée des clients et opérations à fournir au métier : \n' +
-            //     '\n \nImpacts\n' +
-            //     description_impact +
-            //     '\n \nCauses\n' +
-            //     cause +
-            //     '\n \nActions de résolution menées\n' +
-            //     action_retablissement +
-            //     "\n \nPlan d'actions\n" +
-            //     plan_action +
-            //     '\n \nProchaine communication à ..h..\n' +
-            //     '\n \nCordialement,' +
-            //     '\nXXXXXXXXXX' +
-            //     '\nTour De Contrôle' +
-            //     '\nITIM/GSI/TDC' +
-            //     '\nHeures Ouvrées : 01-42-14-22-23' +
-            //     '\nAstreinte de crise : 06-09-79-20-35';
-
-            // //Ouvre outlook avec le mail pré-rempli (adresses mail, objet, corps du mail (Possibilité d'ajouter les CC))
-            // //window.open("mailto:"+adresseMail+"?subject="+obj+"&body="+body)
-            // var mailTo =
-            //     'mailto:' +
-            //     adresseMail +
-            //     '?subject=' +
-            //     obj +
-            //     '&body=' +
-            //     encodeURIComponent(formatedBody);
-            // window.location.href = mailTo;
-
-            // ////////////////////////////////////////
-            // //////////////NODEMAILER////////////////
-            // ////////////////////////////////////////
-
-            // /*const nodeMailer = require('nodemailer');
-
-            //     var transporter = nodeMailer.createTransport({
-            //         service: 'Outlook365',
-            //         auth: {
-            //             user: '',
-            //             pass: '',
-            //         },
-            //     });
-
-            //     var mailOptions = {
-            //         from: 'lucie.varlet@socgen.com',
-            //         to: 'lucie-varlet@hotmail.fr',
-            //         subject: 'Test',
-            //         text: 'Message',
-            //         html: '<b>corps du mail</b>',
-            //     };
-
-            //     transporter.sendMail(mailOptions, function(error, info) {
-            //         if (error) {
-            //             return console.log(error);
-            //         }
-            //         console.log('Message sent: ' + info.response);
-            //     });
-
-            //     transporter.close();*/
-        },
 
         // Méthode de récupération de tout les champs énumérées
         getFieldsOptions() {
@@ -929,48 +942,17 @@ export default {
                 .get('http://localhost:5000/api/applications')
                 .then(response => {
                     this.remoteEnum.applications = response.data;
-                });
-        },
-
-        ////////////////////////////////////////
-        // Ces 2 fonctions sont nécessaire pour afficher les application dans le champ el-autocomplete
-        // Voir "querySearch" et "createFilter" dans https://element.eleme.io/#/en-US/component/input#autocomplete
-        ////////////////////////////////////////
-        // Récupère les applis qui match avec la saisie de l'utilisateur
-        getMatchingApplications(requete, retour) {
-            if (requete.length > 1) {
-                var apps = this.remoteEnum.applications;
-                var results = requete
-                    ? apps.filter(this.createAppFilter(requete))
-                    : apps;
-                retour(results);
-                //console.log(retour);
-            } else {
-                retour([{ nom: '' }]);
-            }
-        },
-        // Crée le filtre nécessaire à matcher les applis
-        createAppFilter(queryString) {
-            return apps => {
-                return (
-                    apps.code_irt
-                        .toLowerCase()
-                        .indexOf(queryString.toLowerCase()) != -1 ||
-                    apps.trigramme
-                        .toLowerCase()
-                        .indexOf(queryString.toLowerCase()) != -1 ||
-                    apps.nom.toLowerCase().indexOf(queryString.toLowerCase()) !=
-                        -1 ||
-                    apps.libelle_court
-                        .toLowerCase()
-                        .indexOf(queryString.toLowerCase()) != -1
-                );
-            };
+				});
+				
+			this.$http
+				.get('http://localhost:5000/api/incidents/entite')
+				.then(response => {
+					this.remoteEnum.responsabilite = response.data;
+				});
 		},
-        ////////////////////////////////////////
 
-        // Récupère les informations d'un incident pour l'insérer dans le formulaire
-        getIncident(idIncident) {
+			// Récupère les informations d'un incident pour l'insérer dans le formulaire
+    getIncident(idIncident) {
             // Obtention de l'incident
             Axios.get(
                 'http://localhost:5000/api/main-courante/' + idIncident
@@ -1033,11 +1015,42 @@ export default {
         },
     },
 
-    watch: {
-        incident_id: function() {
-            this.getIncident(this.incident_id);
+        ////////////////////////////////////////
+        // Ces 2 fonctions sont nécessaire pour afficher les application dans le champ el-autocomplete
+        // Voir "querySearch" et "createFilter" dans https://element.eleme.io/#/en-US/component/input#autocomplete
+        ////////////////////////////////////////
+        // Récupère les applis qui match avec la saisie de l'utilisateur
+        getMatchingApplications(requete, retour) {
+            if (requete.length > 1) {
+                var apps = this.remoteEnum.applications;
+                var results = requete
+                    ? apps.filter(this.createAppFilter(requete))
+                    : apps;
+                retour(results);
+                //console.log(retour);
+            } else {
+                retour([{ nom: '' }]);
+            }
         },
-    },
+        // Crée le filtre nécessaire à matcher les applis
+        createAppFilter(queryString) {
+            return apps => {
+                return (
+                    apps.code_irt
+                        .toLowerCase()
+                        .indexOf(queryString.toLowerCase()) != -1 ||
+                    apps.trigramme
+                        .toLowerCase()
+                        .indexOf(queryString.toLowerCase()) != -1 ||
+                    apps.nom.toLowerCase().indexOf(queryString.toLowerCase()) !=
+                        -1 ||
+                    apps.libelle_court
+                        .toLowerCase()
+                        .indexOf(queryString.toLowerCase()) != -1
+                );
+            };
+		},
+        ////////////////////////////////////////
 };
 </script>
 
@@ -1070,5 +1083,4 @@ th:first-child .cell
 	&::before
 		content: "* "
 		color: red
-
 </style>
