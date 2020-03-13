@@ -52,5 +52,9 @@ export default new Router({
 			path: '/maj-agence/id=:id',
 			component: () => import('./views/Agence.vue'),
 		},
+		{
+			path: '/agences',
+			component: () => import('./views/GestionAgence.vue')
+		},
 	],
 });

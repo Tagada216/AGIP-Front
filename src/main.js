@@ -14,9 +14,11 @@ import '../node_modules/ag-grid-community/dist/styles/ag-theme-balham.css';
 
 Vue.config.productionTip = false;
 Vue.prototype.$http = require('axios');
-Vue.use(Element, { locale });
+Vue.use(Element, {
+	locale,
+});
 
 new Vue({
-    router,
-    render: h => h(App),
+	router,
+	render: h => h(App),
 }).$mount('#app');
