@@ -253,196 +253,6 @@
 		<el-form-item style="text-align: center">
 			<el-button type="primary" @click="submit()">Sauvegarder</el-button>
 		</el-form-item>
-
-		<!-- Partie Agence -->
-		<!-- <el-dialog
-			title="Agences isolées"
-			:visible.sync="ajoutIncidentsAgencesVisible"
-			width="80%"
-			center
-		>
-			<el-form ref="agence" :model="agence" :rules="rules" label-position="top">
-					<el-row :gutter="20">
-						<el-col :span="6">
-
-							<el-card>
-								<div slot="header">
-									<h4 class="card-header">Référence(s) de l'incident</h4>
-								</div>
-								<el-input
-									v-model="agence.references"
-								></el-input>
-							</el-card>
-
-							<el-card>
-								<div slot="header">
-									<h4 class="card-header">Horodatages de l'incident</h4>
-								</div>
-
-								<el-form-item label="Début de l'incident" prop="date_debut">
-									<el-date-picker
-										v-model="agence.date_debut"
-										type="datetime"
-										placeholder="Selectionnez l'horodatage"
-										format="dd/MM/yyyy HH:mm:ss"
-										value-format="yyyy-MM-dd HH:mm:ss"
-									></el-date-picker>
-								</el-form-item>
-
-								<el-form-item label="Faux incident ?">
-									<el-col :span="3.5">
-										<el-switch
-											style="display: block"
-											v-model="agence.is_faux_incident"
-											active-color="#13ce66"
-											inactive-color="#ff4949"
-											active-text="Oui"
-											inactive-text="Non"
-										></el-switch>
-									</el-col>
-								</el-form-item>
-
-								<el-form-item label="Fin de l'incident">
-									<el-date-picker
-										v-model="agence.date_fin"
-										type="datetime"
-										placeholder="Selectionnez l'horodatage"
-										format="dd/MM/yyyy HH:mm:ss"
-										value-format="yyyy-MM-dd HH:mm:ss"
-										:disabled="agence.is_faux_incident"
-									/>
-								</el-form-item>
-							</el-card>
-
-						</el-col>
-
-
-						<el-col :span="18">
-
-							<el-card>
-								<div slot="header">
-									<h4 class="card-header">Informations générales de l'incident</h4>
-								</div>
-
-								<el-row :gutter="20">
-									<el-col :span="6">
-										<el-form-item label="Priorité" prop="priorite_id">
-											<el-select v-model="agence.priorite_id">
-												<el-option
-													v-for="item in remoteEnum.priorites"
-													:key="item.id"
-													:label="item.priorite"
-													:value="item.id"
-												></el-option>
-											</el-select>
-										</el-form-item>
-									</el-col>
-
-									<el-col :span="6">
-										<el-form-item label="Statut" prop="statut_id">
-											<el-select v-model="agence.statut_id">
-												<el-option
-													v-for="item in remoteEnum.statut"
-													:key="item.id"
-													:label="item.nom"
-													:value="item.id"
-												></el-option>
-											</el-select>
-										</el-form-item>
-									</el-col>
-								</el-row>
-
-								<el-form-item label="Enseigne(s) impactée(s)" prop="enseigne_impactee">
-									<el-select v-model="agence.enseigne_impactee">
-										<el-option
-											v-for="enseigne in remoteEnum.enseignes"
-											:label="enseigne.nom"
-											:key="enseigne.id"
-											:value="enseigne.id"
-										></el-option>
-									</el-select>
-								</el-form-item>
-
-								<el-form-item label="Description" prop="description">
-									<el-input
-										type="textarea"
-										:autosize="{ minRows: 2, maxRows: 8 }"
-										placeholder="Description"
-										v-model="agence.description"
-									></el-input>
-								</el-form-item>
-
-								<el-form-item label="Impact" prop="description_impact">
-									<el-input
-										type="textarea"
-										:autosize="{ minRows: 4, maxRows: 8 }"
-										placeholder="Impact"
-										v-model="agence.description_impact"
-									></el-input>
-								</el-form-item>
-
-								<el-form-item label="Un contournement existe ?">
-									<el-col :span="3.5">
-										<el-switch
-											style="display: block"
-											v-model="agence.is_contournement"
-											active-color="#13ce66"
-											inactive-color="#ff4949"
-											active-text="Oui"
-											inactive-text="Non"
-											@change="setContournementRule()"
-										></el-switch>
-									</el-col>
-								</el-form-item>
-
-								<el-form-item
-									label="Description du contournement"
-									prop="description_contournement"
-								>
-									<el-input
-										type="textarea"
-										:autosize="{ minRows: 4, maxRows: 8 }"
-										placeholder="Contournement"
-										v-model="agence.description_contournement"
-										:disabled="!agence.is_contournement"
-									></el-input>
-								</el-form-item>
-								<el-table :data="agence.application_impactee" border>
-									<el-table-column
-										label="Application(s) impactée(s)"
-										prop="application_impactee"
-									>
-										<template slot-scope="scope">
-											<el-autocomplete
-												placeholder="Application impactée"
-												v-model="
-													agence.application_impactee[scope.$index]
-														.display_name 
-												"
-												:fetch-suggestions="getMatchingApplications"
-												value-key="display_name"
-												@select="appSelected"
-											></el-autocomplete>
-										</template>
-									</el-table-column>
-								</el-table>
-								<el-form-item
-									label="Cause"
-									prop="cause"
-								>
-									<el-input
-										type="textarea"
-										:autosize="{minRows:4, maxRows:8}"
-										placeholder="Cause"
-										v-model="agence.cause"
-									></el-input>
-								</el-form-item>
-							</el-card>
-						</el-col>
-					</el-row>
-			</el-form>
-		</el-dialog>-->
-		<!-- Fin partie agence -->
 	</el-form>
 </template>
 
@@ -623,11 +433,13 @@ export default {
 						return false;
 					}
 
+					// On parcourt tous les champs applications impactées
 					for (
 						var i = 0;
 						i < this.form.application_impactee.length;
 						i++
 					) {
+						// On vérifie qu'il y a au moins une application impactée
 						if (
 							this.form.application_impactee.length >= 1 &&
 							this.form.application_impactee[i].display_name == ''
@@ -642,7 +454,9 @@ export default {
 						}
 					}
 
+					// On parcourt tous les champs référence
 					for (var i = 0; i < this.form.references.length; i++) {
+						// Si les champs sont vides on écrit "A venir"
 						if (
 							this.form.references.length >= 1 &&
 							this.form.references[i].reference == ''
@@ -653,6 +467,7 @@ export default {
 
 					console.log(this.form);
 
+					// On enregistre en base de données
 					this.$http
 						.post(
 							'http://localhost:5000/api/main-courante',

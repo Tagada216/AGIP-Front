@@ -1005,6 +1005,7 @@ export default {
 
     methods: {
 
+		// Méthode qui permet d'afficher ou non la card impact réseau BPF
 		validateImpactReseauBPF(){
 			if(this.impactReseauBPF==true)
 			{
@@ -1017,6 +1018,7 @@ export default {
 			}
 		},
 
+		// Méthode qui permet d'afficher ou non la card impact client BPF
 		validateImpactClientBPF(){
 			if(this.impactClientBPF==true)
 			{
@@ -1029,6 +1031,7 @@ export default {
 			}
 		},
 
+		// Méthode qui permet d'afficher ou non la card impact réseau BDDF
 		validateImpactReseauBDDF(){
 			if(this.impactReseauBDDF==true)
 			{
@@ -1041,6 +1044,7 @@ export default {
 			}
 		},
 
+		// Méthode qui permet d'afficher ou non la card impact client BDDF
 		validateImpactClientBDDF(){
 			if(this.impactClientBDDF==true)
 			{
@@ -1053,6 +1057,7 @@ export default {
 			}
 		},
 
+		// Méthode qui permet d'afficher ou non la card impact réseau CDN 
 		validateImpactReseauCDN()
 		{
 			if(this.impactReseauCDN==true)
@@ -1066,6 +1071,7 @@ export default {
 			}
 		},
 
+		// Méthode qui permet d'afficher ou non la card impact client CDN
 		validateImpactClientCDN()
 		{
 			if(this.impactClientCDN==true)
@@ -1079,6 +1085,7 @@ export default {
 			}
 		},
 
+		// Méthode qui vérifie si les checkbox BDDF/CDN/BPF sont cochées et qui active les cards en fontion de l'état des checkbox
 		verifCheckEnseignesImpactees()
 		{
 			if(this.form.enseigne_impactee[0]==1 || this.form.enseigne_impactee[1]==1 || this.form.enseigne_impactee[2]==1)

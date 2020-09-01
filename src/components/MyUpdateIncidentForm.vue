@@ -566,6 +566,7 @@ export default {
                         return false;
                     }*/
 
+					// On vérifie qu'il y a au moins une référence
                     if (this.form.references.length == 0) {
                         this.$message({
                         dangerouslyUseHTMLString: true,
@@ -585,10 +586,12 @@ export default {
                         type: 'error',
                     });
                         return false;
-                    }
-
+					}
+					
+					// On parcourt tous les champs application impactée
                     for (var i=0; i<this.form.application_impactee.length;i++)
                     {
+						// On vérifie que les champs ouverts soient remplis
                         if(this.form.application_impactee.length>=1 && this.form.application_impactee[i].display_name=='')
                         {
                             this.$message({
@@ -601,8 +604,10 @@ export default {
                         }
                     }
 
+					// On parcourt tous les champs référence
                     for (var i=0; i<this.form.references.length;i++)
                     {
+						// Si les champs ouverts sont vides on écrit "A venir" à l'intérieur
                         if(this.form.references.length>=1 && this.form.references[i].reference=='')
                         {
                             this.form.references[i].reference="A venir"
@@ -615,6 +620,7 @@ export default {
 
 						console.log(this.curID)
 
+						// On enregistre en base de données
 						this.$http
 							.put('http://localhost:5000/api/main-courante', 
 							this.form
@@ -750,6 +756,7 @@ export default {
                 : '';
 		},
 
+		// Méthode qui permet de dupliquer l'incident sélectionné
 		dupliquer() {
 			window.location.href="/#/new-incident/id="+this.incident_id
 			if (this.incident_id==undefined)
@@ -760,6 +767,7 @@ export default {
 			}
 		},
 
+		// Méthode qui permet d'envoyer l'incident séléctionné vers un formulaire COSIP
 		cosip() {
 			window.location.href='/#/cosip/id='+this.incident_id
 			if (this.incident_id==undefined)
@@ -770,6 +778,7 @@ export default {
 			}
 		},
 	
+		// Méthode qui permettra de faire de la communication d'incident (non fonctionnelle)
         async envoyerMail() {
             // Only needed if you don't have a real mail account for testing
             let testAccount = await nodemailer.createTestAccount();

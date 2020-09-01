@@ -510,6 +510,7 @@ export default {
                         return false;
                     }*/
 
+					// On vérifie qu'il y a au moins une référence
                     if (this.form.references.length == 0) {
                         this.$message({
                         dangerouslyUseHTMLString: true,
@@ -531,8 +532,10 @@ export default {
                         return false;
                     }
 
+					// On parcourt tous les champs application impactée
                     for (var i=0; i<this.form.application_impactee.length;i++)
                     {
+						// On vérifie si les champs ouverts sont remplis
                         if(this.form.application_impactee.length>=1 && this.form.application_impactee[i].display_name=='')
                         {
                             this.$message({
@@ -543,10 +546,12 @@ export default {
                         });
                             return false;
                         }
-                    }
-
+					}
+					
+					// On parcourt tous les champs référence
                     for (var i=0; i<this.form.references.length;i++)
                     {
+						// Si les champs ouverts ne sont pas remplis on écrit "A venir" à l'intérieur
                         if(this.form.references.length>=1 && this.form.references[i].reference=='')
                         {
                             this.form.references[i].reference="A venir"
@@ -566,7 +571,10 @@ export default {
 
 						console.log("curID = "+this.curID)
 
+						// Ecran de chargement pendant l'enregistrement en BDD
 						let loadingInstance = Loading.service({ fullscreen: true});
+
+						// Enregistrement en BDD
 						this.$http
 							.put('http://localhost:5000/api/main-courante-agence', 
 							this.form
@@ -673,6 +681,7 @@ export default {
 			const input = document.getElementById('input')
 			input.addEventListener('change', () => {
 				readXlsxFile(input.files[0]).then((rows) => {
+				
 					for(const row of rows)
 					{
 						if(this.form.references[0].reference==row[0])
@@ -800,7 +809,7 @@ export default {
 							{
 								mois="12"
 							}
-
+							
 
 							// Afin d'afficher la date dans le format voulu soit JJ/MM/AAAA
 							if(dateFin[4]+dateFin[5]+dateFin[6]=="Jan")
