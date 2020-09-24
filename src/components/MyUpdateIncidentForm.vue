@@ -604,15 +604,39 @@ export default {
                         }
                     }
 
-					// On parcourt tous les champs référence
-                    for (var i=0; i<this.form.references.length;i++)
-                    {
-						// Si les champs ouverts sont vides on écrit "A venir" à l'intérieur
-                        if(this.form.references.length>=1 && this.form.references[i].reference=='')
-                        {
-                            this.form.references[i].reference="A venir"
-                        }
+					 // On parcourt tous les champs référence
+			    for(
+				let i = 0;
+				i< this.form.references.length;
+				i++
+				){
+					// Si le premier champs est vide on écrit "A venir"
+				    if(this.form.references.length == 1 && this.form.references[i].reference == ''){
+								
+                            this.form.references[i].reference = 'A venir';
 					}
+					// Si il y à plusieurs champs, les champs doivent êtres remplis d'une références obligatoirement et au bon format
+				    else if (this.form.references.length >= 1 &&
+						this.form.references[i].reference.length >=1 && 
+						this.isValid(this.form.references[i].reference.toUpperCase()))
+				    {
+						this.form.references[i].reference = this.form.references[i].reference.toUpperCase();
+						//console.log(this.form.references[i].reference);
+						//console.log(this.form.references[i].reference.toUpperCase());
+						//console.log(this.form.references[i].reference.length);
+						//console.log("OK ");
+
+				    }else{
+						this.$message({
+								dangerouslyUseHTMLString: true,
+								message:
+									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Si il y à plus de deux références veuillez remplir les champs au format : \"P00IN-0000000\".</p>",
+								type: 'error',
+							});
+							return false;
+                    }
+                    
+                }
 
 						console.log(this.incident_id)
 
