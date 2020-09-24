@@ -14,8 +14,8 @@
 					<el-table :data="form.references" border>
 						<el-table-column label="Référence">
 							<template slot-scope="scope">
-								<el-input
-									v-model="
+								<el-input 
+									v-model.trim="
                                         form.references[scope.$index].reference
                                     "
 								></el-input>
@@ -265,6 +265,8 @@ import Axios from 'axios';
 import { win32 } from 'path';
 import readXlsxFile from 'read-excel-file';
 import { Loading } from 'element-ui';
+import { Transform } from 'stream';
+
 export default {
 	components: { MyUpdateIncidentForm },
 
@@ -279,6 +281,8 @@ export default {
 		},
 	},
 
+	
+
 	data() {
 		return {
 			// Données énumérées venant de l'API
@@ -288,6 +292,8 @@ export default {
 				enseignes: [],
 				application_impactee: [],
 			},
+			
+
 
 			// Données du formulaire
 			form: {
@@ -394,7 +400,11 @@ export default {
 			ajoutIncidentsAgencesVisible: false,
 		};
 	},
+	
 	methods: {
+		isValid(value){
+			return /^P\d{2,}[IN|PB|CH|RQ]{2,}[-]{1,}\d{7,}$/.test(value);
+		},
 		// Cette méthode est lancée quand un champ d'appli impacté s'est vu selectionné une appli parmis les propositions
 		// Quand tel est le cas, on insere les données de l'appli (CI et trigramme) pour pouvoir la relier en BDD
 		appSelected(appSelection) {
@@ -407,7 +417,12 @@ export default {
 		// Méthode exécuté par le bouton "Sauvegarder".
 		// Elle gère la validation du formulaire ainsi que l'envoie des données vers l'API
 		submit() {
-			console.log(this.form.application_impactee);
+			//console.log(this.form.application_impactee);
+			//console.log(this.form.references.keys(0));
+			//console.log(this.form.references.length);
+			//console.log(this.form.references[0].reference);
+			//console.log(this.form.references[0].reference.toUpperCase());
+
 
 			this.$refs['form'].validate(valid => {
 				if (valid) {
@@ -421,6 +436,9 @@ export default {
 						});
 						return false;
 					}
+
+
+					
 
 					// On vérifie qu'il y a au moins une application impactée
 					else if (this.form.application_impactee.length == 0) {
@@ -453,17 +471,54 @@ export default {
 							return false;
 						}
 					}
+		
+
+		        // On parcourt tous les champs référence
+			    for(
+				let i = 0;
+				i< this.form.references.length;
+				i++
+				){
+					// Si le premier champs est vide on écrit "A venir"
+				    if(this.form.references.length == 1 && this.form.references[i].reference == ''){
+								
+                            this.form.references[i].reference = 'A venir';
+					}
+					// Si il y à plusieurs champs, les champs doivent êtres remplis d'une références obligatoirement et au bon format
+				    else if (this.form.references.length >= 1 &&
+						this.form.references[i].reference.length >=1 && 
+						this.isValid(this.form.references[i].reference.toUpperCase()))
+				    {
+						this.form.references[i].reference = this.form.references[i].reference.toUpperCase();
+						//console.log(this.form.references[i].reference);
+						//console.log(this.form.references[i].reference.toUpperCase());
+						//console.log(this.form.references[i].reference.length);
+						//console.log("OK ");
+
+				    }else{
+						this.$message({
+								dangerouslyUseHTMLString: true,
+								message:
+									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Si il y à plus de deux références veuillez remplir les champs au format : \"P00IN-0000000\".</p>",
+								type: 'error',
+							});
+							return false;
+					}
+				}
+				
+				
 
 					// On parcourt tous les champs référence
-					for (var i = 0; i < this.form.references.length; i++) {
+					/*for (var i = 0; i < this.form.references.length; i++) {
 						// Si les champs sont vides on écrit "A venir"
 						if (
 							this.form.references.length >= 1 &&
 							this.form.references[i].reference == ''
 						) {
 							this.form.references[i].reference = 'A venir';
+							console.log('A venir');
 						}
-					}
+					} */
 
 					console.log(this.form);
 
@@ -883,7 +938,7 @@ export default {
 			this.delConfirmationModalVisible = true;
 		},
 		handleCreate() {
-			this.form.references.push({ reference: '' });
+			this.form.references.push({ reference: '' });	
 		},
 
 		// Les handler pour la table et le modal des applis impactees
