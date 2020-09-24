@@ -437,9 +437,6 @@ export default {
 						return false;
 					}
 
-
-					
-
 					// On vérifie qu'il y a au moins une application impactée
 					else if (this.form.application_impactee.length == 0) {
 						this.$message({
@@ -473,21 +470,22 @@ export default {
 					}
 		
 
-		        // On parcourt tous les champs référence
-			    for(
-				let i = 0;
-				i< this.form.references.length;
-				i++
-				){
+		        	// On parcourt tous les champs référence
+			    	for(
+					let i = 0;
+					i< this.form.references.length;
+					i++
+					){
 					// Si le premier champs est vide on écrit "A venir"
-				    if(this.form.references.length == 1 && this.form.references[i].reference == ''){
+				    	if(this.form.references.length == 1 && this.form.references[i].reference == '' && this.form.statut_id != 5){
 								
                             this.form.references[i].reference = 'A venir';
-					}
+						}
 					// Si il y à plusieurs champs, les champs doivent êtres remplis d'une références obligatoirement et au bon format
-				    else if (this.form.references.length >= 1 &&
-						this.form.references[i].reference.length >=1 && 
-						this.isValid(this.form.references[i].reference.toUpperCase()))
+				    	else if (this.form.references.length >= 1 &&
+								 this.form.references[i].reference.length >=1 && 
+								 this.isValid(this.form.references[i].reference.toUpperCase())
+								)
 				    {
 						this.form.references[i].reference = this.form.references[i].reference.toUpperCase();
 						//console.log(this.form.references[i].reference);
@@ -499,16 +497,28 @@ export default {
 						this.$message({
 								dangerouslyUseHTMLString: true,
 								message:
-									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Si il y à plus de deux références veuillez remplir les champs au format : \"P00IN-0000000\".</p>",
+									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Si il y à plus de deux <strong>Références</strong> </br><strong>ou</strong></br>==> Si le <strong>Statut est Résolu<strong/> veuillez remplir le(s) champs <strong>Référence</strong> au format : \"P00IN-0000000\".</p>",
 								type: 'error',
 							});
 							return false;
 					}
+
+					if(this.form.statut_id === 5 && this.form.date_fin === null){
+							this.$message({
+								dangerouslyUseHTMLString: true,
+								message:
+									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Le Statut de l'incident est en <strong>Résolu</strong> le champs <strong>Fin de l'incident est obligatoire</strong> .</p>",
+								type: 'error',
+							});
+							return false;
+					}	
+
 				}
 				
 
 					console.log(this.form);
-
+					
+					
 					// On enregistre en base de données
 					this.$http
 						.post(
@@ -538,31 +548,13 @@ export default {
 						type: 'error',
 					});
 					return false;
+			
 				}
-
-					for(
-				let i = 0;
-				this.remoteEnum.statut >= 1;
-				i++
-			){
-				console.log(this.remoteEnum.statut[i]);
-			}
-
-				/*if(this.form.statut. != "Résolu"){
-					console.log("pas de date obligatoire")
-						
-				}else{
-					console.log("Fin de date obligatoire");
-					this.$message({
-						dangerouslyUseHTMLString: true,
-						message:
-							"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Le Statut de l'incident est en  <strong>Résolu</strong>, une Date de fin d'incident doit être renseignée .</p>",
-						type: 'error',
-					});
-					return false;
-				}*/
 			});
+			
 		},
+
+		
 
 		///////Partie Agence/////////
 		importer() {

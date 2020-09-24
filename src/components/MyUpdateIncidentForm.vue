@@ -638,7 +638,16 @@ export default {
 							});
 							return false;
                     }
-                    
+
+                    if(this.form.statut_id === 5 && this.form.date_fin === null){
+						this.$message({
+								dangerouslyUseHTMLString: true,
+								message:
+									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Le Statut de l'incident est en <strong>Résolu</strong> le champs <strong>Fin de l'incident est obligatoire</strong> .</p>",
+								type: 'error',
+							});
+							return false;
+					}   
                 }
 
 						console.log(this.incident_id)
