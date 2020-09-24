@@ -267,6 +267,8 @@ import readXlsxFile from 'read-excel-file';
 import { Loading } from 'element-ui';
 import { Transform } from 'stream';
 
+
+
 export default {
 	components: { MyUpdateIncidentForm },
 
@@ -414,16 +416,14 @@ export default {
 			this.form.application_impactee[appIndex] = appSelection;
 		},
 
+		
+
 		// Méthode exécuté par le bouton "Sauvegarder".
 		// Elle gère la validation du formulaire ainsi que l'envoie des données vers l'API
 		submit() {
 			//console.log(this.form.application_impactee);
-			//console.log(this.form.references.keys(0));
-			//console.log(this.form.references.length);
-			//console.log(this.form.references[0].reference);
-			//console.log(this.form.references[0].reference.toUpperCase());
-
-
+			
+			
 			this.$refs['form'].validate(valid => {
 				if (valid) {
 					// On vérifie qu'il y a au moins une référence
@@ -506,19 +506,6 @@ export default {
 					}
 				}
 				
-				
-
-					// On parcourt tous les champs référence
-					/*for (var i = 0; i < this.form.references.length; i++) {
-						// Si les champs sont vides on écrit "A venir"
-						if (
-							this.form.references.length >= 1 &&
-							this.form.references[i].reference == ''
-						) {
-							this.form.references[i].reference = 'A venir';
-							console.log('A venir');
-						}
-					} */
 
 					console.log(this.form);
 
@@ -552,6 +539,28 @@ export default {
 					});
 					return false;
 				}
+
+					for(
+				let i = 0;
+				this.remoteEnum.statut >= 1;
+				i++
+			){
+				console.log(this.remoteEnum.statut[i]);
+			}
+
+				/*if(this.form.statut. != "Résolu"){
+					console.log("pas de date obligatoire")
+						
+				}else{
+					console.log("Fin de date obligatoire");
+					this.$message({
+						dangerouslyUseHTMLString: true,
+						message:
+							"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Le Statut de l'incident est en  <strong>Résolu</strong>, une Date de fin d'incident doit être renseignée .</p>",
+						type: 'error',
+					});
+					return false;
+				}*/
 			});
 		},
 

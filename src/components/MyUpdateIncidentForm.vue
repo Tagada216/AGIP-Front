@@ -547,6 +547,9 @@ export default {
     methods: {
         // Cette méthode est lancée quand un champ d'appli impacté s'est vu selectionné une appli parmis les propositions
         // Quand tel est le cas, on insere les données de l'appli (CI et trigramme) pour pouvoir la relier en BDD
+        isValid(value){
+			return /^P\d{2,}[IN|PB|CH|RQ]{2,}[-]{1,}\d{7,}$/.test(value);
+		},
         appSelected(appSelection){
             const appIndex = this.form.application_impactee.map(el => el.display_name).indexOf(appSelection.display_name)
             this.form.application_impactee[appIndex] = appSelection
