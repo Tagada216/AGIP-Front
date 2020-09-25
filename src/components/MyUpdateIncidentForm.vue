@@ -672,9 +672,11 @@ export default {
                                 message:
                                     "<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
                                 type: 'success',
-							});
+                            });
+                            window.location.reload();
 						})
-
+                        
+                        
 					}
                 else {
                     /*console.log('error');
