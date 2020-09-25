@@ -614,7 +614,7 @@ export default {
 				i++
 				){
 					// Si le premier champs est vide on écrit "A venir"
-				    if(this.form.references.length == 1 && this.form.references[i].reference == ''){
+				    if(this.form.references.length == 1 && this.form.references[i].reference == '' && this.form.statut_id != 5){
 								
                             this.form.references[i].reference = 'A venir';
                     }
