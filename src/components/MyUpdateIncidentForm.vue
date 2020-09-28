@@ -291,7 +291,8 @@
                             :autosize="{ minRows: 4, maxRows: 8 }"
                             placeholder="Cause"
                             v-model="form.cause"
-                        ></el-input>
+                        >
+                        </el-input>
                     </el-form-item>
 
                     <el-form-item label="Origine">
@@ -556,6 +557,15 @@ export default {
         },
 
         onSubmit() {
+
+            // Vérification si les champs son vide ne pas enregistrer la valeur null retourner par défaut par vueJS avec le v-model
+            if ((this.form.cause == "null" ) || (this.form.cause == null) && (this.form.origine == "null" ) || (this.form.origine == null) && (this.form.action_retablissement == "null" ) || (this.form.action_retablissement == null) && (this.form.plan_action == "null" ) || (this.form.plan_action == null) ){
+                this.form.cause = "";
+                this.form.origine="";
+                this.form.action_retablissement="";
+                this.form.plan_action="";
+            }
+
             this.$refs['form'].validate(valid => {
                 if (valid) { 
                     /*// On vérifie qu'il y a au moins une référence
@@ -654,6 +664,7 @@ export default {
 							return false;
 					}   
                 }
+
 
 						console.log(this.incident_id)
 
@@ -1040,10 +1051,10 @@ export default {
                     response.data[0].date_qualif_p01;
                 this.form.date_premiere_com = response.data[0].date_premier_com;
                 this.form.cause = response.data[0].cause;
+                this.form.action_retablissement = response.data[0].action_retablissement;
                 this.form.origine = response.data[0].origine;
-                this.form.action_retablissement =
-                    response.data[0].action_retablissement;
                 this.form.plan_action = response.data[0].plan_action;
+
                 this.form.is_faux_incident = response.data[0].is_faux_incident
                     ? true
                     : false;
