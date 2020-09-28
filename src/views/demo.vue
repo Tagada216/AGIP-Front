@@ -29,7 +29,7 @@
                 </button>
             </el-tooltip>
         </base-header>
-
+       
         <grid class="grid" data-link="http://localhost:5000/api/probs" />
     </div>
 </template>
@@ -37,6 +37,7 @@
 <script>
 import Grid from '@/components/Grid.vue';
 import JsonExcel from 'vue-json-excel';
+
 
 export default {
     data() {
