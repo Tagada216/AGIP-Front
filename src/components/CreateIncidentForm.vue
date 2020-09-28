@@ -583,7 +583,7 @@ export default {
 
 				for (const row of rows) {
 					// Si le statut est en cours on ajoute l'incident dans la main courante
-					if (row[7].includes('En cours')) {
+					if (row[7].includes('En cours')== true) {
 						//this.ajoutIncidentsAgencesVisible=true
 						Axios.get(
 							'http://localhost:5000/api/main-courante'
