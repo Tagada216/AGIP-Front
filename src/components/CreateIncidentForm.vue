@@ -545,6 +545,7 @@ export default {
 									"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
 								type: 'success',
 							});
+							window.location.reload();
 						});
 				} else {
 					this.$message({
@@ -582,7 +583,7 @@ export default {
 
 				for (const row of rows) {
 					// Si le statut est en cours on ajoute l'incident dans la main courante
-					if (row[7].includes('En cours')) {
+					if (row[7].includes('En cours')== true) {
 						//this.ajoutIncidentsAgencesVisible=true
 						Axios.get(
 							'http://localhost:5000/api/main-courante'
