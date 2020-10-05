@@ -657,7 +657,7 @@ export default {
                                 type: 'success',
 							});
 						})
-
+                        window.location.reload();
 					}
                 else {
                     /*console.log('error');

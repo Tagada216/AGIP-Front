@@ -543,6 +543,7 @@ export default {
 								type: 'success',
 							});
 						});
+						window.location.reload();
 				} else {
 					this.$message({
 						dangerouslyUseHTMLString: true,

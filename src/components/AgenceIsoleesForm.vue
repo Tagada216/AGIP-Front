@@ -64,51 +64,44 @@ export default {
 						for (const row of rows) {
 							//console.log(row);
 							//console.log(row[0]);
-                            //console.log(row[7]);
-                            //console.log(row[2]);
+							//console.log(row[7]);
+							//console.log(row[2]);
+							var reponse = response.data;
 
-                            /*if(row[7].includes('En cours')){
-                                console.log("j'accède au row 7");
-                            }else{
-                                console.log("je n'y accède pas ");
-                            }*/
+							for (const rep of reponse) {
 
+                                // Si la référence existe déjà, ont la met à jours
+								if ((row[0].includes('Réf'))) {
+                                    //console.log('ref non identiques');
 
-                            
+                                        this.agence.references = row[0];
+                                        console.log(this.agence.references);
+                                    
+                                    
+                                console.log('Références identiques');
+									
+                                
+                                } 
+                                // Sinon on effectue une insertion
+                                else {
+                                    /*this.$http
+										.post(
+											'http://localhost:5000/api/creation-incident_main-courante',
+											this.agence
+										)
+										.then(result => {
+											this.$message({
+												dangerouslyUseHTMLString: true,
+												message:
+													"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+												type: 'success',
+											});
+                                        });*/
+									console.log('Références non identiques');
+								}
 
-							// On vérifie que les différentes références du fichier Excel des agences sont présentes dans la main courante
-							/*if (
-									response.data[p].references.includes(
-										row[0]
-									) == true
-								) {
-									for (let row of rows) {
-										// Si l'état de l'incident est "En cours"
-										if (
-											row[7].includes('En cours') == true
-										) {
-											this.incident_id =
-											response.data[p].incident_id;
-										this.curID =
-											response.data[p].incident_id;
-
-											console.log(row[0] + ' En cours');
-											console.log(this.incident_id);
-										}
-										// Sinon si l'état de l'incident est "Clos"
-										else {
-											this.incident_id =
-											response.data[p].incident_id;
-										this.curID =
-											response.data[p].incident_id;
-										window.open(
-											'/#/maj-agence/id=' +
-												this.incident_id
-										);
-											console.log(row[0] + ' Clos');
-										}
-									}
-								} */
+								//console.log(response.data[p].reference);
+							}
 						}
 					}
 				);
