@@ -71,6 +71,11 @@ export default {
                     icon: 'fas fa-pen',
                 },
                 {
+                    href: '/agence-isolees',
+                    title: 'Agence Isolées',
+                    icon: 'fas fa-folder-plus',
+                },
+                {
                     href: '/main-courante',
                     title: 'Main courante',
                     icon: 'fas fa-book-open',

@@ -25,6 +25,10 @@ export default new Router({
 			component: () => import('./views/NewIncident.vue'),
 		},
 		{
+			path: '/agence-isolees',
+			component: () => import('./views/AgenceIsolees.vue'),
+		},
+		{
 			path: '/fichier-rouge',
 			component: () => import('./views/demo.vue'),
 		},

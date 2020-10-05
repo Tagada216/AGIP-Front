@@ -23,7 +23,7 @@ import { setTimeout } from 'timers';
 import { constants } from 'crypto';
 import { log } from 'util';
 import { arraySlugToHeader, arraySlugifier, arrayToJSON } from '../etlUtils';
-import { Multipane, MultipaneResizer } from 'vue-multipane';
+
 
 export default {
 	data() {
