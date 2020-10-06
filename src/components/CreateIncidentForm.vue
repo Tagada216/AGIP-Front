@@ -266,23 +266,18 @@ import { win32 } from 'path';
 import readXlsxFile from 'read-excel-file';
 import { Loading } from 'element-ui';
 import { Transform } from 'stream';
-
 export default {
 	components: { MyUpdateIncidentForm },
-
 	created() {
 		this.getFieldsOptions();
 		this.duplicate();
 	},
-
 	props: {
 		incident_id: {
 			type: Number,
 		},
 	},
-
 	
-
 	data() {
 		return {
 			// Données énumérées venant de l'API
@@ -293,8 +288,6 @@ export default {
 				application_impactee: [],
 			},
 			
-
-
 			// Données du formulaire
 			form: {
 				references: [], //
@@ -310,7 +303,6 @@ export default {
 				enseigne_impactee: [],
 				application_impactee: [],
 			},
-
 			// Données du formulaire agence
 			agence: {
 				references: '', //
@@ -327,7 +319,6 @@ export default {
 				application_impactee: [],
 				cause: '',
 			},
-
 			// Règles de validation pour le formulaire
 			rules: {
 				date_debut: [
@@ -388,7 +379,6 @@ export default {
 					},
 				],
 			},
-
 			// Les lignes suivantes sont des variables nécessaires au modal de suppression
 			delConfirmationModalVisible: false,
 			delConfirmationModalVisibleApp: false,
@@ -413,17 +403,13 @@ export default {
 				.indexOf(appSelection.display_name);
 			this.form.application_impactee[appIndex] = appSelection;
 		},
-
+		
 		// Méthode exécuté par le bouton "Sauvegarder".
 		// Elle gère la validation du formulaire ainsi que l'envoie des données vers l'API
 		submit() {
 			//console.log(this.form.application_impactee);
-			//console.log(this.form.references.keys(0));
-			//console.log(this.form.references.length);
-			//console.log(this.form.references[0].reference);
-			//console.log(this.form.references[0].reference.toUpperCase());
-
-
+			
+			
 			this.$refs['form'].validate(valid => {
 				if (valid) {
 					// On vérifie qu'il y a au moins une référence
@@ -436,10 +422,6 @@ export default {
 						});
 						return false;
 					}
-
-
-					
-
 					// On vérifie qu'il y a au moins une application impactée
 					else if (this.form.application_impactee.length == 0) {
 						this.$message({
@@ -450,7 +432,6 @@ export default {
 						});
 						return false;
 					}
-
 					// On parcourt tous les champs applications impactées
 					for (
 						var i = 0;
@@ -472,56 +453,56 @@ export default {
 						}
 					}
 		
-
-		        // On parcourt tous les champs référence
-			    for(
-				let i = 0;
-				i< this.form.references.length;
-				i++
-				){
+		        	// On parcourt tous les champs référence
+			    	for(
+					let i = 0;
+					i< this.form.references.length;
+					i++
+					){
 					// Si le premier champs est vide on écrit "A venir"
-				    if(this.form.references.length == 1 && this.form.references[i].reference == ''){
+				    	if(this.form.references.length == 1 && this.form.references[i].reference == '' && this.form.statut_id != 5){
 								
                             this.form.references[i].reference = 'A venir';
-					}
+						}
+						else if ((this.form.references.length == 1 && this.form.references[i].reference == '') ||
+								 (this.form.references.length == 1 && this.form.references[i].reference == 'A venir'))
+						{
+							this.form.references[i].reference = 'A venir';
+						}
 					// Si il y à plusieurs champs, les champs doivent êtres remplis d'une références obligatoirement et au bon format
-				    else if (this.form.references.length >= 1 &&
-						this.form.references[i].reference.length >=1 && 
-						this.isValid(this.form.references[i].reference.toUpperCase()))
+				    	else if (this.form.references.length >= 1 &&
+								 this.form.references[i].reference.length >=1 && 
+								 this.isValid(this.form.references[i].reference.toUpperCase())
+								)
 				    {
 						this.form.references[i].reference = this.form.references[i].reference.toUpperCase();
 						//console.log(this.form.references[i].reference);
 						//console.log(this.form.references[i].reference.toUpperCase());
 						//console.log(this.form.references[i].reference.length);
 						//console.log("OK ");
-
 				    }else{
 						this.$message({
 								dangerouslyUseHTMLString: true,
 								message:
-									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Si il y à plus de deux références veuillez remplir les champs au format : \"P00IN-0000000\".</p>",
+									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Si il y à plus de deux <strong>Références</strong> </br><strong>ou</strong></br>==> Si le <strong>Statut est Résolu<strong/> veuillez remplir le(s) champs <strong>Référence</strong> au format : \"P00IN-0000000\".</p>",
 								type: 'error',
 							});
 							return false;
 					}
+					if(this.form.statut_id === 5 && this.form.date_fin === null){
+							this.$message({
+								dangerouslyUseHTMLString: true,
+								message:
+									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Le Statut de l'incident est en <strong>Résolu</strong> le champs <strong>Fin de l'incident est obligatoire</strong> .</p>",
+								type: 'error',
+							});
+							return false;
+					}	
 				}
 				
-				
-
-					// On parcourt tous les champs référence
-					/*for (var i = 0; i < this.form.references.length; i++) {
-						// Si les champs sont vides on écrit "A venir"
-						if (
-							this.form.references.length >= 1 &&
-							this.form.references[i].reference == ''
-						) {
-							this.form.references[i].reference = 'A venir';
-							console.log('A venir');
-						}
-					} */
-
 					console.log(this.form);
-
+					
+					
 					// On enregistre en base de données
 					this.$http
 						.post(
@@ -534,7 +515,6 @@ export default {
 								Car il se peut que ça se passe mal et qu'on envoi quand même un message de succés.
 								De plus la fonction window.alert() stop tous les autres traitement JS
 							*/
-
 							// Ceci est un composent du module Element (Voir : https://element.eleme.io/#/fr-FR/component/message)
 							this.$message({
 								dangerouslyUseHTMLString: true,
@@ -542,8 +522,8 @@ export default {
 									"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
 								type: 'success',
 							});
+							window.location.reload();
 						});
-						window.location.reload();
 				} else {
 					this.$message({
 						dangerouslyUseHTMLString: true,
@@ -552,16 +532,17 @@ export default {
 						type: 'error',
 					});
 					return false;
+			
 				}
 			});
+			
 		},
-
+		
 		///////Partie Agence/////////
 		importer() {
 			readXlsxFile(this.$refs.fichierAgence.files[0]).then(rows => {
 				
 				var agencesJSON = arrayToJSON(rows);
-
 				console.log(agencesJSON);
 				//console.log(this.remoteEnum);
 				for (const agence of agencesJSON) {
@@ -573,10 +554,9 @@ export default {
 					agence.prio = this.remoteEnum.priorites.find(el => el.priorite == agence.prio).id
 					console.log(agence);
 				}
-
 				for (const row of rows) {
 					// Si le statut est en cours on ajoute l'incident dans la main courante
-					if (row[7].includes('En cours')) {
+					if (row[7].includes('En cours')== true) {
 						//this.ajoutIncidentsAgencesVisible=true
 						Axios.get(
 							'http://localhost:5000/api/main-courante'
@@ -587,9 +567,7 @@ export default {
 							var mois = '';
 							var moisFin = '';
 							// ----- Début des différentes modifs à faire
-
 							this.agence.references = row[0];
-
 							if (input.files[0].name.includes('CDN' || 'cdn')) {
 								this.agence.enseigne_impactee = 2;
 							}
@@ -601,9 +579,7 @@ export default {
 							if (input.files[0].name.includes('BPF' || 'bpf')) {
 								this.agence.enseigne_impactee = 3;
 							}
-
 							this.agence.description_impact = row[5];
-
 							if (this.agence.application_impactee.length >= 1) {
 								console.log(
 									"L'application est déjà présente dans le champ application impactée"
@@ -614,41 +590,32 @@ export default {
 										'Infrastructure Réseau Banque de Détail',
 								});
 							}
-
 							this.agence.cause = row[8];
-
 							////////////// Statut ///////////////
 							// if (row[7].includes('En cours') == true) {
 							// 	this.agence.statut_id = 2;
 							// }
-
 							// if (row[7].includes('Clos') == true) {
 							// 	this.agence.statut_id = 5;
 							// }
 							////////////////////////////////////
-
 							////////// Priorité /////////////
 							if (row[6].includes('P0') == true) {
 								this.agence.priorite_id = 1;
 							}
-
 							if (row[6].includes('P1') == true) {
 								this.agence.priorite_id = 2;
 							}
-
 							if (row[6].includes('P2') == true) {
 								this.agence.priorite_id = 3;
 							}
-
 							if (row[6].includes('P3') == true) {
 								this.agence.priorite_id = 4;
 							}
-
 							if (row[6].includes('P4') == true) {
 								this.agence.priorite_id = 5;
 							}
 							//////////////////////////////////
-
 							// Afin d'afficher la date dans le format voulu soit JJ/MM/AAAA
 							if (date[4] + date[5] + date[6] == 'Jan') {
 								mois = '01';
@@ -675,7 +642,6 @@ export default {
 							} else {
 								mois = '12';
 							}
-
 							// Afin d'afficher la date dans le format voulu soit JJ/MM/AAAA
 							if (dateFin[4] + dateFin[5] + dateFin[6] == 'Jan') {
 								moisFin = '01';
@@ -732,7 +698,6 @@ export default {
 							} else {
 								moisFin = '12';
 							}
-
 							if (row[4].includes('isolée') == true) {
 								this.agence.description =
 									'Depuis le ' +
@@ -787,7 +752,6 @@ export default {
 									row[5] +
 									' utilisateurs)';
 							}
-
 							////// La date et l'heure récupérées ne sont pas les bonnes (14h en plus)
 							this.agence.date_debut =
 								date[11] +
@@ -827,7 +791,6 @@ export default {
 								dateFin[21] +
 								dateFin[22] +
 								dateFin[23];
-
 							let loadingInstance = Loading.service({
 								fullscreen: true,
 							});
@@ -850,7 +813,6 @@ export default {
 				}
 			});
 		},
-
 		// Permet de dupliquer l'incident sélectionné dans la main courante
 		duplicate() {
 			// On récupère l'id de l'incident situé après le '=' dans l'url
@@ -859,7 +821,6 @@ export default {
 				var idIncident = window.location.href.substr(test + 1);
 				console.log(idIncident);
 			}
-
 			// On récupère les informations de l'incident à dupliquer et on les affiche dans les champs correspondant
 			if (idIncident != undefined) {
 				Axios.get(
@@ -886,13 +847,11 @@ export default {
 					this.form.enseigne_impactee = [];
 					this.form.references = [];
 					this.form.application_impactee = [];
-
 					for (const ens_id of response.data[0].id_enseigne.split(
 						'/'
 					)) {
 						this.form.enseigne_impactee.push(parseInt(ens_id));
 					}
-
 					for (
 						let index = 0;
 						index < response.data[0].reference_id.split('/').length;
@@ -909,22 +868,18 @@ export default {
 							reference: ref,
 						});
 					}
-
 					for (const app of response.data[0].display_name.split(
 						'|||'
 					)) {
 						console.log({ display_name: app });
-
 						this.form.application_impactee.push({
 							display_name: app,
 						});
 					}
-
 					console.log(this.form.application_impactee);
 				});
 			}
 		},
-
 		////////////////////////////////////////
 		// Il faudra voir pour dedoublonner ces fonctions mais c'est pas urgent
 		////////////////////////////////////////
@@ -941,7 +896,6 @@ export default {
 		handleCreate() {
 			this.form.references.push({ reference: '' });	
 		},
-
 		// Les handler pour la table et le modal des applis impactees
 		confirmDeleteApp() {
 			this.form.application_impactee.splice(this.indexRefToDeleteApp, 1);
@@ -958,18 +912,15 @@ export default {
 			this.form.application_impactee.push({ display_name: '' });
 		},
 		////////////////////////////////////////
-
 		// Fonction pour activer le "required" du champ "Description Contournement" en fonction du selecteur OUI/NON
 		setContournementRule() {
 			this.rules.description_contournement[0].required = !this.rules
 				.description_contournement[0].required;
-
 			this.form.description_contournement = !this.rules
 				.description_contournement[0].required
 				? 'Aucun contournement'
 				: '';
 		},
-
 		// Méthode de récupération de tout les champs énumérées
 		getFieldsOptions() {
 			// Obtention des prioritées
@@ -978,21 +929,18 @@ export default {
 				.then(response => {
 					this.remoteEnum.priorites = response.data;
 				});
-
 			// Obtention des statuts
 			this.$http
 				.get('http://localhost:5000/api/incidents/statut')
 				.then(response => {
 					this.remoteEnum.statut = response.data;
 				});
-
 			// Obtention des enseignes
 			this.$http
 				.get('http://localhost:5000/api/enseignes')
 				.then(response => {
 					this.remoteEnum.enseignes = response.data;
 				});
-
 			// Obtention des applications
 			this.$http
 				.get('http://localhost:5000/api/applications')
@@ -1000,7 +948,6 @@ export default {
 					this.remoteEnum.applications = response.data;
 				});
 		},
-
 		////////////////////////////////////////
 		// Ces 2 fonctions sont nécessaire pour afficher les application dans le champ el-autocomplete
 		// Voir "querySearch" et "createFilter" dans https://element.eleme.io/#/en-US/component/input#autocomplete
@@ -1050,28 +997,20 @@ export default {
 .el-form
 	margin: 20px
 	text-align: left
-
 .card-header, .cell .el-input
 	margin: 0
-
 .el-card
 	margin-bottom: 20px
-
 .el-checkbox-group
 	text-align: center
-
 .el-date-editor.el-input, .el-select, .el-autocomplete
 	width: 100%
-
 label.el-form-item__label
 	line-height: 15px
-
 .arrayFormEmpty
 	color: red
-
 th:first-child .cell
 	&::before
 		content: "* "
 		color: red
-
 </style>
