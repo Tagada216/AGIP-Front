@@ -291,7 +291,8 @@
                             :autosize="{ minRows: 4, maxRows: 8 }"
                             placeholder="Cause"
                             v-model="form.cause"
-                        ></el-input>
+                        >
+                        </el-input>
                     </el-form-item>
 
                     <el-form-item label="Origine">
@@ -404,21 +405,16 @@ import { importSpecifier, thisTypeAnnotation, identifier } from 'babel-types';
 import readXlsxFile from 'read-excel-file'
 import { setTimeout } from 'timers';
 import { constants } from 'crypto';
-
 export default {
-
     created() {
 		this.getFieldsOptions();
 		this.getIncident(this.incident_id);
-
     },
-
     props: {
         incident_id: {
             type: Number,
         },
 	},
-
     data() {
         return {
             // Données énumérées venant de l'API
@@ -428,7 +424,6 @@ export default {
                 enseignes: [],
 				application_impactee: [],
 			},
-
             // Données du formulaire
             form: {
                 incident_id: 0,
@@ -491,7 +486,6 @@ export default {
                         trigger: 'blur',
                     },
                 ],
-
                 action_retablissement: [
                     {
                         required: false,
@@ -499,7 +493,6 @@ export default {
                         trigger: 'blur',
                     },
                 ],
-
                 priorite_id: [
                     {
                         required: true,
@@ -530,7 +523,6 @@ export default {
                     },
                 ],
             },
-
             // Les lignes suivantes sont des variables nécessaires au modal de suppression
             delConfirmationModalVisible: false,
             delConfirmationModalVisibleApp: false,
@@ -542,17 +534,25 @@ export default {
 			dialogFormVisible:false,
         };
 	},
-
 	
     methods: {
         // Cette méthode est lancée quand un champ d'appli impacté s'est vu selectionné une appli parmis les propositions
         // Quand tel est le cas, on insere les données de l'appli (CI et trigramme) pour pouvoir la relier en BDD
+        isValid(value){
+			return /^P\d{2,}[IN|PB|CH|RQ]{2,}[-]{1,}\d{7,}$/.test(value);
+		},
         appSelected(appSelection){
             const appIndex = this.form.application_impactee.map(el => el.display_name).indexOf(appSelection.display_name)
             this.form.application_impactee[appIndex] = appSelection
         },
-
         onSubmit() {
+            // Vérification si les champs son vide ne pas enregistrer la valeur null retourner par défaut par vueJS avec le v-model
+            if ((this.form.cause == "null" ) || (this.form.cause == null) && (this.form.origine == "null" ) || (this.form.origine == null) && (this.form.action_retablissement == "null" ) || (this.form.action_retablissement == null) && (this.form.plan_action == "null" ) || (this.form.plan_action == null) ){
+                this.form.cause = "";
+                this.form.origine="";
+                this.form.action_retablissement="";
+                this.form.plan_action="";
+            }
             this.$refs['form'].validate(valid => {
                 if (valid) { 
                     /*// On vérifie qu'il y a au moins une référence
@@ -565,7 +565,6 @@ export default {
                         alert('Aucune donnée dans les applications impactées');
                         return false;
                     }*/
-
 					// On vérifie qu'il y a au moins une référence
                     if (this.form.references.length == 0) {
                         this.$message({
@@ -576,7 +575,6 @@ export default {
                     });
                         return false;
                     }
-
                     // On vérifie qu'il y a au moins une application impactée
                     else if (this.form.application_impactee.length == 0) {
                         this.$message({
@@ -603,7 +601,6 @@ export default {
                             return false;
                         }
                     }
-
 					 // On parcourt tous les champs référence
 			    for(
 				let i = 0;
@@ -611,10 +608,15 @@ export default {
 				i++
 				){
 					// Si le premier champs est vide on écrit "A venir"
-				    if(this.form.references.length == 1 && this.form.references[i].reference == ''){
+				    if(this.form.references.length == 1 && this.form.references[i].reference == '' && this.form.statut_id != 5){
 								
                             this.form.references[i].reference = 'A venir';
-					}
+                    }
+                    else if ((this.form.references.length == 1 && this.form.references[i].reference == '') ||
+								 (this.form.references.length == 1 && this.form.references[i].reference == 'A venir'))
+						{
+							this.form.references[i].reference = 'A venir';
+						}
 					// Si il y à plusieurs champs, les champs doivent êtres remplis d'une références obligatoirement et au bon format
 				    else if (this.form.references.length >= 1 &&
 						this.form.references[i].reference.length >=1 && 
@@ -625,7 +627,6 @@ export default {
 						//console.log(this.form.references[i].reference.toUpperCase());
 						//console.log(this.form.references[i].reference.length);
 						//console.log("OK ");
-
 				    }else{
 						this.$message({
 								dangerouslyUseHTMLString: true,
@@ -635,15 +636,19 @@ export default {
 							});
 							return false;
                     }
-                    
+                    if(this.form.statut_id === 5 && this.form.date_fin === null){
+						this.$message({
+								dangerouslyUseHTMLString: true,
+								message:
+									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Le Statut de l'incident est en <strong>Résolu</strong> le champs <strong>Fin de l'incident est obligatoire</strong> .</p>",
+								type: 'error',
+							});
+							return false;
+					}   
                 }
-
 						console.log(this.incident_id)
-
 						this.curID=this.incident_id
-
 						console.log(this.curID)
-
 						// On enregistre en base de données
 						this.$http
 							.put('http://localhost:5000/api/main-courante', 
@@ -655,9 +660,11 @@ export default {
                                 message:
                                     "<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
                                 type: 'success',
-							});
+                            });
+                            window.location.reload();
 						})
-                        window.location.reload();
+                        
+                        
 					}
                 else {
                     /*console.log('error');
@@ -709,20 +716,17 @@ export default {
 											console.log(row[0] + " Clos")
 										}
 									}
-
 								}
 							}
 						})
 				})
 			})
 		},
-
         ////////////////////////////////////////
         // Il faudra voir pour dedoublonner ces fonctions mais c'est pas urgent
         ////////////////////////////////////////
 		// Les handler pour la table et le modal des references
 		////////////////////////////////////////
-
         confirmDelete() {
             this.form.references.splice(this.indexToDelete, 1);
             this.delConfirmationModalVisible = false;
@@ -735,7 +739,6 @@ export default {
         handleCreate() {
             this.form.references.push({ reference: '' });
         },
-
         // Les handler pour la table et le modal des applis impactees
         confirmDeleteApp() {
             this.form.application_impactee.splice(this.indexRefToDeleteApp, 1);
@@ -751,7 +754,6 @@ export default {
         handleCreateApp() {
             this.form.application_impactee.push({ display_name: '' });
 		},
-
 		//
 		confirmDeleteAppAgence() {
             this.agence.application_agence.splice(this.indexRefToDeleteAppAgence, 1);
@@ -768,18 +770,15 @@ export default {
             this.agence.application_agence.push({ display_name_agence: '' });
         },
         ////////////////////////////////////////
-
         // Fonction pour activer le "required" du champ "Description Contournement" en fonction du selecteur OUI/NON
         setContournementRule() {
             this.rules.description_contournement[0].required = !this.rules
                 .description_contournement[0].required;
-
             this.form.description_contournement = !this.rules
                 .description_contournement[0].required
                 ? 'Aucun contournement'
                 : '';
 		},
-
 		// Méthode qui permet de dupliquer l'incident sélectionné
 		dupliquer() {
 			window.location.href="/#/new-incident/id="+this.incident_id
@@ -790,7 +789,6 @@ export default {
 				console.log(this.incident_id)
 			}
 		},
-
 		// Méthode qui permet d'envoyer l'incident séléctionné vers un formulaire COSIP
 		cosip() {
 			window.location.href='/#/cosip/id='+this.incident_id
@@ -806,7 +804,6 @@ export default {
         async envoyerMail() {
             // Only needed if you don't have a real mail account for testing
             let testAccount = await nodemailer.createTestAccount();
-
             // create reusable transporter object using the default SMTP transport
             let transporter = nodemailer.createTransport({
                 host: 'smtp.ethereal.email',
@@ -817,7 +814,6 @@ export default {
                     pass: testAccount.pass // generated ethereal password
                 }
             });
-
             // send mail with defined transport object
             let info = await transporter.sendMail({
                 from: '"Fred Foo 👻" <foo@example.com>', // sender address
@@ -826,18 +822,12 @@ export default {
                 text: 'Hello world?', // plain text body
                 html: '<b>Hello world?</b>' // html body
             });
-
             console.log('Message sent: %s', info.messageId);
             // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
             // Preview only available when sending through an Ethereal account
             console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
             // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-
-
-
             //Récupération des différents champs
-
             // var description = document.getElementById('description').value;
             // var description_impact = document.getElementById(
             //     'description_impact'
@@ -855,7 +845,6 @@ export default {
             // var enseigne = this.form.enseigne_impactee;
             // var ref = this.form.references;
             // //Définition des adresses mail, de l'objet et du contenu du mail
-
             // var adresseMail = 'lucie.varlet@socgen.com';
             // var obj =
             //     '[Incident ' +
@@ -890,7 +879,6 @@ export default {
             //     '\nITIM/GSI/TDC' +
             //     '\nHeures Ouvrées : 01-42-14-22-23' +
             //     '\nAstreinte de crise : 06-09-79-20-35';
-
             // //Ouvre outlook avec le mail pré-rempli (adresses mail, objet, corps du mail (Possibilité d'ajouter les CC))
             // //window.open("mailto:"+adresseMail+"?subject="+obj+"&body="+body)
             // var mailTo =
@@ -901,13 +889,10 @@ export default {
             //     '&body=' +
             //     encodeURIComponent(formatedBody);
             // window.location.href = mailTo;
-
             // ////////////////////////////////////////
             // //////////////NODEMAILER////////////////
             // ////////////////////////////////////////
-
             // /*const nodeMailer = require('nodemailer');
-
             //     var transporter = nodeMailer.createTransport({
             //         service: 'Outlook365',
             //         auth: {
@@ -915,7 +900,6 @@ export default {
             //             pass: '',
             //         },
             //     });
-
             //     var mailOptions = {
             //         from: 'lucie.varlet@socgen.com',
             //         to: 'lucie-varlet@hotmail.fr',
@@ -923,17 +907,14 @@ export default {
             //         text: 'Message',
             //         html: '<b>corps du mail</b>',
             //     };
-
             //     transporter.sendMail(mailOptions, function(error, info) {
             //         if (error) {
             //             return console.log(error);
             //         }
             //         console.log('Message sent: ' + info.response);
             //     });
-
             //     transporter.close();*/
         },
-
         // Méthode de récupération de tout les champs énumérées
         getFieldsOptions() {
             // Obtention des prioritées
@@ -942,21 +923,18 @@ export default {
                 .then(response => {
                     this.remoteEnum.priorites = response.data;
                 });
-
             // Obtention des statuts
             this.$http
                 .get('http://localhost:5000/api/incidents/statut')
                 .then(response => {
                     this.remoteEnum.statut = response.data;
                 });
-
             // Obtention des enseignes
             this.$http
                 .get('http://localhost:5000/api/enseignes')
                 .then(response => {
                     this.remoteEnum.enseignes = response.data;
                 });
-
             // Obtention des application
             this.$http
                 .get('http://localhost:5000/api/applications')
@@ -964,7 +942,6 @@ export default {
                     this.remoteEnum.applications = response.data;
                 });
         },
-
         ////////////////////////////////////////
         // Ces 2 fonctions sont nécessaire pour afficher les application dans le champ el-autocomplete
         // Voir "querySearch" et "createFilter" dans https://element.eleme.io/#/en-US/component/input#autocomplete
@@ -1001,7 +978,6 @@ export default {
             };
 		},
         ////////////////////////////////////////
-
         // Récupère les informations d'un incident pour l'insérer dans le formulaire
         getIncident(idIncident) {
             // Obtention de l'incident
@@ -1023,9 +999,8 @@ export default {
                     response.data[0].date_qualif_p01;
                 this.form.date_premiere_com = response.data[0].date_premier_com;
                 this.form.cause = response.data[0].cause;
+                this.form.action_retablissement = response.data[0].action_retablissement;
                 this.form.origine = response.data[0].origine;
-                this.form.action_retablissement =
-                    response.data[0].action_retablissement;
                 this.form.plan_action = response.data[0].plan_action;
                 this.form.is_faux_incident = response.data[0].is_faux_incident
                     ? true
@@ -1037,11 +1012,9 @@ export default {
                 this.form.enseigne_impactee = [];
 				this.form.references = [];
 				this.form.application_impactee = [];
-
                 for (const ens_id of response.data[0].id_enseigne.split('/')) {
 					this.form.enseigne_impactee.push(parseInt(ens_id));
                 }
-
                 for (
                     let index = 0;
                     index < response.data[0].reference_id.split('/').length;
@@ -1065,7 +1038,6 @@ export default {
             });
         },
     },
-
     watch: {
         incident_id: function() {
             this.getIncident(this.incident_id);
@@ -1083,25 +1055,18 @@ export default {
 .el-form
 	margin: 20px
 	text-align: left
-
 .card-header, .cell .el-input
 	margin: 0
-
 .el-card
 	margin-bottom: 20px
-
 .el-checkbox-group
 	text-align: center
-
 .el-date-editor.el-input, .el-select, .el-autocomplete
 	width: 100%
-
 label.el-form-item__label
 	line-height: 15px
-
 th:first-child .cell
 	&::before
 		content: "* "
 		color: red
-
 </style>

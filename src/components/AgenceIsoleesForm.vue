@@ -62,29 +62,48 @@ export default {
 					response => {
 						// On parcourt toutes les lignes du fichier Excel des agences
 						for (const row of rows) {
-							//console.log(row);
-							//console.log(row[0]);
-							//console.log(row[7]);
-							//console.log(row[2]);
-							var reponse = response.data;
+							const reponse = response.data;
 
 							for (const rep of reponse) {
+								// Si la référence existe déjà, ont la met à jours
+								if (rep.reference == row[0]) {
 
-                                // Si la référence existe déjà, ont la met à jours
-								if ((row[0].includes('Réf'))) {
-                                    //console.log('ref non identiques');
-
-                                        this.agence.references = row[0];
-                                        console.log(this.agence.references);
-                                    
-                                    
-                                console.log('Références identiques');
 									
-                                
-                                } 
-                                // Sinon on effectue une insertion
-                                else {
-                                    /*this.$http
+									this.agence.references = row[0];
+									//console.log(this.agence.references);
+									
+									this.agence.date_debut = row[1];
+									this.agence.date_fin = row[2];
+									
+									
+
+									// On enregistre en base de données
+									this.$http
+										.put(
+											'http://localhost:5000/api/main-courante',
+											this.form
+										)
+										.then(result => {
+											this.$message({
+												dangerouslyUseHTMLString: true,
+												message:
+													"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+												type: 'success',
+											});
+										});
+									//window.location.reload();
+								}
+								// Sinon on effectue une insertion
+								else {
+									// On exclu la première ligne du fichier Excel
+									if (row[0].includes('Réf')) {
+										console.log('je suis le ot Réf');
+									} else {
+										this.agence.references = row[0];
+										console.log(
+											'Références non identiques'
+										);
+										/*this.$http
 										.post(
 											'http://localhost:5000/api/creation-incident_main-courante',
 											this.agence
@@ -97,7 +116,7 @@ export default {
 												type: 'success',
 											});
                                         });*/
-									console.log('Références non identiques');
+									}
 								}
 
 								//console.log(response.data[p].reference);
