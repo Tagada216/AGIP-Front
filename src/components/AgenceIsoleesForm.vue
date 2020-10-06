@@ -18,8 +18,9 @@ import { importSpecifier, thisTypeAnnotation, identifier } from 'babel-types';
 import readXlsxFile from 'read-excel-file';
 import { setTimeout } from 'timers';
 import { constants } from 'crypto';
-import { log } from 'util';
+import { log, isNull } from 'util';
 import { arraySlugToHeader, arraySlugifier, arrayToJSON } from '../etlUtils';
+import fs from 'fs';
 
 export default {
 	data() {
@@ -47,11 +48,16 @@ export default {
 				enseigne_impactee: '',
 				application_impactee: [],
 				cause: '',
+				is_agence: true,
+
 			},
 		};
 	},
 
 	methods: {
+
+
+		
 		//////Partie Agence/////////
 		importer(event) {
 			const file = event.target.files[0];
@@ -60,28 +66,30 @@ export default {
 			readXlsxFile(file).then(rows => {
 				Axios.get('http://localhost:5000/api/reference').then(
 					response => {
+
+						
+
 						// On parcourt toutes les lignes du fichier Excel des agences
 						for (const row of rows) {
 							const reponse = response.data;
 
-							for (const rep of reponse) {
 								// Si la référence existe déjà, ont la met à jours
 								if (rep.reference == row[0]) {
-
-									
 									this.agence.references = row[0];
-									//console.log(this.agence.references);
-									
-									this.agence.date_debut = row[1];
-									this.agence.date_fin = row[2];
-									
+									console.log(this.agence.references);
+
+									let date = row[1]+''
+									let dateFin = row[2]+''
+									let mois= ""
+									let moisFin = ""
+
 									
 
 									// On enregistre en base de données
-									this.$http
+									/*this.$http
 										.put(
 											'http://localhost:5000/api/main-courante',
-											this.form
+											this.agence
 										)
 										.then(result => {
 											this.$message({
@@ -91,12 +99,12 @@ export default {
 												type: 'success',
 											});
 										});
-									//window.location.reload();
+									//window.location.reload();*/
 								}
 								// Sinon on effectue une insertion
 								else {
 									// On exclu la première ligne du fichier Excel
-									if (row[0].includes('Réf')) {
+									/*if (row[0].includes('Réf')) {
 										console.log('je suis le ot Réf');
 									} else {
 										this.agence.references = row[0];
@@ -116,7 +124,7 @@ export default {
 												type: 'success',
 											});
                                         });*/
-									}
+									//}
 								}
 
 								//console.log(response.data[p].reference);
