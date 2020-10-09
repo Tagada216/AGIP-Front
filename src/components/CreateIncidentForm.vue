@@ -251,7 +251,7 @@
 		<!-- Fin Modal de confirmation de suppression d'une application impactée-->
 
 		<el-form-item style="text-align: center">
-			<el-button type="primary" @click="submit()">Sauvegarder</el-button>
+			<el-button type="primary" class="button" @click="submit()">Sauvegarder</el-button>
 		</el-form-item>
 	</el-form>
 </template>

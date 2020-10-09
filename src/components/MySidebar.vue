@@ -1,5 +1,5 @@
 <template>
-    <sidebar-menu widthCollapsed="70px" :menu="menu" />
+	<sidebar-menu widthCollapsed="70px" :menu="menu" />
 </template>
 
 <style lang="sass">
@@ -8,6 +8,10 @@ $itemPadding: 10px
 $itemlineHeight: 50px
 $iconHeight: 50px
 $iconWidth: 50px
+
+.v-sidebar-menu .vsm-item.first-item.active-item > .vsm-link > .vsm-icon, .v-sidebar-menu .vsm-item.first-item.parent-active-item > .vsm-link > .vsm-icon 
+    color: #fff
+    background-color: #ed1a3a !important
 
 .active-item
     background-color: $primaryColor
@@ -19,22 +23,23 @@ $iconWidth: 50px
     font-size: 1.2em
 
 .v-sidebar-menu
+    background-color: #1e1e21 !important
     .vsm-header
         font-size: 1.4em
     .vsm-link
         font-size: 1.3em
 
     .collapse-btn
-
+        height: 80px !important
         &:after
             content: ">"
             font-size: 5em
-        height: 70px
+            height: 70px
 
     .vsm-arrow
         &:after
             content: ">"
-            font-size: 2em
+            font-size: 5em
 
     .vsm-item.first-item.open-item > .vsm-link
         background-color: #888888
@@ -43,92 +48,92 @@ $iconWidth: 50px
 <script>
 import { SidebarMenu } from 'vue-sidebar-menu';
 export default {
-    name: 'MySidebar',
-    data() {
-        return {
-            menu: [
-                {
-                    // item
-                    href: '/',
-                    title: 'Accueil',
-                    icon: 'fas fa-home',
-                    // disabled: true
-                    // class: ''
-                    // attributes: {}
-                    // alias: '/path'
-                },
-                {
-                    header: true,
-                    title: 'Incidents',
-                    // component: componentName
-                    // visibleOnCollapse: true
-                    // class:''
-                    // attributes: {}
-                },
-                {
-                    href: '/new-incident',
-                    title: 'Nouvel incident',
-                    icon: 'fas fa-pen',
-                },
-                {
-                    href: '/agence-isolees',
-                    title: 'Agence Isolées',
-                    icon: 'fas fa-folder-plus',
-                },
-                {
-                    href: '/main-courante',
-                    title: 'Main courante',
-                    icon: 'fas fa-book-open',
+	name: 'MySidebar',
+	data() {
+		return {
+			menu: [
+				{
+					// item
+					href: '/',
+					title: 'Accueil',
+					icon: 'fas fa-home',
+					// disabled: true
+					// class: ''
+					// attributes: {}
+					// alias: '/path'
+				},
+				{
+					header: true,
+					title: 'Incidents',
+					// component: componentName
+					// visibleOnCollapse: true
+					// class:''
+					// attributes: {}
+				},
+				{
+					href: '/new-incident',
+					title: 'Nouvel incident',
+					icon: 'fas fa-pen',
+				},
+				{
+					href: '/agence-isolees',
+					title: 'Agence Isolées',
+					icon: 'fas fa-folder-plus',
+				},
+				{
+					href: '/main-courante',
+					title: 'Main courante',
+					icon: 'fas fa-book-open',
 				},
 				{
 					href: '/cosip',
 					title: 'COSIP',
 					icon: 'fas fa-tasks',
 				},
-                // {
-                //     href: '/fichier-rouge',
-                //     title: 'Fichier Rouge',
-                //     icon: 'fas fa-file',
-                // },
-                // {
-                //     href: '/post-mortem',
-                //     title: 'Post-Mortem',
-                //     icon: 'fas fa-archive',
-                // },
-                {
-                    header: true,
-                    title: 'Problemes',
-                },
-                {
-                    href: '/problemes',
-                    title: 'Liste des problèmes',
-                    icon: 'fas fa-hands-helping',
+				// {
+				//     href: '/fichier-rouge',
+				//     title: 'Fichier Rouge',
+				//     icon: 'fas fa-file',
+				// },
+				// {
+				//     href: '/post-mortem',
+				//     title: 'Post-Mortem',
+				//     icon: 'fas fa-archive',
+				// },
+				{
+					header: true,
+					title: 'Problemes',
 				},
-                {
-                    header: true,
-                    title: 'Reportings',
+				{
+					href: '/problemes',
+					title: 'Liste des problèmes',
+					icon: 'fas fa-hands-helping',
+				},
+				{
+					header: true,
+					title: 'Reportings',
 				},
 
-                {
-                    href: '/statistique',
-                    title: 'Statistiques',
-                    icon: 'fas fa-chart-bar',
-                },
-            ],
-            props: {
-                widthCollapsed: {
-                    type: String,
-                    default: '50px',
-                },
-                collapsed: {
-                    type: Boolean,
-                    default: true,
-                },
-            },
-        };
-    },
-    components: {
-        SidebarMenu,
-    },
+				{
+					href: '/statistique',
+					title: 'Statistiques',
+					icon: 'fas fa-chart-bar',
+				},
+			],
+			props: {
+				widthCollapsed: {
+					type: String,
+					default: '50px',
+				},
+				collapsed: {
+					type: Boolean,
+					default: true,
+				},
+			},
+		};
+	},
+	components: {
+		SidebarMenu,
+	},
 };
 </script>

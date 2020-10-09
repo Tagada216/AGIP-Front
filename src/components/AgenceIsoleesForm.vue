@@ -2,7 +2,7 @@
 	<div>
 		<!-- Agences isolées -->
 		<h4 class="card-header">Agences isolées</h4>
-		<el-button type="primary" @click="importer()">Importer</el-button>
+		<el-button type="primary" class="button" @click="importer()">Importer</el-button>
 		<modal class="modal" name="importModal">
 			<div class="fileupload" :class="{ 'fileupload--slim': slim }">
 				<base-button v-if="slim">
@@ -176,7 +176,17 @@ export default {
 </script>
 
 <style lang="scss">
+$redColor: #ed1a3a;
+$blackColor: #2c3e50;
 
+
+.button {
+	background-color: #ed1a3a !important;
+	border-color: #ed1a3a !important;
+	padding: 15px 50px !important;
+	font-size: 20px !important;
+	border-radius: 25px !important;
+}
 
 .vm--modal {
 	width: 750px !important;
@@ -198,7 +208,7 @@ export default {
 	border: 10px solid;
 	border-image-slice: 1;
 	border-width: 5px;
-	border-image-source: linear-gradient(to left, #2c3e50, #ed1a3a);
+	border-image-source: linear-gradient(to left, $blackColor, $redColor);
 	cursor: pointer;
 
 	&--slim {
