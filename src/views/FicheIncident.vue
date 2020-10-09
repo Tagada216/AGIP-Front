@@ -5,7 +5,7 @@
     </div>
 </template>
 <script>
-import Cosip from '@/components/Cosip';
+import Cosip from '@/components/CosipForm';
 
 export default {
     components: {

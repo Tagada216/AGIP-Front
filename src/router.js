@@ -42,7 +42,7 @@ export default new Router({
 		},
 		{
 			path: '/cosip',
-			component: () => import('./views/FicheIncident.vue'),
+			component: () => import('./views/Cosip.vue'),
 		},
 		{
 			path: '/cosip/id=:id',
