@@ -3,8 +3,24 @@
 		<!-- Agences isolées -->
 		<h4 class="card-header">Agences isolées</h4>
 		<el-button type="primary" @click="importer()">Importer</el-button>
-		<modal name="example" height="auto">
-			<p class='p'>Hello word</p>
+		<modal class="modal" name="importModal">
+			<div class="fileupload" :class="{ 'fileupload--slim': slim }">
+				<base-button v-if="slim">
+					<slot :files="files">{{ title }}</slot>
+				</base-button>
+				<div v-else class="fileupload__help">
+					<slot :files="files">
+						<span>Glisser-Déposer un fichier</span>
+						<br />
+						<span>ou</span>
+						<br />
+						<span>Cliquer dans la fenêtre pour choisir un fichier</span>
+						<br />
+						<span class="fileupload__description">{{ description }}</span>
+					</slot>
+				</div>
+				<input type="file" class="fileupload__file" @change="fileSelected" />
+			</div>
 		</modal>
 		<!-- Fin agences isolées-->
 	</div>
@@ -22,12 +38,18 @@ import { arraySlugToHeader, arraySlugifier, arrayToJSON } from '../etlUtils';
 import fs from 'fs';
 import VModal from 'vue-js-modal';
 
-Vue.use(VModal, { componentName: 'modal' })
+Vue.use(VModal, { componentName: 'modal' });
 
 export default {
-	
+	props: {
+		slim: { type: Boolean, default: false },
+		title: { type: String, default: '' },
+	},
+
 	data() {
 		return {
+			files: [],
+
 			// Données énumérées venant de l'API
 			remoteEnum: {
 				priorites: [],
@@ -59,8 +81,13 @@ export default {
 	},
 
 	methods: {
+		fileSelected(event) {
+			const files = event.target.files;
+			this.files = [...files];
+		},
+
 		importer() {
-			this.$modal.show('example');
+			this.$modal.show('importModal');
 		},
 		//////Partie Agence/////////
 		/*chargerDoc(event) {
@@ -132,12 +159,78 @@ export default {
 			});
 		},*/
 	},
+
+	computed: {
+		description() {
+			switch (this.files.length) {
+				case 0:
+					return 'Aucun fichier sélectionné.';
+				case 1:
+					return `${this.files[0].name}`;
+				default:
+					return `${this.files.length} files selected.`;
+			}
+		},
+	},
 };
 </script>
 
-<style lang="sass">
-.card-header
-	margin-top: 5em
-	margin-bottom: 5em
+<style lang="scss">
 
+
+.vm--modal {
+	width: 750px !important;
+	height: 448px !important;
+}
+
+.card-header {
+	margin-top: 5em;
+	margin-bottom: 5em;
+}
+
+.fileupload {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 4rem 2rem;
+	height: 28em;
+	border: 10px solid;
+	border-image-slice: 1;
+	border-width: 5px;
+	border-image-source: linear-gradient(to left, #2c3e50, #ed1a3a);
+	cursor: pointer;
+
+	&--slim {
+		display: inline-block;
+		padding: 0;
+		border: none;
+	}
+
+	&__help {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+
+		font-size: 14px;
+		line-height: 19px;
+		color: #808196;
+		text-align: center;
+	}
+
+	&__file {
+		opacity: 0;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		cursor: inherit;
+	}
+
+	&__description {
+		margin-top: 1rem;
+		font-weight: 600;
+	}
+}
 </style>
