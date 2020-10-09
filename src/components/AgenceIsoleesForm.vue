@@ -1,12 +1,11 @@
 <template>
 	<div>
 		<!-- Agences isolées -->
-		<el-card>
-			<div slot="header">
-				<h4 class="card-header">Agences isolées</h4>
-			</div>
-			<input type="file" id="input" @change="importer($event)" style="margin-left:10px;" />
-		</el-card>
+		<h4 class="card-header">Agences isolées</h4>
+		<el-button type="primary" @click="importer()">Importer</el-button>
+		<modal name="example" height="auto">
+			<p class='p'>Hello word</p>
+		</modal>
 		<!-- Fin agences isolées-->
 	</div>
 </template>
@@ -21,8 +20,12 @@ import { constants } from 'crypto';
 import { log, isNull } from 'util';
 import { arraySlugToHeader, arraySlugifier, arrayToJSON } from '../etlUtils';
 import fs from 'fs';
+import VModal from 'vue-js-modal';
+
+Vue.use(VModal, { componentName: 'modal' })
 
 export default {
+	
 	data() {
 		return {
 			// Données énumérées venant de l'API
@@ -49,44 +52,39 @@ export default {
 				application_impactee: [],
 				cause: '',
 				is_agence: true,
-
+				service_metier: '',
+				observations: '',
 			},
 		};
 	},
 
 	methods: {
-
-
-		
+		importer() {
+			this.$modal.show('example');
+		},
 		//////Partie Agence/////////
-		importer(event) {
+		/*chargerDoc(event) {
 			const file = event.target.files[0];
 			//console.log(file);
 
 			readXlsxFile(file).then(rows => {
 				Axios.get('http://localhost:5000/api/reference').then(
 					response => {
-
-						
-
 						// On parcourt toutes les lignes du fichier Excel des agences
 						for (const row of rows) {
 							const reponse = response.data;
 
-								// Si la référence existe déjà, ont la met à jours
-								if (rep.reference == row[0]) {
-									this.agence.references = row[0];
-									console.log(this.agence.references);
+							// Si la référence existe déjà, ont la met à jours
+							if (rep.reference == row[0]) {
+								console.log(this.agence.references);
 
-									let date = row[1]+''
-									let dateFin = row[2]+''
-									let mois= ""
-									let moisFin = ""
+								let date = row[1] + '';
+								let dateFin = row[2] + '';
+								let mois = '';
+								let moisFin = '';
 
-									
-
-									// On enregistre en base de données
-									/*this.$http
+								// On enregistre en base de données
+								/*this.$http
 										.put(
 											'http://localhost:5000/api/main-courante',
 											this.agence
@@ -100,11 +98,11 @@ export default {
 											});
 										});
 									//window.location.reload();*/
-								}
-								// Sinon on effectue une insertion
-								else {
-									// On exclu la première ligne du fichier Excel
-									/*if (row[0].includes('Réf')) {
+		//}
+		// Sinon on effectue une insertion
+		//else {
+		// On exclu la première ligne du fichier Excel
+		/*if (row[0].includes('Réf')) {
 										console.log('je suis le ot Réf');
 									} else {
 										this.agence.references = row[0];
@@ -124,25 +122,22 @@ export default {
 												type: 'success',
 											});
                                         });*/
-									//}
-								}
+		//}
+		//}
 
-								//console.log(response.data[p].reference);
-							}
-						}
+		//console.log(response.data[p].reference);
+		/*}
 					}
 				);
-				//var agencesJSON = arrayToJSON(rows);
-
-				//console.log(agencesJSON);
-				//console.log(this.remoteEnum);
-
-				/*for( const agence of agencesJSON){
-
-					console.log(agence.ref);
-				}*/
 			});
-		},
+		},*/
 	},
 };
 </script>
+
+<style lang="sass">
+.card-header
+	margin-top: 5em
+	margin-bottom: 5em
+
+</style>

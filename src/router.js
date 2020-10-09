@@ -60,5 +60,6 @@ export default new Router({
 			path: '/agences',
 			component: () => import('./views/GestionAgence.vue')
 		},
+	
 	],
 });
