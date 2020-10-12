@@ -9,14 +9,16 @@ $itemlineHeight: 50px
 $iconHeight: 50px
 $iconWidth: 50px
 
-.v-sidebar-menu .vsm-item.first-item.active-item > .vsm-link > .vsm-icon, .v-sidebar-menu .vsm-item.first-item.parent-active-item > .vsm-link > .vsm-icon 
-    color: #fff
-    background-color: #ed1a3a !important
+
+
+.v-sidebar-menu .vsm-item.first-item.active-item > .vsm-link > .vsm-icon
+    background-color: $primaryColor !important
+		
 
 .active-item
     background-color: $primaryColor
-    & > a:hover
-        background-color: $primaryColor
+  
+		
 
 @import "vue-sidebar-menu/src/scss/vue-sidebar-menu.scss"
 .vsm-title

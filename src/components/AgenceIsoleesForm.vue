@@ -19,10 +19,11 @@
 						<span class="fileupload__description">{{ description }}</span>
 					</slot>
 				</div>
-				<input type="file" class="fileupload__file" @change="fileSelected" />
+				<input  accept=".xlsx, .xls, .xlsm" type="file" id="input" class="fileupload__file" @change="fileSelected" />
 			</div>
+			<el-button :loading="loading" type="primary" class="button-ok" @click="Ok">OK</el-button>
 		</modal>
-		<!-- Fin agences isolées-->
+		<!-- Fin agenc es isolées-->
 	</div>
 </template>
 
@@ -37,6 +38,7 @@ import { log, isNull } from 'util';
 import { arraySlugToHeader, arraySlugifier, arrayToJSON } from '../etlUtils';
 import fs from 'fs';
 import VModal from 'vue-js-modal';
+import XLSX from 'xlsx';
 
 Vue.use(VModal, { componentName: 'modal' });
 
@@ -44,11 +46,19 @@ export default {
 	props: {
 		slim: { type: Boolean, default: false },
 		title: { type: String, default: '' },
+		beforeUpload: Function, // eslint-disable-line
+		onSuccess: Function, // eslint-disable-line
 	},
 
 	data() {
 		return {
 			files: [],
+
+			loading: false,
+			excelData: {
+				header: null,
+				results: null,
+			},
 
 			// Données énumérées venant de l'API
 			remoteEnum: {
@@ -81,27 +91,40 @@ export default {
 	},
 
 	methods: {
+
+		generateData({ header, results }) {
+			this.excelData.header = header;
+			this.excelData.results = results;
+			this.onSuccess && this.onSuccess(this.excelData);
+		},
+
 		fileSelected(event) {
 			const files = event.target.files;
 			this.files = [...files];
+			console.log(files);
 		},
 
 		importer() {
 			this.$modal.show('importModal');
 		},
+
+		Ok() {
+			this.$modal.hide('importModal');
+		},
+
 		//////Partie Agence/////////
-		/*chargerDoc(event) {
+		changeDoc(event) {
 			const file = event.target.files[0];
-			//console.log(file);
+			console.log(file);
 
 			readXlsxFile(file).then(rows => {
 				Axios.get('http://localhost:5000/api/reference').then(
 					response => {
-						// On parcourt toutes les lignes du fichier Excel des agences
+						//On parcourt toutes les lignes du fichier Excel des agences
 						for (const row of rows) {
 							const reponse = response.data;
 
-							// Si la référence existe déjà, ont la met à jours
+							//Si la référence existe déjà, ont la met à jours
 							if (rep.reference == row[0]) {
 								console.log(this.agence.references);
 
@@ -110,54 +133,52 @@ export default {
 								let mois = '';
 								let moisFin = '';
 
-								// On enregistre en base de données
-								/*this.$http
-										.put(
-											'http://localhost:5000/api/main-courante',
-											this.agence
-										)
-										.then(result => {
-											this.$message({
-												dangerouslyUseHTMLString: true,
-												message:
-													"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-												type: 'success',
-											});
-										});
-									//window.location.reload();*/
-		//}
-		// Sinon on effectue une insertion
-		//else {
-		// On exclu la première ligne du fichier Excel
-		/*if (row[0].includes('Réf')) {
-										console.log('je suis le ot Réf');
-									} else {
-										this.agence.references = row[0];
-										console.log(
-											'Références non identiques'
-										);
-										/*this.$http
-										.post(
-											'http://localhost:5000/api/creation-incident_main-courante',
-											this.agence
-										)
-										.then(result => {
-											this.$message({
-												dangerouslyUseHTMLString: true,
-												message:
-													"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-												type: 'success',
-											});
-                                        });*/
-		//}
-		//}
+								//On enregistre en base de données
+								// this.$http
+								// 	.put(
+								// 		'http://localhost:5000/api/main-courante',
+								// 		this.agence
+								// 	)
+								// 	.then(result => {
+								// 		this.$message({
+								// 			dangerouslyUseHTMLString: true,
+								// 			message:
+								// 				"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+								// 			type: 'success',
+								// 		});
+								// 	});
+								// window.location.reload();
+							}
+							//Sinon on effectue une insertion
+							else {
+								//On exclu la première ligne du fichier Excel
+								// if (row[0].includes('Réf')) {
+								// 	console.log('je suis le ot Réf');
+								// } else {
+								// 	this.agence.references = row[0];
+								// 	console.log('Références non identiques');
+								// 	this.$http
+								// 		.post(
+								// 			'http://localhost:5000/api/creation-incident_main-courante',
+								// 			this.agence
+								// 		)
+								// 		.then(result => {
+								// 			this.$message({
+								// 				dangerouslyUseHTMLString: true,
+								// 				message:
+								// 					"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+								// 				type: 'success',
+								// 			});
+								// 		});
+								// }
+							}
 
-		//console.log(response.data[p].reference);
-		/*}
+							console.log(response.data[p].reference);
+						}
 					}
 				);
 			});
-		},*/
+		},
 	},
 
 	computed: {
@@ -179,18 +200,39 @@ export default {
 $redColor: #ed1a3a;
 $blackColor: #2c3e50;
 
-
 .button {
-	background-color: #ed1a3a !important;
-	border-color: #ed1a3a !important;
 	padding: 15px 50px !important;
 	font-size: 20px !important;
 	border-radius: 25px !important;
 }
 
+.button-ok {
+	background-color: #409eff;
+	border-color: #409eff;
+	color: #fff;
+	padding: 15px 50px !important;
+	font-size: 20px !important;
+	border-radius: 25px !important;
+	margin-top: 5em;
+	position: absolute;
+	top: 12em;
+	left: 15em;
+}
+
+.button-ok:focus,
+.button-ok:hover {
+	background: #66b1ff;
+	border-color: #66b1ff;
+	color: #fff;
+}
+
 .vm--modal {
 	width: 750px !important;
-	height: 448px !important;
+	height: 480px !important;
+	border: 10px solid;
+	border-image-slice: 1;
+	border-width: 5px;
+	border-image-source: linear-gradient(to left, $blackColor, $redColor);
 }
 
 .card-header {
@@ -204,11 +246,7 @@ $blackColor: #2c3e50;
 	align-items: center;
 	justify-content: center;
 	padding: 4rem 2rem;
-	height: 28em;
-	border: 10px solid;
-	border-image-slice: 1;
-	border-width: 5px;
-	border-image-source: linear-gradient(to left, $blackColor, $redColor);
+	height: 23em;
 	cursor: pointer;
 
 	&--slim {

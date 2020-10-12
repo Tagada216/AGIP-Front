@@ -1041,8 +1041,6 @@ export default {
     text-align: left
 
 .button 
-    background-color: #ed1a3a !important
-    border-color: #ed1a3a !important
     padding: 15px 50px !important
     font-size: 20px !important
     border-radius: 25px !important
