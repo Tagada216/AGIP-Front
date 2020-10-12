@@ -19,7 +19,13 @@
 						<span class="fileupload__description">{{ description }}</span>
 					</slot>
 				</div>
-				<input  accept=".xlsx, .xls, .xlsm" type="file" id="input" class="fileupload__file" @change="fileSelected" />
+				<input
+					accept=".xlsx, .xls, .xlsm"
+					type="file"
+					ref="excel-upload-input"
+					class="fileupload__file"
+					@change="fileSelected"
+				/>
 			</div>
 			<el-button :loading="loading" type="primary" class="button-ok" @click="Ok">OK</el-button>
 		</modal>
@@ -91,7 +97,6 @@ export default {
 	},
 
 	methods: {
-
 		generateData({ header, results }) {
 			this.excelData.header = header;
 			this.excelData.results = results;
@@ -101,15 +106,70 @@ export default {
 		fileSelected(event) {
 			const files = event.target.files;
 			this.files = [...files];
-			console.log(files);
+			//console.log(files);
+			const rawFile = files[0]; // only use files[0]
+			if (!rawFile) return;
+			this.upload(rawFile);
 		},
 
 		importer() {
 			this.$modal.show('importModal');
 		},
 
-		Ok() {
+		Ok(){
 			this.$modal.hide('importModal');
+		},
+
+		upload(rawFile) {
+			this.$refs['excel-upload-input'].value = null; // fix can't select the same excel
+			if (!this.beforeUpload) {
+				this.readerData(rawFile);
+				return;
+			}
+			const before = this.beforeUpload(rawFile);
+			if (before) {
+				this.readerData(rawFile);
+			}
+		},
+
+		readerData(rawFile) {
+			this.loading = true;
+			return new Promise((resolve, reject) => {
+				const reader = new FileReader();
+				reader.onload = e => {
+					const data = e.target.result;
+					const workbook = XLSX.read(data, { type: 'array' });
+					const firstSheetName = workbook.SheetNames[0];
+					const worksheet = workbook.Sheets[firstSheetName];
+					const header = this.getHeaderRow(worksheet);
+					const results = XLSX.utils.sheet_to_json(worksheet);
+					this.generateData({ header, results });
+					this.loading = false;
+					resolve();
+				};
+
+				reader.readAsArrayBuffer(rawFile);
+			});
+		},
+
+		getHeaderRow(sheet) {
+			const headers = [];
+			const range = XLSX.utils.decode_range(sheet['!ref']);
+			let C;
+			const R = range.s.r;
+			/* start in the first row */
+			for (C = range.s.c; C <= range.e.c; ++C) {
+				/* walk every column in the range */
+				const cell = sheet[XLSX.utils.encode_cell({ c: C, r: R })];
+				/* find the cell in the first row */
+				let hdr = 'UNKNOWN ' + C; // <-- replace with your desired default
+				if (cell && cell.t) hdr = XLSX.utils.format_cell(cell);
+				headers.push(hdr);
+			}
+			return headers;
+		},
+		isExcel(file) {
+			return /\.(xlsx|xls|xlsm|csv)$/.test(file.name);
 		},
 
 		//////Partie Agence/////////
@@ -204,6 +264,11 @@ $blackColor: #2c3e50;
 	padding: 15px 50px !important;
 	font-size: 20px !important;
 	border-radius: 25px !important;
+}
+
+.el-button.is-loading {
+	position: absolute !important;
+	pointer-events: none !important;
 }
 
 .button-ok {
