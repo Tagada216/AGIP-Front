@@ -25,6 +25,9 @@
 					ref="excel-upload-input"
 					class="fileupload__file"
 					@change="fileSelected"
+					@drop="handleDrop"
+					@dragover="handleDragover"
+					@dragenter="handleDragover"
 				/>
 			</div>
 			<el-button :loading="loading" type="primary" class="button-ok" @click="Ok">OK</el-button>
@@ -52,18 +55,23 @@ export default {
 	props: {
 		slim: { type: Boolean, default: false },
 		title: { type: String, default: '' },
-		beforeUpload: Function, // eslint-disable-line
-		onSuccess: Function, // eslint-disable-line
+		// beforeUpload: Function, // eslint-disable-line
+		// onSuccess: Function, // eslint-disable-line
 	},
 
 	data() {
 		return {
 			files: [],
 
-			loading: false,
-			excelData: {
-				header: null,
-				results: null,
+			// loading: false,
+			// excelData: {
+			// 	header: null,
+			// 	results: null,
+			// },
+
+			state: {
+				tickets: [{ name: 'test' }],
+				headers: ['Test header'],
 			},
 
 			// Données énumérées venant de l'API
@@ -97,80 +105,143 @@ export default {
 	},
 
 	methods: {
-		generateData({ header, results }) {
-			this.excelData.header = header;
-			this.excelData.results = results;
-			this.onSuccess && this.onSuccess(this.excelData);
+		/** HELPERS **/
+		get_header_row(sheet) {
+			var headers = [],
+				range = XLSX.utils.decode_range(sheet['!ref']);
+			var C,
+				R = range.s.r; /* start in the first row */
+			for (C = range.s.c; C <= range.e.c; ++C) {
+				/* walk every column in the range */
+				var cell =
+					sheet[
+						XLSX.utils.encode_cell({ c: C, r: R })
+					]; /* find the cell in the first row */
+				var hdr = 'UNKNOWN ' + C; // <-- replace with your desired default
+				if (cell && cell.t) hdr = XLSX.utils.format_cell(cell);
+				headers.push(hdr);
+			}
+			return headers;
 		},
-
-		fileSelected(event) {
-			const files = event.target.files;
-			this.files = [...files];
-			//console.log(files);
-			const rawFile = files[0]; // only use files[0]
-			if (!rawFile) return;
-			this.upload(rawFile);
+		fixdata(data) {
+			var o = '',
+				l = 0,
+				w = 10240;
+			for (; l < data.byteLength / w; ++l)
+				o += String.fromCharCode.apply(
+					null,
+					new Uint8Array(data.slice(l * w, l * w + w))
+				);
+			o += String.fromCharCode.apply(
+				null,
+				new Uint8Array(data.slice(l * w))
+			);
+			return o;
+		},
+		workbook_to_json(workbook) {
+			var result = {};
+			workbook.SheetNames.forEach(function(sheetName) {
+				var roa = XLSX.utils.sheet_to_row_object_array(
+					workbook.Sheets[sheetName]
+				);
+				if (roa.length > 0) {
+					result[sheetName] = roa;
+				}
+			});
+			return result;
+		},
+		/** PARSING and DRAGDROP **/
+		handleDrop(e) {
+			e.stopPropagation();
+			e.preventDefault();
+			console.log('DROPPED');
+			var files = e.dataTransfer.files,
+				i,
+				f;
+			for (i = 0, f = files[i]; i != files.length; ++i) {
+				var reader = new FileReader(),
+					name = f.name;
+				reader.onload = function(e) {
+					var results,
+						data = e.target.result,
+						fixedData = fixdata(data),
+						workbook = XLSX.read(btoa(fixedData), {
+							type: 'base64',
+						}),
+						firstSheetName = workbook.SheetNames[0],
+						worksheet = workbook.Sheets[firstSheetName];
+					state.headers = get_header_row(worksheet);
+					results = XLSX.utils.sheet_to_json(worksheet);
+					state.tickets = results;
+				};
+				reader.readAsArrayBuffer(f);
+			}
+		},
+		handleDragover(e) {
+			e.stopPropagation();
+			e.preventDefault();
+			e.dataTransfer.dropEffect = 'copy';
 		},
 
 		importer() {
 			this.$modal.show('importModal');
 		},
 
-		Ok(){
+		Ok() {
 			this.$modal.hide('importModal');
 		},
 
-		upload(rawFile) {
-			this.$refs['excel-upload-input'].value = null; // fix can't select the same excel
-			if (!this.beforeUpload) {
-				this.readerData(rawFile);
-				return;
-			}
-			const before = this.beforeUpload(rawFile);
-			if (before) {
-				this.readerData(rawFile);
-			}
-		},
+		// upload(rawFile) {
+		// 	this.$refs['excel-upload-input'].value = null; // fix can't select the same excel
+		// 	if (!this.beforeUpload) {
+		// 		this.readerData(rawFile);
+		// 		return;
+		// 	}
+		// 	const before = this.beforeUpload(rawFile);
+		// 	if (before) {
+		// 		this.readerData(rawFile);
+		// 	}
+		// },
 
-		readerData(rawFile) {
-			this.loading = true;
-			return new Promise((resolve, reject) => {
-				const reader = new FileReader();
-				reader.onload = e => {
-					const data = e.target.result;
-					const workbook = XLSX.read(data, { type: 'array' });
-					const firstSheetName = workbook.SheetNames[0];
-					const worksheet = workbook.Sheets[firstSheetName];
-					const header = this.getHeaderRow(worksheet);
-					const results = XLSX.utils.sheet_to_json(worksheet);
-					this.generateData({ header, results });
-					this.loading = false;
-					resolve();
-				};
+		// readerData(rawFile) {
+		// 	this.loading = true;
+		// 	return new Promise((resolve, reject) => {
+		// 		const reader = new FileReader();
+		// 		reader.onload = e => {
+		// 			const data = e.target.result;
+		// 			const workbook = XLSX.read(data, { type: 'array' });
+		// 			const firstSheetName = workbook.SheetNames[0];
+		// 			const worksheet = workbook.Sheets[firstSheetName];
+		// 			const header = this.getHeaderRow(worksheet);
+		// 			const results = XLSX.utils.sheet_to_json(worksheet);
+		// 			this.generateData({ header, results });
+		// 			this.loading = false;
+		// 			resolve();
+		// 		};
 
-				reader.readAsArrayBuffer(rawFile);
-			});
-		},
+		// 		reader.readAsArrayBuffer(rawFile);
+		// 	});
+		// },
 
-		getHeaderRow(sheet) {
-			const headers = [];
-			const range = XLSX.utils.decode_range(sheet['!ref']);
-			let C;
-			const R = range.s.r;
-			/* start in the first row */
-			for (C = range.s.c; C <= range.e.c; ++C) {
-				/* walk every column in the range */
-				const cell = sheet[XLSX.utils.encode_cell({ c: C, r: R })];
-				/* find the cell in the first row */
-				let hdr = 'UNKNOWN ' + C; // <-- replace with your desired default
-				if (cell && cell.t) hdr = XLSX.utils.format_cell(cell);
-				headers.push(hdr);
-			}
-			return headers;
-		},
-		isExcel(file) {
-			return /\.(xlsx|xls|xlsm|csv)$/.test(file.name);
-		},
+		// getHeaderRow(sheet) {
+		// 	const headers = [];
+		// 	const range = XLSX.utils.decode_range(sheet['!ref']);
+		// 	let C;
+		// 	const R = range.s.r;
+		// 	/* start in the first row */
+		// 	for (C = range.s.c; C <= range.e.c; ++C) {
+		// 		/* walk every column in the range */
+		// 		const cell = sheet[XLSX.utils.encode_cell({ c: C, r: R })];
+		// 		/* find the cell in the first row */
+		// 		let hdr = 'UNKNOWN ' + C; // <-- replace with your desired default
+		// 		if (cell && cell.t) hdr = XLSX.utils.format_cell(cell);
+		// 		headers.push(hdr);
+		// 	}
+		// 	return headers;
+		// },
+		// isExcel(file) {
+		// 	return /\.(xlsx|xls|xlsm|csv)$/.test(file.name);
+		// },
 
 		//////Partie Agence/////////
 		changeDoc(event) {
