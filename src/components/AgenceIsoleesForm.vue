@@ -2,17 +2,17 @@
 	<div>
 		<div class="row">
 			<div class="col-md-12">
-				<table class="table table-striped table-hover table-condensed table-responsive">
+				<table class="table table-striped table-hover table-condensed table-responsive table-striped ">
 					<thead>
 						<tr>
-							<th v-for="(item, items) in state.headers" :key="items">{{item}}</th>
+							<th v-for="(titleHeader, titlesHeader) in state.headers" :key="titlesHeader">{{titleHeader}}</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr v-for="(item, items) in state.tickets" :key="items">
 							<td v-for="(key, keys) in item" :key="keys">
-								<label>{{key}}</label>
-								<p>{{item.key}}</p>
+								<label v-if="titles == 'Début'">{{dateFormate(key)}}</label>
+								<label v-else>{{key}}</label>
 							</td>
 						</tr>
 					</tbody>
@@ -87,6 +87,7 @@ export default {
 				tickets: [{ name: 'test' }],
 				headers: ['Test header'],
 			},
+			display: false,
 
 			// loading: false,
 			// excelData: {
@@ -125,6 +126,16 @@ export default {
 	},
 
 	methods: {
+		dateFormate(date){
+			if(this.state.tickets == "Début"){	
+			const event = new Date(Date.UTC(date));
+			const options = {day: '2-digit' , month: '2-digit', year: 'numeric' };
+			return event.toLocaleDateString(undefined, options);
+			}else{
+				console.log(date);
+			}
+		},
+		
 		/** HELPERS **/
 		// get_header_row(sheet) {
 		// 	var headers = [],
@@ -209,7 +220,7 @@ export default {
 			const files = e.target.files;
 			this.files = [...files];
 			console.log(files);
-			const rawFile = files[0]; // only use files[0]
+			const rawFile = files[0]; //Nom du fichier
 			if (!rawFile) return;
 			this.upload(rawFile);
 		},
@@ -270,6 +281,7 @@ export default {
 			}
 			return headers;
 		},
+		
 		isExcel(file) {
 			return /\.(xlsx|xls|xlsm|csv)$/.test(file.name);
 		},
@@ -354,6 +366,7 @@ export default {
 					return `${this.files.length} files selected.`;
 			}
 		},
+		
 	},
 };
 </script>
