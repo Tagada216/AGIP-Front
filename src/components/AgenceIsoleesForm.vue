@@ -1,38 +1,63 @@
 <template>
 	<div>
-		<!-- Agences isolées -->
-		<h4 class="card-header">Agences isolées</h4>
-		<el-button type="primary" class="button" @click="importer()">Importer</el-button>
-		<modal class="modal" name="importModal">
-			<div class="fileupload" :class="{ 'fileupload--slim': slim }">
-				<base-button v-if="slim">
-					<slot :files="files">{{ title }}</slot>
-				</base-button>
-				<div v-else class="fileupload__help">
-					<slot :files="files">
-						<span>Glisser-Déposer un fichier</span>
-						<br />
-						<span>ou</span>
-						<br />
-						<span>Cliquer dans la fenêtre pour choisir un fichier</span>
-						<br />
-						<span class="fileupload__description">{{ description }}</span>
-					</slot>
-				</div>
-				<input
-					accept=".xlsx, .xls, .xlsm"
-					type="file"
-					ref="excel-upload-input"
-					class="fileupload__file"
-					@change="fileSelected"
+		<div class="row">
+			<div class="col-md-12">
+				<table class="table table-striped table-hover table-condensed table-responsive">
+					<thead>
+						<tr>
+							<th v-for="(item, items) in state.headers" :key="items">{{item}}</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="(item, items) in state.tickets" :key="items">
+							<td v-for="(key, keys) in item" :key="keys">
+								<label>{{key}}</label>
+								<p>{{item.key}}</p>
+							</td>
+						</tr>
+					</tbody>
+					<tfoot></tfoot>
+				</table>
+			</div>
+		</div>
+		<div>
+			<!-- Agences isolées -->
+			<h4 class="card-header">Agences isolées</h4>
+			<el-button type="primary" class="button" @click="importer()">Importer</el-button>
+			<modal class="modal" name="importModal">
+				<div
+					class="fileupload"
+					:class="{ 'fileupload--slim': slim }"
 					@drop="handleDrop"
 					@dragover="handleDragover"
 					@dragenter="handleDragover"
-				/>
-			</div>
-			<el-button :loading="loading" type="primary" class="button-ok" @click="Ok">OK</el-button>
-		</modal>
-		<!-- Fin agenc es isolées-->
+				>
+					<base-button v-if="slim">
+						<slot :files="files">{{ title }}</slot>
+					</base-button>
+					<div v-else class="fileupload__help">
+						<slot :files="files">
+							<span>Glisser-Déposer un fichier</span>
+							<br />
+							<span>ou</span>
+							<br />
+							<span>Cliquer dans la fenêtre pour choisir un fichier</span>
+							<br />
+							<span class="fileupload__description">{{ description }}</span>
+						</slot>
+					</div>
+					<input
+						:slim="true"
+						accept=".xlsx, .xls, .xlsm"
+						type="file"
+						class="fileupload__file"
+						@change="fileSelected"
+					/>
+				</div>
+				<el-button type="primary" class="button-ok" @click="Ok">OK</el-button>
+			</modal>
+			<!-- Fin agenc es isolées-->
+		</div>
 	</div>
 </template>
 
@@ -62,17 +87,16 @@ export default {
 	data() {
 		return {
 			files: [],
+			state: {
+				tickets: [{ name: 'test' }],
+				headers: ['Test header'],
+			},
 
 			// loading: false,
 			// excelData: {
 			// 	header: null,
 			// 	results: null,
 			// },
-
-			state: {
-				tickets: [{ name: 'test' }],
-				headers: ['Test header'],
-			},
 
 			// Données énumérées venant de l'API
 			remoteEnum: {
@@ -154,6 +178,7 @@ export default {
 		handleDrop(e) {
 			e.stopPropagation();
 			e.preventDefault();
+			console.log(e);
 			console.log('DROPPED');
 			var files = e.dataTransfer.files,
 				i,
@@ -161,18 +186,19 @@ export default {
 			for (i = 0, f = files[i]; i != files.length; ++i) {
 				var reader = new FileReader(),
 					name = f.name;
-				reader.onload = function(e) {
+				console.log(reader);
+				reader.onload = e => {
 					var results,
 						data = e.target.result,
-						fixedData = fixdata(data),
+						fixedData = this.fixdata(data),
 						workbook = XLSX.read(btoa(fixedData), {
 							type: 'base64',
 						}),
 						firstSheetName = workbook.SheetNames[0],
 						worksheet = workbook.Sheets[firstSheetName];
-					state.headers = get_header_row(worksheet);
+					this.state.headers = this.get_header_row(worksheet);
 					results = XLSX.utils.sheet_to_json(worksheet);
-					state.tickets = results;
+					this.state.tickets = results;
 				};
 				reader.readAsArrayBuffer(f);
 			}
@@ -181,6 +207,12 @@ export default {
 			e.stopPropagation();
 			e.preventDefault();
 			e.dataTransfer.dropEffect = 'copy';
+		},
+
+		fileSelected(e) {
+			const files = e.target.files;
+			this.files = [...files];
+			console.log(files);
 		},
 
 		importer() {
