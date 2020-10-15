@@ -1,23 +1,14 @@
 <template>
 	<div>
-		<div class="row">
-			<div class="col-md-12">
-				<table class="table table-striped table-hover table-condensed table-responsive table-striped ">
-					<thead>
-						<tr>
-							<th v-for="(titleHeader, titlesHeader) in state.headers" :key="titlesHeader">{{titleHeader}}</th>
+		<div>
+			<div id="app">
+				<div ref="target" id="target" class="hover">
+					<table>
+						<tr v-for="data in tableData">
+							<td v-for="row in data">{{row}}</td>
 						</tr>
-					</thead>
-					<tbody>
-						<tr v-for="(item, items) in state.tickets" :key="items">
-							<td v-for="(key, keys) in item" :key="keys">
-								<label v-if="titles == 'Début'">{{dateFormate(key)}}</label>
-								<label v-else>{{key}}</label>
-							</td>
-						</tr>
-					</tbody>
-					<tfoot></tfoot>
-				</table>
+					</table>
+				</div>
 			</div>
 		</div>
 		<div>
@@ -41,9 +32,11 @@
 						</slot>
 					</div>
 					<input
+						multiple
 						:slim="true"
 						accept=".xlsx, .xls, .xlsm"
 						type="file"
+						:loading="loading"
 						ref="excel-upload-input"
 						class="fileupload__file"
 						@change="fileSelected"
@@ -75,8 +68,6 @@ export default {
 	props: {
 		slim: { type: Boolean, default: false },
 		title: { type: String, default: '' },
-		// beforeUpload: Function, // eslint-disable-line
-		// onSuccess: Function, // eslint-disable-line
 	},
 
 	data() {
@@ -87,13 +78,12 @@ export default {
 				tickets: [{ name: 'test' }],
 				headers: ['Test header'],
 			},
-			display: false,
 
-			// loading: false,
-			// excelData: {
-			// 	header: null,
-			// 	results: null,
-			// },
+			tableData: [],
+			tableCleanData: [],
+			tableRow: [],
+
+			loading: false,
 
 			// Données énumérées venant de l'API
 			remoteEnum: {
@@ -126,162 +116,175 @@ export default {
 	},
 
 	methods: {
-		dateFormate(date){
-			if(this.state.tickets == "Début"){	
-			const event = new Date(Date.UTC(date));
-			const options = {day: '2-digit' , month: '2-digit', year: 'numeric' };
-			return event.toLocaleDateString(undefined, options);
-			}else{
-				console.log(date);
-			}
-		},
-		
-		/** HELPERS **/
-		// get_header_row(sheet) {
-		// 	var headers = [],
-		// 		range = XLSX.utils.decode_range(sheet['!ref']);
-		// 	var C,
-		// 		R = range.s.r; /* start in the first row */
-		// 	for (C = range.s.c; C <= range.e.c; ++C) {
-		// 		/* walk every column in the range */
-		// 		var cell =
-		// 			sheet[
-		// 				XLSX.utils.encode_cell({ c: C, r: R })
-		// 			]; /* find the cell in the first row */
-		// 		var hdr = 'UNKNOWN ' + C; // <-- replace with your desired default
-		// 		if (cell && cell.t) hdr = XLSX.utils.format_cell(cell);
-		// 		headers.push(hdr);
-		// 	}
-		// 	return headers;
-		// },
-		// fixdata(data) {
-		// 	var o = '',
-		// 		l = 0,
-		// 		w = 10240;
-		// 	for (; l < data.byteLength / w; ++l)
-		// 		o += String.fromCharCode.apply(
-		// 			null,
-		// 			new Uint8Array(data.slice(l * w, l * w + w))
-		// 		);
-		// 	o += String.fromCharCode.apply(
-		// 		null,
-		// 		new Uint8Array(data.slice(l * w))
-		// 	);
-		// 	return o;
-		// },
-		// workbook_to_json(workbook) {
-		// 	var result = {};
-		// 	workbook.SheetNames.forEach(function(sheetName) {
-		// 		var roa = XLSX.utils.sheet_to_row_object_array(
-		// 			workbook.Sheets[sheetName]
-		// 		);
-		// 		if (roa.length > 0) {
-		// 			result[sheetName] = roa;
-		// 		}
-		// 	});
-		// 	return result;
-		// },
-		// /** PARSING and DRAGDROP **/
-		// handleDrop(e) {
-		// 	e.stopPropagation();
-		// 	e.preventDefault();
-		// 	console.log(e);
-		// 	console.log('DROPPED');
-		// 	var files = e.dataTransfer.files,
-		// 		i,
-		// 		f;
-		// 	for (i = 0, f = files[i]; i != files.length; ++i) {
-		// 		var reader = new FileReader(),
-		// 			name = f.name;
-		// 		console.log(reader);
-		// 		reader.onload = e => {
-		// 			var results,
-		// 				data = e.target.result,
-		// 				fixedData = this.fixdata(data),
-		// 				workbook = XLSX.read(btoa(fixedData), {
-		// 					type: 'base64',
-		// 				}),
-		// 				firstSheetName = workbook.SheetNames[0],
-		// 				worksheet = workbook.Sheets[firstSheetName];
-		// 			this.state.headers = this.get_header_row(worksheet);
-		// 			results = XLSX.utils.sheet_to_json(worksheet);
-		// 			this.state.tickets = results;
+		//Permet de formater les dates
+		// dateFormate(date) {
+		// 	if (this.state.tickets == 'Début') {
+		// 		const event = new Date(Date.UTC(date));
+		// 		const options = {
+		// 			day: '2-digit',
+		// 			month: '2-digit',
+		// 			year: 'numeric',
 		// 		};
-		// 		reader.readAsArrayBuffer(f);
+		// 		return event.toLocaleDateString(undefined, options);
+		// 	} else {
+		// 		console.log(date);
 		// 	}
-		// },
-		// handleDragover(e) {
-		// 	e.stopPropagation();
-		// 	e.preventDefault();
-		// 	e.dataTransfer.dropEffect = 'copy';
 		// },
 
+		//Permet de séléctionner un ou plusieurs fichiers et de les télécharger
 		fileSelected(e) {
 			const files = e.target.files;
 			this.files = [...files];
-			console.log(files);
+			//console.log(files);
 			const rawFile = files[0]; //Nom du fichier
 			if (!rawFile) return;
+			if (!this.isExcel(rawFile)) {
+				this.$message.error(
+					'support téléchargeable avec les suffixes .xlsx, .xlsm, .xls, .csv uniquement '
+				);
+				return false;
+			}
 			this.upload(rawFile);
+			//console.log(rawFile);
 		},
 
+		//ouvre la fenêtre modal
 		importer() {
 			this.$modal.show('importModal');
 		},
 
+		//ferme la fenêtre modal
 		Ok() {
 			this.$modal.hide('importModal');
 		},
 
+		//permet de récupérer le(s) fichier(s) et de les envoyer en lecture
 		upload(rawFile) {
-			this.$refs['excel-upload-input'].value = null; // fix can't select the same excel
-			if (!this.beforeUpload) {
-				this.readerData(rawFile);
-				return;
-			}
-			const before = this.beforeUpload(rawFile);
-			if (before) {
-				this.readerData(rawFile);
-			}
-		},
+			this.$refs['excel-upload-input'].value = null; // Permet de ne pas sélectionner le même excel 
 
+			//Voir si fonction nécessaire en réunion
+
+			// if (!this.beforeUpload) {
+			// 	this.readerData(rawFile);
+			// 	return;
+			// }
+			// const before = this.beforeUpload(rawFile);
+			// if (before) {
+
+			this.readerData(rawFile);
+			// }
+		},
+		// Permet de limiter la taille du fichier télécharger(voir si fonction nécessaire en réunion)
+		// beforeUpload(file) {
+		// 	console.log(file.size)
+		// 	const isLt1M = file.size / 1024 / 1024 < 1;
+		// 	if (isLt1M) {
+		// 		return true;
+		// 	}
+		// 	this.$message({
+		// 		message: 'Vous ne pouvez pas importer un fichier de plus de 1m.',
+		// 		type: 'warning',
+		// 	});
+		// 	return false;
+		// },
+
+
+		//Permet de lire le(s) fichier(s) et de les enregistrers dans un ou des tableaux
 		readerData(rawFile) {
 			this.loading = true;
 			return new Promise((resolve, reject) => {
-				const reader = new FileReader();
+				var reader = new FileReader(),
+					name = rawFile.name,
+					vm = this;
 				reader.onload = e => {
-					const data = e.target.result;
-					const workbook = XLSX.read(data, { type: 'array' });
-					const firstSheetName = workbook.SheetNames[0];
-					const worksheet = workbook.Sheets[firstSheetName];
-					this.state.headers = this.getHeaderRow(worksheet);
-					const results = XLSX.utils.sheet_to_json(worksheet);
-					this.state.tickets = results;
-					this.loading = false;
-					resolve();
-				};
+					var data = e.target.result;
+					var workbook = XLSX.read(data, { type: 'binary' });
+					// console.log(workbook);
+					// console.log(workbook.SheetNames.length);
 
-				reader.readAsArrayBuffer(rawFile);
+					//Si le fichier Excel contient plusieurs feuilles
+					if (workbook.SheetNames.length > 1) {
+						//Enlève le premier élément du tableau dont on n'as pas besoin en lecture
+						var unwantedSheetName = workbook.SheetNames.shift();
+						for (var i = 0; i < workbook.SheetNames.length; i++) {
+							// console.log('/////////////////////////');
+							// console.log(workbook.SheetNames[i]);
+							// console.log('/////////////////////////');
+							//Récupère le nom du fichier
+							var theSheetNames = workbook.SheetNames[i];
+							// console.log(theSheetNames);
+							//Récupère les données du fichier par rapport à son nom 
+							var theSheets = workbook.Sheets[theSheetNames];
+							// console.log(theSheets);
+
+							//Variable qui ne me sert pas pour le moment(à voir si modif du code nécessaire)
+							// var temp = [];
+							
+							for (var row = 1; ; row++) {
+								//Vérifie si la première cellule est vide
+								if (theSheets['A' + row] == null) {
+									break;
+								}
+
+								for (var col = 65; col <= 90; col++) {
+									var c = String.fromCharCode(col); // get 'A', 'B', 'C' ...
+
+									//Permet de récupérer les clés Excel comme "A1"
+									var key = '' + c + row;
+									if (theSheets[key] == null) {
+										theSheets[key] = '';
+									}
+
+									vm.tableRow.push(theSheets[key]['w']);
+								}
+								vm.tableData.push(vm.tableRow);
+								vm.tableRow = [];
+								this.loading = false;
+								resolve();
+							}
+						}
+					} else {
+						//Si le fichier contient une seul feuille
+						// console.log(workbook);
+						// console.log('ma taille est de 1');
+						var sheetName = workbook.SheetNames[0];
+						// console.log(sheetName);
+						var sheet = workbook.Sheets[sheetName];
+						// console.log(sheet);
+						if (sheet[key] == undefined) {
+						}
+						var temp = [];
+						for (var row = 1; ; row++) {
+							if (sheet['A' + row] == null) {
+								break;
+							}
+
+							for (var col = 65; col <= 90; col++) {
+								var c = String.fromCharCode(col); // get 'A', 'B', 'C' ...
+								var key = '' + c + row;
+								if (sheet[key] == null) {
+									sheet[key] = '';
+								}
+								if (sheet[key] !== undefined) {
+									console.log(sheet[key]['w']);
+								}
+								vm.tableRow.push(sheet[key]['w']);
+							}
+
+							vm.tableData.push(vm.tableRow);
+
+							vm.tableRow = [];
+
+							this.loading = false;
+							resolve();
+						}
+					}
+				};
+				reader.readAsBinaryString(rawFile);
 			});
 		},
 
-		getHeaderRow(sheet) {
-			const headers = [];
-			const range = XLSX.utils.decode_range(sheet['!ref']);
-			let C;
-			const R = range.s.r;
-			/* start in the first row */
-			for (C = range.s.c; C <= range.e.c; ++C) {
-				/* walk every column in the range */
-				const cell = sheet[XLSX.utils.encode_cell({ c: C, r: R })];
-				/* find the cell in the first row */
-				let hdr = 'UNKNOWN ' + C; // <-- replace with your desired default
-				if (cell && cell.t) hdr = XLSX.utils.format_cell(cell);
-				headers.push(hdr);
-			}
-			return headers;
-		},
-		
+		//Permet de vérifier si le fichier à bien le suffixe nécessaire avant de l'importer
 		isExcel(file) {
 			return /\.(xlsx|xls|xlsm|csv)$/.test(file.name);
 		},
@@ -366,7 +369,6 @@ export default {
 					return `${this.files.length} files selected.`;
 			}
 		},
-		
 	},
 };
 </script>
@@ -459,6 +461,43 @@ $blackColor: #2c3e50;
 	&__description {
 		margin-top: 1rem;
 		font-weight: 600;
+	}
+
+	#target {
+		height: 400px;
+		width: 700px;
+		background-color: #f8f8f8;
+		margin: 200px auto;
+		overflow: hidden;
+		border-radius: 5px;
+		box-shadow: 2px 2px 5px #888;
+	}
+	.hover::before {
+		content: 'Drop excel file here.';
+		width: 100%;
+		height: 100%;
+		display: block;
+		text-align: center;
+		line-height: 400px;
+		font-size: 24px;
+	}
+	#target > table {
+		height: 250px;
+		width: 400px;
+		border: 1px solid #ccc;
+		border-radius: 3px;
+		margin: 75px auto;
+	}
+	#target > table td {
+		text-align: center;
+		border-top: 1px solid #ccc;
+		border-left: 1px solid #ccc;
+	}
+	#target > table tr:first-child > td {
+		border-top: 0px solid #ccc;
+	}
+	#target > table tr > td:first-child {
+		border-left: 0px solid #ccc;
 	}
 }
 </style>
