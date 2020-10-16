@@ -1,20 +1,25 @@
 <template>
 	<div>
 		<div>
-			<div id="app">
-				<div ref="target" id="target" class="hover">
-					<table id="table">
-						<tr v-for="data in tableData">
-							<td v-for="row in data">{{row}}</td>
+			<div ref="target" id="target">
+				<table class="styled-table">
+					<thead id="tableHead">
+						<tr v-for="(headData, head) in tableHeadFinal" :key="head">
+							<td v-for="(rowHead, headRow) in headData" :key="headRow">{{rowHead}}</td>
 						</tr>
-					</table>
-				</div>
+					</thead>
+					<tbody id="tableBody">
+						<tr class="active-row" v-for="(data, tData) in tableData" :key="tData">
+							<td v-for="(row, tRow) in data" :key="tRow">{{row}}</td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 		</div>
 		<div>
 			<!-- Agences isolées -->
 			<h4 class="card-header">Agences isolées</h4>
-			<el-button id="myButton" type="primary" class="button" @click="changeButton()">Importer</el-button>
+			<el-button id="myButton" type="primary" class="button" @click="changeButton()">{{ buttonName }}</el-button>
 			<modal class="modal" name="importModal">
 				<div class="fileupload" :class="{ 'fileupload--slim': slim }">
 					<base-button v-if="slim">
@@ -62,6 +67,7 @@ import fs from 'fs';
 import VModal from 'vue-js-modal';
 import XLSX from 'xlsx';
 
+
 Vue.use(VModal, { componentName: 'modal' });
 
 export default {
@@ -79,8 +85,11 @@ export default {
 				headers: ['Test header'],
 			},
 
+			buttonName: 'Importer',
+
 			tableData: [],
-			tableCleanData: [],
+			tableHeadFinal: [],
+			tableHead: [],
 			tableRow: [],
 
 			loading: false,
@@ -145,19 +154,35 @@ export default {
 				return false;
 			}
 			this.upload(rawFile);
+			setTimeout(this.changeButtonName(), 5000);
+
 			//console.log(rawFile);
 		},
 
 		//Change la fonctionnalité du bouton
 		changeButton() {
-			var change = document.getElementById('myButton');
-			var getValueOfTableDiv = document.getElementById('table');
+			var getButton = document.getElementById('myButton');
+			var getValueOfTableHead = document.getElementById('tableHead');
+			var getValueOfTableBody = document.getElementById('tableBody');
 
-			if (getValueOfTableDiv.innerHTML == '') {
-				change.onclick = this.importer();
-				change.innerHTML = 'Sauvegarder';
+			if (
+				getValueOfTableHead.innerHTML == '' &&
+				getValueOfTableBody.innerHTML == ''
+			) {
+				getButton.onclick = this.importer();
 			} else {
-				change.onclick = this.submit();
+				getButton.onclick = this.submit();
+			}
+		},
+
+		changeButtonName() {
+			var getTHead = document.getElementById('tableHead');
+			var getTBody = document.getElementById('tableBody');
+			var getValueButton = document.getElementById('myButton');
+			if (getTHead && getTBody == '') {
+				this.buttonName = 'Importer';
+			} else {
+				this.buttonName = 'Sauvegarder';
 			}
 		},
 
@@ -191,6 +216,7 @@ export default {
 			this.readerData(rawFile);
 			// }
 		},
+
 		// Permet de limiter la taille du fichier télécharger(voir si fonction nécessaire en réunion)
 		// beforeUpload(file) {
 		// 	console.log(file.size)
@@ -216,57 +242,78 @@ export default {
 					var data = e.target.result;
 					var workbook = XLSX.read(data, { type: 'binary' });
 					// console.log(workbook);
-					// console.log(workbook.SheetNames.length);
-
 					//Si le fichier Excel contient plusieurs feuilles
 					if (workbook.SheetNames.length > 1) {
-						//Enlève le premier élément du tableau dont on n'as pas besoin en lecture
-						var unwantedSheetName = workbook.SheetNames.shift();
 						for (var i = 0; i < workbook.SheetNames.length; i++) {
-							// console.log('/////////////////////////');
-							// console.log(workbook.SheetNames[i]);
-							// console.log('/////////////////////////');
-							//Récupère le nom du fichier
-							var theSheetNames = workbook.SheetNames[i];
-							// console.log(theSheetNames);
-							//Récupère les données du fichier par rapport à son nom
-							var theSheets = workbook.Sheets[theSheetNames];
-							// console.log(theSheets);
+							var unwantedSheetName = workbook.SheetNames;
+							//RegEx qui permet de tester la valeur de unwantedSheetName pour ne pas les prendre en compte
+							if (
+								/[^cc|temp|CDN|Parametre|HISTO]/.test(
+									unwantedSheetName[i]
+								)
+							) {
+								//Récupère le nom du fichier
+								var theSheetNames = workbook.SheetNames[i];
+								//Récupère les données du fichier par rapport à son nom
+								var theSheets = workbook.Sheets[theSheetNames];
 
-							//Variable qui ne me sert pas pour le moment(à voir si modif du code nécessaire)
-							// var temp = [];
+								//Variable qui ne me sert pas pour le moment(à voir si modif du code nécessaire)
+								// var temp = [];
 
-							for (var row = 1; ; row++) {
-								//Vérifie si la première cellule est vide
-								if (theSheets['A' + row] == null) {
-									break;
-								}
-
-								for (var col = 65; col <= 90; col++) {
-									var c = String.fromCharCode(col); // get 'A', 'B', 'C' ...
-
-									//Permet de récupérer les clés Excel comme "A1"
-									var key = '' + c + row;
-									if (theSheets[key] == null) {
-										theSheets[key] = '';
+								for (var row = 1; ; row++) {
+									//Vérifie si la première cellule est vide
+									if (theSheets['A' + row] == null) {
+										break;
 									}
 
-									vm.tableRow.push(theSheets[key]['w']);
+									for (var col = 65; col <= 90; col++) {
+										var c = String.fromCharCode(col); // get 'A', 'B', 'C' ...
+
+										//Permet de récupérer les clés Excel comme "A1"
+										var key = '' + c + row;
+										if (theSheets[key] == null) {
+											theSheets[key] = '';
+										}
+
+										/*Permet de récupérer que la partie head du tableau, enlêle la cellule "Commentaires Ticket Jump" 
+										et les cellules vides*/
+										if (
+											key === c + 1 &&
+											key != 'L1' &&
+											theSheets[key]['w'] != undefined
+										) {
+											vm.tableHead.push(
+												theSheets[key]['w']
+											);
+										} else {
+											/**
+											 * Traitement du reste du tableau allant dans le body
+											 * Les cellules vide sont enlevées avec le regEx
+											 */
+											if (/[^L-Z]/.test(c)) {
+												vm.tableRow.push(
+													theSheets[key]['w']
+												);
+											}
+										}
+									}
+
+									vm.tableHeadFinal.push(vm.tableHead);
+									vm.tableData.push(vm.tableRow);
+
+									vm.tableHead = [];
+									vm.tableRow = [];
+
+									this.loading = false;
+									resolve();
 								}
-								vm.tableData.push(vm.tableRow);
-								vm.tableRow = [];
-								this.loading = false;
-								resolve();
 							}
 						}
+						console.log(vm.tableHeadFinal);
 					} else {
 						//Si le fichier contient une seul feuille
-						// console.log(workbook);
-						// console.log('ma taille est de 1');
 						var sheetName = workbook.SheetNames[0];
-						// console.log(sheetName);
 						var sheet = workbook.Sheets[sheetName];
-						// console.log(sheet);
 						if (sheet[key] == undefined) {
 						}
 						var temp = [];
@@ -281,14 +328,30 @@ export default {
 								if (sheet[key] == null) {
 									sheet[key] = '';
 								}
-								// if (sheet[key] !== undefined) {
-								// 	console.log(sheet[key]['w']);
-								// }
-								vm.tableRow.push(sheet[key]['w']);
+
+								if (key === c + 1) {
+									vm.tableHead.push(sheet[key]['w']);
+
+									for (
+										let i = 0;
+										i < vm.tableHead.length;
+										i++
+									) {
+										if (vm.tableHead[i] == undefined) {
+											vm.tableHead.pop(vm.tableHead[i]);
+										}
+									}
+								} else {
+									if (/[^L-Z]/.test(c)) {
+										vm.tableRow.push(sheet[key]['w']);
+									}
+								}
 							}
 
+							vm.tableHeadFinal.push(vm.tableHead);
 							vm.tableData.push(vm.tableRow);
 
+							vm.tableHead = [];
 							vm.tableRow = [];
 
 							this.loading = false;
@@ -373,7 +436,7 @@ export default {
 				case 1:
 					return `${this.files[0].name}`;
 				default:
-					return `${this.files.length} files selected.`;
+					return `${this.files.length} fichiers sélectionnés.`;
 			}
 		},
 	},
@@ -388,6 +451,7 @@ $blackColor: #2c3e50;
 	padding: 15px 50px !important;
 	font-size: 20px !important;
 	border-radius: 25px !important;
+	margin-bottom: 100px !important;
 }
 
 .el-button.is-loading {
@@ -469,42 +533,42 @@ $blackColor: #2c3e50;
 		margin-top: 1rem;
 		font-weight: 600;
 	}
+}
 
-	#target {
-		height: 400px;
-		width: 700px;
-		background-color: #f8f8f8;
-		margin: 200px auto;
-		overflow: hidden;
-		border-radius: 5px;
-		box-shadow: 2px 2px 5px #888;
-	}
-	.hover::before {
-		content: 'Drop excel file here.';
-		width: 100%;
-		height: 100%;
-		display: block;
-		text-align: center;
-		line-height: 400px;
-		font-size: 24px;
-	}
-	#target > table {
-		height: 250px;
-		width: 400px;
-		border: 1px solid #ccc;
-		border-radius: 3px;
-		margin: 75px auto;
-	}
-	#target > table td {
-		text-align: center;
-		border-top: 1px solid #ccc;
-		border-left: 1px solid #ccc;
-	}
-	#target > table tr:first-child > td {
-		border-top: 0px solid #ccc;
-	}
-	#target > table tr > td:first-child {
-		border-left: 0px solid #ccc;
-	}
+.styled-table {
+	border-collapse: collapse;
+	margin: 25px 25px;
+	font-size: 0.9em;
+	font-family: sans-serif;
+	min-width: 400px;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.styled-table > thead > tr {
+	background-color: #009879;
+	color: #ffffff;
+	text-align: left;
+}
+
+.styled-table th,
+.styled-table td {
+	padding: 12px 15px;
+}
+
+.styled-table tbody tr {
+	border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+	background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:last-of-type {
+	border-bottom: 2px solid #009879;
+}
+
+.styled-table tbody tr.active-row {
+	font-weight: bold;
+	color: #009879;
 }
 </style>
