@@ -3,7 +3,7 @@
 		<div>
 			<div id="app">
 				<div ref="target" id="target" class="hover">
-					<table>
+					<table id="table">
 						<tr v-for="data in tableData">
 							<td v-for="row in data">{{row}}</td>
 						</tr>
@@ -14,7 +14,7 @@
 		<div>
 			<!-- Agences isolées -->
 			<h4 class="card-header">Agences isolées</h4>
-			<el-button type="primary" class="button" @click="importer()">Importer</el-button>
+			<el-button id="myButton" type="primary" class="button" @click="changeButton()">Importer</el-button>
 			<modal class="modal" name="importModal">
 				<div class="fileupload" :class="{ 'fileupload--slim': slim }">
 					<base-button v-if="slim">
@@ -42,7 +42,7 @@
 						@change="fileSelected"
 					/>
 				</div>
-				<el-button type="primary" class="button-ok" @click="Ok">OK</el-button>
+				<el-button type="primary" class="button-ok" @click="ok">OK</el-button>
 			</modal>
 			<!-- Fin agenc es isolées-->
 		</div>
@@ -148,19 +148,36 @@ export default {
 			//console.log(rawFile);
 		},
 
+		//Change la fonctionnalité du bouton
+		changeButton() {
+			var change = document.getElementById('myButton');
+			var getValueOfTableDiv = document.getElementById('table');
+
+			if (getValueOfTableDiv.innerHTML == '') {
+				change.onclick = this.importer();
+				change.innerHTML = 'Sauvegarder';
+			} else {
+				change.onclick = this.submit();
+			}
+		},
+
+		test() {
+			alert('je fonctionne');
+		},
+
 		//ouvre la fenêtre modal
 		importer() {
 			this.$modal.show('importModal');
 		},
 
 		//ferme la fenêtre modal
-		Ok() {
+		ok() {
 			this.$modal.hide('importModal');
 		},
 
 		//permet de récupérer le(s) fichier(s) et de les envoyer en lecture
 		upload(rawFile) {
-			this.$refs['excel-upload-input'].value = null; // Permet de ne pas sélectionner le même excel 
+			this.$refs['excel-upload-input'].value = null; // Permet de ne pas sélectionner le même excel
 
 			//Voir si fonction nécessaire en réunion
 
@@ -188,7 +205,6 @@ export default {
 		// 	return false;
 		// },
 
-
 		//Permet de lire le(s) fichier(s) et de les enregistrers dans un ou des tableaux
 		readerData(rawFile) {
 			this.loading = true;
@@ -213,13 +229,13 @@ export default {
 							//Récupère le nom du fichier
 							var theSheetNames = workbook.SheetNames[i];
 							// console.log(theSheetNames);
-							//Récupère les données du fichier par rapport à son nom 
+							//Récupère les données du fichier par rapport à son nom
 							var theSheets = workbook.Sheets[theSheetNames];
 							// console.log(theSheets);
 
 							//Variable qui ne me sert pas pour le moment(à voir si modif du code nécessaire)
 							// var temp = [];
-							
+
 							for (var row = 1; ; row++) {
 								//Vérifie si la première cellule est vide
 								if (theSheets['A' + row] == null) {
@@ -265,9 +281,9 @@ export default {
 								if (sheet[key] == null) {
 									sheet[key] = '';
 								}
-								if (sheet[key] !== undefined) {
-									console.log(sheet[key]['w']);
-								}
+								// if (sheet[key] !== undefined) {
+								// 	console.log(sheet[key]['w']);
+								// }
 								vm.tableRow.push(sheet[key]['w']);
 							}
 
@@ -290,70 +306,61 @@ export default {
 		},
 
 		//////Partie Agence/////////
-		changeDoc(event) {
-			const file = event.target.files[0];
-			console.log(file);
+		submit() {
+			console.log(this.tableData);
 
-			readXlsxFile(file).then(rows => {
-				Axios.get('http://localhost:5000/api/reference').then(
-					response => {
-						//On parcourt toutes les lignes du fichier Excel des agences
-						for (const row of rows) {
-							const reponse = response.data;
-
-							//Si la référence existe déjà, ont la met à jours
-							if (rep.reference == row[0]) {
-								console.log(this.agence.references);
-
-								let date = row[1] + '';
-								let dateFin = row[2] + '';
-								let mois = '';
-								let moisFin = '';
-
-								//On enregistre en base de données
-								// this.$http
-								// 	.put(
-								// 		'http://localhost:5000/api/main-courante',
-								// 		this.agence
-								// 	)
-								// 	.then(result => {
-								// 		this.$message({
-								// 			dangerouslyUseHTMLString: true,
-								// 			message:
-								// 				"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-								// 			type: 'success',
-								// 		});
-								// 	});
-								// window.location.reload();
-							}
-							//Sinon on effectue une insertion
-							else {
-								//On exclu la première ligne du fichier Excel
-								// if (row[0].includes('Réf')) {
-								// 	console.log('je suis le ot Réf');
-								// } else {
-								// 	this.agence.references = row[0];
-								// 	console.log('Références non identiques');
-								// 	this.$http
-								// 		.post(
-								// 			'http://localhost:5000/api/creation-incident_main-courante',
-								// 			this.agence
-								// 		)
-								// 		.then(result => {
-								// 			this.$message({
-								// 				dangerouslyUseHTMLString: true,
-								// 				message:
-								// 					"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-								// 				type: 'success',
-								// 			});
-								// 		});
-								// }
-							}
-
-							console.log(response.data[p].reference);
-						}
-					}
-				);
+			Axios.get('http://localhost:5000/api/reference').then(response => {
+				//On parcourt toutes les lignes du fichier Excel des agences
+				// for (const row of rows) {
+				// 	const reponse = response.data;
+				//Si la référence existe déjà, ont la met à jours
+				// if (rep.reference == row[0]) {
+				// 	console.log(this.agence.references);
+				// 	let date = row[1] + '';
+				// 	let dateFin = row[2] + '';
+				// 	let mois = '';
+				// 	let moisFin = '';
+				//On enregistre en base de données
+				// this.$http
+				// 	.put(
+				// 		'http://localhost:5000/api/main-courante',
+				// 		this.agence
+				// 	)
+				// 	.then(result => {
+				// 		this.$message({
+				// 			dangerouslyUseHTMLString: true,
+				// 			message:
+				// 				"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+				// 			type: 'success',
+				// 		});
+				// 	});
+				// window.location.reload();
+				// }
+				//Sinon on effectue une insertion
+				// else {
+				//On exclu la première ligne du fichier Excel
+				// if (row[0].includes('Réf')) {
+				// 	console.log('je suis le ot Réf');
+				// } else {
+				// 	this.agence.references = row[0];
+				// 	console.log('Références non identiques');
+				// 	this.$http
+				// 		.post(
+				// 			'http://localhost:5000/api/creation-incident_main-courante',
+				// 			this.agence
+				// 		)
+				// 		.then(result => {
+				// 			this.$message({
+				// 				dangerouslyUseHTMLString: true,
+				// 				message:
+				// 					"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+				// 				type: 'success',
+				// 			});
+				// 		});
+				// }
+				// }
+				// console.log(response.data[p].reference);
+				// }
 			});
 		},
 	},
