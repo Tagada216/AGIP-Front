@@ -10,12 +10,12 @@
                 splitpanes-min="15"
                 splitpanes-max="100"
                 style="height: 100%"
-                @incidentSelected="updateRef"
-				dataLink="http://localhost:5000/api/probs/cosip"
+                @probsSelected="updateRef"
+				dataLink="http://localhost:5000/api/probs/cosip/"
             />
 
             <CosipForm
-                :incident_id="curID"
+                :references="curRef"
                 splitpanes-size="50"
                 splitpanes-min="20"
                 splitpanes-max="100"
@@ -32,14 +32,11 @@ import 'splitpanes/dist/splitpanes.css';
 import CosipForm from '@/components/CosipForm.vue';
 import methods from '@/components/CosipForm';
 import Axios from 'axios';
+import { constants } from 'crypto';
 
 export default {
 
-    data() {
-        return {
-            curRef: 1,
-        };
-    },
+
 
     components: {
         Grid,

@@ -75,6 +75,7 @@ export default {
     methods: {
         updateID(id) {
             this.curID = id;
+            console.log("L'id est " + this.curID)
         },
 
         async fetchMainCourrante() {

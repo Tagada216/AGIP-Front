@@ -850,7 +850,7 @@ export default {
 		this.validateImpactReseauCDN()
 		this.validateImpactClientCDN()
 		this.verifCheckEnseignesImpactees()
-		this.getCosip(this.reference)
+		this.getCosip(this.references)
     },
 
     props: {
@@ -1229,11 +1229,11 @@ export default {
 		},
 
 		//Méthode GetCosip() pour l'update d'un incdent déjà dans le cosip  
-		getCosip(reference){
-			Axios.get('http://localhost:5000/probs/cosip/'+ reference).then(
+		getCosip(references){
+			Axios.get('http://localhost:5000/probs/cosip/'+ references).then(
 				response => {
+					this.form.titre=response.data[0].titre
 					console.log(response.data[0].statut)
-					this.form.description=response.data[0].description
 				})
 		},
 
@@ -1356,8 +1356,8 @@ export default {
 
 	},
 	watch: {
-        incident_id: function() {
-            this.getCosip(this.reference);
+        references: function() {
+            this.getCosip(this.references);
         },
     },
 	
