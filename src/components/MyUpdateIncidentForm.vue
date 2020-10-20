@@ -346,7 +346,7 @@ import Axios from 'axios';
 // import { escape } from 'querystring';
 // import { open } from 'fs';
 // import confirmationVue from './confirmation.vue';
-//import func from '../../vue-temp/vue-editor-bridge';
+// import func from '../../vue-temp/vue-editor-bridge';
 import Vue from 'vue';
 import CreateIncidentFormVue from './CreateIncidentForm.vue';
 import { readFile, watch } from 'fs';
@@ -1036,15 +1036,6 @@ export default {
 -->
 <style lang="sass">
  
-.el-form
-    margin: 20px
-    text-align: left
-
-.button 
-    padding: 15px 50px !important
-    font-size: 20px !important
-    border-radius: 25px !important
-
 .card-header, .cell .el-input
     margin: 0
 .el-card

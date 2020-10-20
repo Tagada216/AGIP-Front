@@ -2,6 +2,7 @@
 	<div>
 		<div>
 			<div ref="target" id="target">
+				<h2 id="title"></h2>
 				<table class="styled-table">
 					<thead id="tableHead">
 						<tr v-for="(headData, head) in tableHeadFinal" :key="head">
@@ -39,7 +40,7 @@
 					<input
 						multiple
 						:slim="true"
-						accept=".xlsx, .xls, .xlsm"
+						accept=".xlsx, .xls, .xlsm, .csv"
 						type="file"
 						:loading="loading"
 						ref="excel-upload-input"
@@ -57,16 +58,16 @@
 <script>
 import Vue from 'vue';
 import Axios from 'axios';
-import { importSpecifier, thisTypeAnnotation, identifier } from 'babel-types';
+// import { importSpecifier, thisTypeAnnotation, identifier } from 'babel-types';
 import readXlsxFile from 'read-excel-file';
-import { setTimeout } from 'timers';
-import { constants } from 'crypto';
-import { log, isNull } from 'util';
-import { arraySlugToHeader, arraySlugifier, arrayToJSON } from '../etlUtils';
+// import { setTimeout } from 'timers';
+// import { constants } from 'crypto';
+// import { log, isNull } from 'util';
+// import { arraySlugToHeader, arraySlugifier, arrayToJSON } from '../etlUtils';
 import fs from 'fs';
 import VModal from 'vue-js-modal';
 import XLSX from 'xlsx';
-
+import { get } from 'https';
 
 Vue.use(VModal, { componentName: 'modal' });
 
@@ -86,7 +87,7 @@ export default {
 			},
 
 			buttonName: 'Importer',
-
+			fileName: '',
 			tableData: [],
 			tableHeadFinal: [],
 			tableHead: [],
@@ -144,18 +145,39 @@ export default {
 		fileSelected(e) {
 			const files = e.target.files;
 			this.files = [...files];
-			//console.log(files);
-			const rawFile = files[0]; //Nom du fichier
-			if (!rawFile) return;
-			if (!this.isExcel(rawFile)) {
-				this.$message.error(
-					'support téléchargeable avec les suffixes .xlsx, .xlsm, .xls, .csv uniquement '
-				);
+			// console.log(this.files.length);
+
+			// Pour récupérer plusieurs fichiers si ont en à besoin
+			// if (this.files.length > 1) {
+			// 	for (var i = 0; i < this.files.length; i++) {
+			// 		console.log(this.files[i]);
+			// 	}
+			// }
+			//Blocage de l'import de plusieurs fichiers
+			if (this.files.length > 1) {
+				this.$message({
+					dangerouslyUseHTMLString: true,
+					message:
+						"<h2 style='font-family: arial'>Import impossible !</h2> <p style='font-family: arial'>==> Veuillez sélectionnés <strong> un seul fichier </strong> à la fois.</p>",
+					type: 'error',
+				});
 				return false;
 			}
+			const rawFile = files[0]; //Nom du fichier
+			if (!rawFile) return;
+
+			if (!this.isExcel(rawFile)) {
+				this.$message({
+					dangerouslyUseHTMLString: true,
+					message:
+						"<h2 style='font-family: arial'>Type de fichier non supporté !</h2> <p style='font-family: arial'>==>Support téléchargeable avec les suffixes <strong> .xlsx, .xlsm, .xls, .csv </strong> uniquement.</p>",
+					type: 'error',
+				});
+				return false;
+			}
+
 			this.upload(rawFile);
 			setTimeout(this.changeButtonName(), 5000);
-
 			//console.log(rawFile);
 		},
 
@@ -178,6 +200,7 @@ export default {
 		changeButtonName() {
 			var getTHead = document.getElementById('tableHead');
 			var getTBody = document.getElementById('tableBody');
+
 			var getValueButton = document.getElementById('myButton');
 			if (getTHead && getTBody == '') {
 				this.buttonName = 'Importer';
@@ -186,26 +209,24 @@ export default {
 			}
 		},
 
-		test() {
-			alert('je fonctionne');
-		},
-
 		//ouvre la fenêtre modal
 		importer() {
 			this.$modal.show('importModal');
+			var confirmed = false;
 		},
 
 		//ferme la fenêtre modal
 		ok() {
 			this.$modal.hide('importModal');
+			this.confirmed = true;
 		},
 
 		//permet de récupérer le(s) fichier(s) et de les envoyer en lecture
 		upload(rawFile) {
-			this.$refs['excel-upload-input'].value = null; // Permet de ne pas sélectionner le même excel
+			this.$refs['excel-upload-input'].value; // Permet de ne pas sélectionner le même excel
+			// console.log(this.$refs['excel-upload-input'].value);
 
 			//Voir si fonction nécessaire en réunion
-
 			// if (!this.beforeUpload) {
 			// 	this.readerData(rawFile);
 			// 	return;
@@ -215,6 +236,11 @@ export default {
 
 			this.readerData(rawFile);
 			// }
+		},
+
+		resetValue() {
+			this.tableHeadFinal = [];
+			this.tableData = [];
 		},
 
 		// Permet de limiter la taille du fichier télécharger(voir si fonction nécessaire en réunion)
@@ -232,12 +258,18 @@ export default {
 		// },
 
 		//Permet de lire le(s) fichier(s) et de les enregistrers dans un ou des tableaux
+
 		readerData(rawFile) {
 			this.loading = true;
 			return new Promise((resolve, reject) => {
 				var reader = new FileReader(),
 					name = rawFile.name,
 					vm = this;
+				this.fileName = name;
+				var creatTitle = document.getElementById('title');
+				creatTitle.innerHTML = name;
+				creatTitle.addEventListener('change', this.resetValue());
+
 				reader.onload = e => {
 					var data = e.target.result;
 					var workbook = XLSX.read(data, { type: 'binary' });
@@ -309,7 +341,7 @@ export default {
 								}
 							}
 						}
-						console.log(vm.tableHeadFinal);
+						// console.log(vm.tableHeadFinal);
 					} else {
 						//Si le fichier contient une seul feuille
 						var sheetName = workbook.SheetNames[0];
@@ -370,60 +402,70 @@ export default {
 
 		//////Partie Agence/////////
 		submit() {
-			console.log(this.tableData);
+			// console.log(this.tableData);
 
 			Axios.get('http://localhost:5000/api/reference').then(response => {
-				//On parcourt toutes les lignes du fichier Excel des agences
-				// for (const row of rows) {
-				// 	const reponse = response.data;
-				//Si la référence existe déjà, ont la met à jours
-				// if (rep.reference == row[0]) {
-				// 	console.log(this.agence.references);
-				// 	let date = row[1] + '';
-				// 	let dateFin = row[2] + '';
-				// 	let mois = '';
-				// 	let moisFin = '';
-				//On enregistre en base de données
-				// this.$http
-				// 	.put(
-				// 		'http://localhost:5000/api/main-courante',
-				// 		this.agence
-				// 	)
-				// 	.then(result => {
-				// 		this.$message({
-				// 			dangerouslyUseHTMLString: true,
-				// 			message:
-				// 				"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-				// 			type: 'success',
-				// 		});
-				// 	});
-				// window.location.reload();
-				// }
-				//Sinon on effectue une insertion
-				// else {
-				//On exclu la première ligne du fichier Excel
-				// if (row[0].includes('Réf')) {
-				// 	console.log('je suis le ot Réf');
-				// } else {
-				// 	this.agence.references = row[0];
-				// 	console.log('Références non identiques');
-				// 	this.$http
-				// 		.post(
-				// 			'http://localhost:5000/api/creation-incident_main-courante',
-				// 			this.agence
-				// 		)
-				// 		.then(result => {
-				// 			this.$message({
-				// 				dangerouslyUseHTMLString: true,
-				// 				message:
-				// 					"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-				// 				type: 'success',
-				// 			});
-				// 		});
-				// }
-				// }
-				// console.log(response.data[p].reference);
-				// }
+				// On parcourt toutes les références de la main courante
+				for (var p = 0; p <= response.data.length; p++) {
+					console.log(response.data[p].reference);
+					// On parcourt toutes les références du tHead
+					// for (const headData of this.tableHeadFinal) {
+						// On parcourt toutes les références du tBody
+						// for (const bodyData of this.tableData) {
+							// console.log(headData);
+							// console.log(bodyData);
+							// const reponse = response.data;
+							// console.log(reponse[p].reference);
+							// Si la référence existe déjà, ont la met à jours
+							// if (rep.reference == row[0]) {
+							// console.log(this.agence.references);
+							// let date = row[1] + '';
+							// let dateFin = row[2] + '';
+							// let mois = '';
+							// let moisFin = '';
+							// // On enregistre en base de données
+							// this.$http
+							// 	.put(
+							// 		'http://localhost:5000/api/main-courante',
+							// 		this.agence
+							// 	)
+							// 	.then(result => {
+							// 		this.$message({
+							// 			dangerouslyUseHTMLString: true,
+							// 			message:
+							// 				"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+							// 			type: 'success',
+							// 		});
+							// 	});
+							// window.location.reload();
+							// }
+							// Sinon on effectue une insertion
+							// else {
+							// On exclu la première ligne du fichier Excel
+							// if (row[0].includes('Réf')) {
+							// 	console.log('je suis le ot Réf');
+							// } else {
+							// 	this.agence.references = row[0];
+							// 	console.log('Références non identiques');
+							// 	this.$http
+							// 		.post(
+							// 			'http://localhost:5000/api/creation-incident_main-courante',
+							// 			this.agence
+							// 		)
+							// 		.then(result => {
+							// 			this.$message({
+							// 				dangerouslyUseHTMLString: true,
+							// 				message:
+							// 					"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+							// 				type: 'success',
+							// 			});
+							// 		});
+							// }
+							// }
+							// console.log(response.data[p].reference);
+						// }
+					// }
+				}
 			});
 		},
 	},
@@ -436,7 +478,11 @@ export default {
 				case 1:
 					return `${this.files[0].name}`;
 				default:
-					return `${this.files.length} fichiers sélectionnés.`;
+					// Cas où ont pourraient sélectionner plusieurs fichiers
+					// return `${this.files.length} fichiers sélectionnés.`;
+
+					//Blocage du téléchargement de plusieurs fichiers
+					return 'Plusieurs fichiers sélectionnés ! </br> Un seul fichier téléchargeable possible !';
 			}
 		},
 	},
@@ -547,7 +593,7 @@ $blackColor: #2c3e50;
 .styled-table > thead > tr {
 	background-color: #009879;
 	color: #ffffff;
-	text-align: left;
+	text-align: center;
 }
 
 .styled-table th,
@@ -557,6 +603,8 @@ $blackColor: #2c3e50;
 
 .styled-table tbody tr {
 	border-bottom: 1px solid #dddddd;
+	text-align: left;
+	line-height: 1.2;
 }
 
 .styled-table tbody tr:nth-of-type(even) {
