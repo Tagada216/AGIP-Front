@@ -16,3 +16,9 @@ export default {
 };
 </script>
 
+<style lang="scss">
+.card-header,
+.cell .el-input {
+	margin: 5em;
+}
+</style>
