@@ -13,6 +13,8 @@ import 'element-ui/lib/theme-chalk/index.css';
 import './faHandler';
 import './globalComponents';
 
+import '../node_modules/ag-grid-community/dist/styles/ag-grid.css';
+import '../node_modules/ag-grid-community/dist/styles/ag-theme-balham.css';
 
 
 Vue.config.productionTip = false;
