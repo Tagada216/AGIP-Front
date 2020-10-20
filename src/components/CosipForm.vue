@@ -830,10 +830,13 @@
         <!-- Fin Modal de confirmation de suppression d'une application impactée-->
 
         <el-form-item style="text-align: center">
-			<el-button type="danger">Annuler</el-button>
-            <el-button type="primary" @click="onSubmit()"
+			<el-button v-show="!isCosip" type="danger">Annuler</el-button>
+            <el-button v-if="isCosisp = !isCosip" type="primary" @click="onSubmit()"
                 >Valider</el-button
             >
+            <el-button v-else type="primary" @click="onUpdate()"
+                >Enregistrer les modifications</el-button
+            >			
         </el-form-item>
     </el-form>
 </template>
@@ -849,7 +852,9 @@ import { setTimeout } from 'timers';
 import { constants } from 'crypto';
 
 export default {
-
+	mounted(){
+		this.verifURL()  // Lance la focntion au "chargement" de la page
+	},
     created() {
 		this.getFieldsOptions();
 		this.cosip();
@@ -872,8 +877,9 @@ export default {
     data() {
         return {
 
+			url:'',
 			checkedImpactBDDF: false,
-
+			isCosip: false,
 			options: [{
 				value:'Diagnostic',
 				label:'Diagnostic'
@@ -990,7 +996,7 @@ export default {
 				eteceCDN:''
 			},
 
-			rules:{
+			rules:{  // Régles de validation des champs requis du formulaire
 				date_debut: [
 					{
 						required:true,
@@ -1120,7 +1126,16 @@ export default {
     methods: {
 
 
-
+		//Méthode de récupération de l'url courante afin de modifier le bouton de validation du formulaire en "crétation" ou "Modification"
+		verifURL(){
+			this.url = window.location.href
+			console.log("isCosip: "+ this.isCosip)
+			console.log("L'URL de la page est: " + this.url)
+			if(this.url == "http://localhost:8080/#/cosip"){
+				this.isCosip = true
+				console.log("isCosip: "+ this.isCosip)
+			}
+		},
 		// Méthode qui permet d'afficher ou non la card impact réseau BPF
 		validateImpactReseauBPF(){
 			if(this.impactReseauBPF==true)
