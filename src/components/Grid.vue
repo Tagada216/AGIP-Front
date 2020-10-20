@@ -87,6 +87,7 @@ export default {
                 });
             }
         },
+        //Trigger qui permet de récupérer L'id ou la référence depuis le tableau main courante ou Cosip 
         onRowSelected(event) {
             if (event.node.selected) {
                 this.$emit('incidentSelected', event.data.id);

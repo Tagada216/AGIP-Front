@@ -55,3 +55,12 @@ export default {
     }
 };
 </script>
+
+<style lang="sass">
+
+div.splitpanes
+  height: calc(100vh - 71px)
+
+div.splitpanes__pane
+  overflow: auto
+</style>

@@ -107,7 +107,9 @@
                         ></el-input>
                     </el-form-item>
 
-					<el-form-item label="Cause">
+					<el-form-item label="Cause"
+						prop="cause"
+					>
 						<el-input
 							id="cause"
 							type="textarea"
@@ -117,7 +119,9 @@
 						></el-input>
 					</el-form-item>
 
-                    <el-form-item label="Origine">
+                    <el-form-item label="Origine"
+						prop="origine"
+					>
 						<el-input 
 							id="numChangement"
 							placeholder="Numéro de changement"
@@ -153,8 +157,11 @@
 							</el-row>
 							<el-row :gutter="20">
 								<el-col :span="6">
-									<el-form-item label="Détection">
+									<el-form-item label="Détection"
+										prop="date_detection"
+									>
 										<el-date-picker
+											id="date_detection"
 											v-model="form.date_detection"
 											type="datetime"
 											placeholder="Sélectionnez l'horodatage"
@@ -164,8 +171,11 @@
 									</el-form-item>
 								</el-col>
 								<el-col :span="6">
-									<el-form-item label="Première communication à l'enseigne">
+									<el-form-item label="Première communication à l'enseigne"
+										prop="date_premiere_com"
+									>
 										<el-date-picker
+											id="date_premiere_com"
 											v-model="form.date_premiere_com"
 											type="datetime"
 											placeholder="Sélectionnez l'horodatage"
@@ -941,6 +951,8 @@ export default {
 				commentaire:'',
 				slash:'',
 				statut_id:'',
+				date_detection:'',
+				date_premiere_com:'',
 
 				// Impact Réseau BDDF
 				indispoBDDF:'',
@@ -978,7 +990,108 @@ export default {
 				eteceCDN:''
 			},
 
-			rules:{},
+			rules:{
+				date_debut: [
+					{
+						required:true,
+						message: 'Champ non rempli',
+						trigger: 'change',
+					},
+				],
+				description: [
+					{
+						required: true,
+						message: 'Champ non rempli',
+						trigger: 'blur',
+					},
+				],
+				priorite_id: [
+					{
+						required: true,
+						message: 'Champ non rempli',
+						trigger: 'change',
+					},
+				],
+				statut_id: [
+					{
+						required: true,
+						message: 'Champ non rempli',
+						trigger: 'change',
+					},
+				],
+				enseigne_impactee: [
+					{
+						type: 'array',
+						required: true,
+						message: 'Aucune selection',
+						trigger: 'change',
+					},
+				],
+				mois_cosip: [
+					{
+						required: true,
+						message: 'Champ non rempli',
+						trigger: 'change',
+					},
+				],
+				semaine_cosip: [
+					{
+						required: true,
+						message: 'Champ non rempli',
+						trigger: 'change',
+					},
+				],
+				cause: [
+					{
+						required: true,
+						message: 'Champ non rempli',
+						trigger: 'change',
+					},
+				],
+				origine: [
+					{
+						required: true,
+						message: 'Champ non rempli',
+						trigger: 'change',
+					},
+				],
+				action_retablissement: [
+					{
+						required: true,
+						message: 'Champ non rempli',
+						trigger: 'change',						
+					},
+				],
+				plan_action: [
+					{
+						required: true,
+						message: 'Champ non rempli',
+						trigger: 'change',						
+					},
+				],
+				responsabilite: [
+					{
+						type: 'array',
+						required: true,
+						message: 'Aucune selection',
+						trigger: 'change',						
+					},
+				],
+				date_detection: [
+					{
+						required:true,
+						message: 'Champ non rempli',
+						trigger: 'change',
+					},
+				],
+				date_premiere_com: [
+					{
+						required:true,
+						message: 'Champ non rempli',
+						trigger: 'change',
+					},
+				],									
+			},
 
             // Les lignes suivantes sont des variables nécessaires au modal de suppression
             delConfirmationModalVisible: false,
