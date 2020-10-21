@@ -36,7 +36,11 @@ import { constants } from 'crypto';
 
 export default {
 
-
+    data(){
+        return{
+            curRef: "PB"
+        }
+    },
 
     components: {
         Grid,
@@ -48,6 +52,7 @@ export default {
         updateRef(ref) {
             this.curRef = ref;
             console.log("Référence actuelle : " + this.curRef)
+            //getCosip(this.curRef)
         },
 
 

@@ -42,6 +42,7 @@ export default new Router({
 		},
 		{
 			path: '/cosip',
+			name:'cosip',
 			component: () => import('./views/Cosip.vue'),
 		},
 		{

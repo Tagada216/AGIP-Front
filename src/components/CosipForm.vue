@@ -832,7 +832,7 @@
         <el-form-item style="text-align: center">
 			<el-button v-show="!isCosip" type="danger">Annuler</el-button>
             <el-button v-if="isCosisp = !isCosip" type="primary" @click="onSubmit()"
-                >Valider</el-button
+                >Ajouter au COSIP</el-button
             >
             <el-button v-else type="primary" @click="onUpdate()"
                 >Enregistrer les modifications</el-button
@@ -850,7 +850,6 @@ import { importSpecifier, thisTypeAnnotation } from 'babel-types';
 import readXlsxFile from 'read-excel-file'
 import { setTimeout } from 'timers';
 import { constants } from 'crypto';
-
 export default {
 	mounted(){
 		this.verifURL()  // Lance la focntion au "chargement" de la page
@@ -1125,7 +1124,34 @@ export default {
 
     methods: {
 
+		//Sauvegarde d'un incident dans le cosip via le formulaire 
+		onSubmit(){
 
+					console.log(this.form);
+					// On enregistre en base de données
+					this.$http
+						.post(
+							'http://localhost:5000/api/probs/cosip',
+							this.form
+						)
+						.then(result => {
+							/* 
+								Ajout du then pour attendre que l'API réponde 
+								Car il se peut que ça se passe mal et qu'on envoi quand même un message de succés.
+								De plus la fonction window.alert() stop tous les autres traitement JS
+							*/
+
+							// Ceci est un composent du module Element (Voir : https://element.eleme.io/#/fr-FR/component/message)
+							this.$message({
+								dangerouslyUseHTMLString: true,
+								message:
+									"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+								type: 'success',
+							});
+							window.location.href = 'http://localhost:8080/#/cosip'
+						});
+						
+		},
 		//Méthode de récupération de l'url courante afin de modifier le bouton de validation du formulaire en "crétation" ou "Modification"
 		verifURL(){
 			this.url = window.location.href
@@ -1356,12 +1382,13 @@ export default {
 				}
 		},
 
-		//Méthode GetCosip() pour l'update d'un incdent déjà dans le cosip  
-		getCosip(references){
-			Axios.get('http://localhost:5000/probs/cosip/'+ references).then(
+		//Méthode GetCosip() pour l'update d'un incdent déjà dans le cosip
+		//On récupére les données du tableau et on les incères dans le formulaire 
+		getCosip(reference){
+			Axios.get('http://localhost:5000/probs/cosip/'+ reference).then(
 				response => {
-					this.form.titre=response.data[0].titre
-					console.log(response.data[0].statut)
+					this.form.description=response.data[0].description
+																			
 				})
 		},
 
@@ -1484,8 +1511,8 @@ export default {
 
 	},
 	watch: {
-        references: function() {
-            this.getCosip(this.references);
+        reference: function() {
+            this.getCosip(this.reference);
         },
     },
 	
