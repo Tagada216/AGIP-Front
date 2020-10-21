@@ -11,6 +11,9 @@
 					</thead>
 					<tbody id="tableBody">
 						<tr class="active-row" v-for="(data, tData) in tableData" :key="tData">
+							<td>
+								<input type="checkbox" class="switch" name="s1" id="s1" />
+							</td>
 							<td v-for="(row, tRow) in data" :key="tRow">{{row}}</td>
 						</tr>
 					</tbody>
@@ -349,6 +352,7 @@ export default {
 						if (sheet[key] == undefined) {
 						}
 						var temp = [];
+						vm.tableHead.unshift('Sélect');
 						for (var row = 1; ; row++) {
 							if (sheet['A' + row] == null) {
 								break;
@@ -380,11 +384,13 @@ export default {
 								}
 							}
 
-							vm.tableHeadFinal.push(vm.tableHead);
-							vm.tableData.push(vm.tableRow);
-
-							vm.tableHead = [];
-							vm.tableRow = [];
+							if (row === 1) {
+								vm.tableHeadFinal.push(vm.tableHead);
+								vm.tableHead = [];
+							} else {
+								vm.tableData.push(vm.tableRow);
+								vm.tableRow = [];
+							}
 
 							this.loading = false;
 							resolve();
@@ -402,8 +408,6 @@ export default {
 
 		//////Partie Agence/////////
 		submit() {
-			// console.log(this.tableData);
-
 			Axios.get('http://localhost:5000/api/reference').then(response => {
 				// On parcourt toutes les références du tHead
 				for (const headData of this.tableHeadFinal) {
@@ -422,7 +426,7 @@ export default {
 										p++
 									) {
 										const reponse = response.data[p];
-										
+										// console.log(reponse.reference);
 									}
 								}
 							}
