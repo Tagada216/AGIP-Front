@@ -405,73 +405,75 @@ export default {
 			// console.log(this.tableData);
 
 			Axios.get('http://localhost:5000/api/reference').then(response => {
-				// On parcourt toutes les références de la main courante
-				for (var p = 0; p <= response.data.length; p++) {
-					if (!response.data[p].reference) {
-						console.log(response.data[p].reference);
+				// On parcourt toutes les références du tHead
+				for (const headData of this.tableHeadFinal) {
+					//On récupère ces valeurs
+					for (const refHeadData of headData) {
+						if (refHeadData.includes('Réf')) {
+							// console.log(refHeadData);
+							// On parcourt toutes les références du tBody
+							for (const bodyData of this.tableData) {
+								// On parcourt toutes les références de la main courante
+								for (const refBodyData of bodyData) {
+									// console.log(refBodyData);
+									for (
+										var p = 0;
+										p <= response.data.length;
+										p++
+									) {
+										const reponse = response.data[p];
+										
+									}
+								}
+							}
+						}
 					}
-
-					// On parcourt toutes les références du tHead
-					// for (const headData of this.tableHeadFinal) {
-					// On parcourt toutes les références du tBody
-					// for (const bodyData of this.tableData) {
-					// console.log(headData);
-					// console.log(bodyData);
-					// const reponse = response.data;
-					// console.log(reponse[p].reference);
-					// Si la référence existe déjà, ont la met à jours
-					// if (rep.reference == row[0]) {
-					// console.log(this.agence.references);
-					// let date = row[1] + '';
-					// let dateFin = row[2] + '';
-					// let mois = '';
-					// let moisFin = '';
-					// // On enregistre en base de données
-					// this.$http
-					// 	.put(
-					// 		'http://localhost:5000/api/main-courante',
-					// 		this.agence
-					// 	)
-					// 	.then(result => {
-					// 		this.$message({
-					// 			dangerouslyUseHTMLString: true,
-					// 			message:
-					// 				"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-					// 			type: 'success',
-					// 		});
-					// 	});
-					// window.location.reload();
-					// }
-					// Sinon on effectue une insertion
-					// else {
-					// On exclu la première ligne du fichier Excel
-					// if (row[0].includes('Réf')) {
-					// 	console.log('je suis le ot Réf');
-					// } else {
-					// 	this.agence.references = row[0];
-					// 	console.log('Références non identiques');
-					// 	this.$http
-					// 		.post(
-					// 			'http://localhost:5000/api/creation-incident_main-courante',
-					// 			this.agence
-					// 		)
-					// 		.then(result => {
-					// 			this.$message({
-					// 				dangerouslyUseHTMLString: true,
-					// 				message:
-					// 					"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-					// 				type: 'success',
-					// 			});
-					// 		});
-					// }
-					// }
-					// console.log(response.data[p].reference);
-					// }
-					// }
 				}
 			});
 		},
 	},
+
+	// Si la référence existe déjà, ont la met à jours
+	// // On enregistre en base de données
+	// this.$http
+	// 	.put(
+	// 		'http://localhost:5000/api/main-courante',
+	// 		this.agence
+	// 	)
+	// 	.then(result => {
+	// 		this.$message({
+	// 			dangerouslyUseHTMLString: true,
+	// 			message:
+	// 				"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+	// 			type: 'success',
+	// 		});
+	// 	});
+	// window.location.reload();
+	// }
+	// Sinon on effectue une insertion
+	// else {
+	// On exclu la première ligne du fichier Excel
+	// if (row[0].includes('Réf')) {
+	// 	console.log('je suis le ot Réf');
+	// } else {
+	// 	this.agence.references = row[0];
+	// 	console.log('Références non identiques');
+	// 	this.$http
+	// 		.post(
+	// 			'http://localhost:5000/api/creation-incident_main-courante',
+	// 			this.agence
+	// 		)
+	// 		.then(result => {
+	// 			this.$message({
+	// 				dangerouslyUseHTMLString: true,
+	// 				message:
+	// 					"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+	// 				type: 'success',
+	// 			});
+	// 		});
+	// }
+	// }
+	// console.log(response.data[p].reference);
 
 	computed: {
 		description() {
