@@ -1024,9 +1024,11 @@ export default {
         // Récupère les informations d'un incident pour l'insérer dans le formulaire
         getIncident(idIncident) {
             // Obtention de l'incident
+            console.log("Début de la requête")
             Axios.get(
                 'http://localhost:5000/api/main-courante/' + idIncident
             ).then(response => {
+                console.log(response.data[0].description)
                 this.form.incident_id = this.incident_id;
                 this.form.description = response.data[0].description;
                 this.form.date_debut = response.data[0].date_debut;

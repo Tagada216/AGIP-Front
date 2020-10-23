@@ -864,13 +864,16 @@ export default {
 		this.validateImpactReseauCDN()
 		this.validateImpactClientCDN()
 		this.verifCheckEnseignesImpactees()
-		this.getCosip(this.references)
+		this.getCosip(this.reference)
     },
 
     props: {
         incident_id: {
             type: Number,
-        },
+		},
+		idCos: {
+			type: Number,
+		},
 	},
 
     data() {
@@ -1338,7 +1341,6 @@ export default {
 
 						this.form.mois_cosip=dateDebut.getFullYear()+"/"+numeroMois;
 
-
 						//Calcul du numéro de la semaine en fonction de la date de début
 						var jour = dateDebut.getDay();
 						dateDebut.setDate(dateDebut.getDate() - (jour + 6) % 7 + 3);
@@ -1384,11 +1386,42 @@ export default {
 
 		//Méthode GetCosip() pour l'update d'un incdent déjà dans le cosip
 		//On récupére les données du tableau et on les incères dans le formulaire 
-		getCosip(reference){
-			Axios.get('http://localhost:5000/probs/cosip/'+ reference).then(
+		getCosip(idCos){
+			console.log("Début de la requête " + idCos)		
+			Axios.get('http://localhost:5000/api/probs/cosip/'+ idCos).then(
 				response => {
 					this.form.description=response.data[0].description
-																			
+					this.form.statut=response.data[0].statut
+					this.form.cause=response.data[0].cause
+					this.form.origine=response.data[0].origine
+					this.form.date_detection=response.data[0].date_detection
+					this.form.date_premiere_com=response.data[0].date_premier_com
+					this.form.action_retablissement=response.data[0].action_retablissement
+					this.form.plan_action=response.data[0].plan_action
+					this.form.date_debut=response.data[0].date_debut	
+					this.form.impactReseauCDN=response.data[0].description_impact
+					const dateDebut = new Date(response.data[0].date_debut);
+					var numeroMois = dateDebut.getMonth()+1					
+					
+					//Calcul du numéro de la semaine en fonction de la date de début
+					var jour = dateDebut.getDay();
+					dateDebut.setDate(dateDebut.getDate() - (jour + 6) % 7 + 3);
+					var ms = dateDebut.valueOf();
+					dateDebut.setMonth(0)
+					dateDebut.setDate(4)
+					var semaineCosip = Math.round((ms - dateDebut.valueOf()) / (7*864e5))+1
+					//Fin du calcul
+
+					this.form.semaine_cosip=dateDebut.getFullYear()+"/S"+semaineCosip
+
+											// Ajout d'un 0 devant le mois si celui-ci est inférieur strict à 10
+						if(numeroMois<10)
+						{
+							numeroMois="0"+numeroMois
+						}
+
+						this.form.mois_cosip=dateDebut.getFullYear()+"/"+numeroMois;
+						
 				})
 		},
 
@@ -1511,8 +1544,8 @@ export default {
 
 	},
 	watch: {
-        reference: function() {
-            this.getCosip(this.reference);
+        idCos: function() {
+            this.getCosip(this.idCos);
         },
     },
 	

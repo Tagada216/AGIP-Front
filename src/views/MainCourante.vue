@@ -62,7 +62,7 @@ export default {
         return { 
 			curID: 1,
 			exportFileName: "Main Courante"
-		};
+		}
 	},
 
     components: {

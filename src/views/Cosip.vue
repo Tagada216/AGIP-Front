@@ -11,11 +11,11 @@
                 splitpanes-max="100"
                 style="height: 100%"
                 @probsSelected="updateRef"
-				dataLink="http://localhost:5000/api/probs/cosip/"
+				dataLink="http://localhost:5000/api/cosip/"
             />
 
             <CosipForm
-                :references="curRef"
+                :idCos="curId"
                 splitpanes-size="50"
                 splitpanes-min="20"
                 splitpanes-max="100"
@@ -38,7 +38,7 @@ export default {
 
     data(){
         return{
-            curRef: "PB"
+            curId: ''
         }
     },
 
@@ -49,10 +49,9 @@ export default {
     },
     
     methods:{
-        updateRef(ref) {
-            this.curRef = ref;
-            console.log("Référence actuelle : " + this.curRef)
-            //getCosip(this.curRef)
+        updateRef(id) {
+            this.curId = id;
+            console.log("Id actuel : " + this.curId)
         },
 
 
