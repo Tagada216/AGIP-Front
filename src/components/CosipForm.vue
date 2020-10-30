@@ -1373,17 +1373,18 @@ export default {
 		//On récupére les données du tableau et on les incères dans le formulaire 
 		getCosip(idCos){
 			console.log("Début de la requête " + idCos)		
-			Axios.get('http://localhost:5000/api/probs/cosip/'+ idCos).then(
+			Axios.get('http://localhost:5000/api/cosip/'+ idCos).then(
 				response => {
-					this.form.description=response.data[0].description
-					this.form.statut=response.data[0].statut
-					this.form.cause=response.data[0].cause
-					this.form.origine=response.data[0].origine
-					this.form.date_detection=response.data[0].date_detection
-					this.form.date_premiere_com=response.data[0].date_premier_com
-					this.form.action_retablissement=response.data[0].action_retablissement
-					this.form.plan_action=response.data[0].plan_action
-					this.form.date_debut=response.data[0].date_debut	
+					this.form.description=response.data[0].description;
+					this.form.statut_id=response.data[0].statut_id;
+					console.log(response.data[0].statut)
+					this.form.cause=response.data[0].cause;
+					this.form.origine=response.data[0].origine;
+					this.form.date_detection=response.data[0].date_detection;
+					this.form.date_premiere_com=response.data[0].date_premier_com;
+					this.form.action_retablissement=response.data[0].action_retablissement;
+					this.form.plan_action=response.data[0].plan_action;
+					this.form.date_debut=response.data[0].date_debut;	
 					this.form.impactReseauCDN=response.data[0].description_impact
 					const dateDebut = new Date(response.data[0].date_debut);
 					var numeroMois = dateDebut.getMonth()+1					
