@@ -1077,14 +1077,14 @@ export default {
 						trigger: 'change',						
 					},
 				],
-				responsabilite: [
+				/*responsabilite: [
 					{
 						type: 'array',
 						required: true,
 						message: 'Aucune selection',
 						trigger: 'change',						
 					},
-				],
+				],*/
 				date_detection: [
 					{
 						required:true,
@@ -1128,13 +1128,17 @@ export default {
     methods: {
 
 		//Sauvegarde d'un incident dans le cosip via le formulaire 
-		onSubmit(){
-
-					console.log(this.form);
+	onSubmit(){
+					// On récupère l'id de l'incident situé après le '=' dans l'url 
+					var test = window.location.href.indexOf('=')
+					if(test!=-1)
+					{
+						var idIncident=window.location.href.substr(test+1)
+					}
 					// On enregistre en base de données
 					this.$http
 						.post(
-							'http://localhost:5000/api/probs/cosip',
+							'http://localhost:5000/api/add-cosip/'+idIncident,
 							this.form
 						)
 						.then(result => {
@@ -1143,7 +1147,6 @@ export default {
 								Car il se peut que ça se passe mal et qu'on envoi quand même un message de succés.
 								De plus la fonction window.alert() stop tous les autres traitement JS
 							*/
-
 							// Ceci est un composent du module Element (Voir : https://element.eleme.io/#/fr-FR/component/message)
 							this.$message({
 								dangerouslyUseHTMLString: true,
