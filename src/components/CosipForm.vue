@@ -82,15 +82,12 @@
                     <el-row :gutter="20">
 						<el-col :span="6">
 							<el-form-item label="Statut" prop="statut_id">
-								<el-select
-									id="statut_id"
-									v-model="form.statut_id"
-								>
+								<el-select v-model="form.statut_id">
 									<el-option
-										v-for="item in options"
-										:key="item.value"
-										:label="item.label"
-										:value="item.value"
+										v-for="item in remoteEnum.statut"
+										:key="item.id"
+										:label="item.nom"
+										:value="item.id"
 									></el-option>
 								</el-select>
 							</el-form-item>
@@ -882,22 +879,7 @@ export default {
 			url:'',
 			checkedImpactBDDF: false,
 			isCosip: false,
-			options: [{
-				value:'Diagnostic',
-				label:'Diagnostic'
-			},
-			{
-				value:'Résolution',
-				label:'Résolution'
-			},
-			{
-				value:'Rétablissement',
-				label:'Rétablissement'
-			},
-			{
-				value:'Terminé',
-				label:'Terminé'
-			}],
+
 
 			optionsImpactAvere: [{
 				value:'Elevé',
@@ -1306,7 +1288,7 @@ export default {
 						this.form.priorite_id=response.data[0].priorite
 						this.form.date_debut = response.data[0].date_debut;
                 		this.form.date_fin = response.data[0].date_fin;
-                		//this.form.statut_id = response.data[0].statut;
+                		this.form.statut_id = response.data[0].statut;
 						this.form.is_faux_incident = response.data[0].is_faux_incident
                     	? true
                     	: false;
@@ -1322,7 +1304,7 @@ export default {
 						this.form.action_retablissement=response.data[0].action_retablissement
 						this.form.date_premiere_com = response.data[0].date_premier_com;
 						this.form.cause = response.data[0].cause;
-						this.form.date_detection = response.data[0].date_detection;
+						//this.form.date_detection = response.data[0].date_detection;
 						const dateDebut = new Date(response.data[0].date_debut);
 						var numeroMois = dateDebut.getMonth()+1
 
