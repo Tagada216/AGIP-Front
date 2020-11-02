@@ -1080,7 +1080,21 @@ export default {
 						message: 'Champ non rempli',
 						trigger: 'change',
 					},
-				],									
+				],
+				description_impactCDN: [
+					{
+						required:true,
+						message: 'Champ non rempli',
+						trigger: 'change',
+					},
+				],	
+				priorite_idCDN: [
+					{
+						required:true,
+						message: 'Champ non rempli',
+						trigger: 'change',
+					},
+				],							
 			},
 
             // Les lignes suivantes sont des variables nécessaires au modal de suppression
