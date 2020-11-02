@@ -439,6 +439,7 @@ export default {
                 date_fin: null, //
                 description: '', //
                 cause: '',
+                cosip_id:'',
                 origine: '',
                 action_retablissement: '',
                 plan_action: '',
@@ -661,10 +662,11 @@ export default {
 
 						console.log(this.curID)
 
+
 						// On enregistre en base de données
 						this.$http
 							.put('http://localhost:5000/api/main-courante', 
-							this.form
+                            this.form,
 						)
 						.then(result => {
                             this.$message({
@@ -1057,7 +1059,9 @@ export default {
                 this.form.description_contournement = response.data[0].description_contournement
                 this.form.enseigne_impactee = [];
 				this.form.references = [];
-				this.form.application_impactee = [];
+                this.form.application_impactee = [];
+                let idcos = response.data[0].cosip_id
+                this.getCosipIdIncident(idcos)
 
                 for (const ens_id of response.data[0].id_enseigne.split('/')) {
 					this.form.enseigne_impactee.push(parseInt(ens_id));
@@ -1085,6 +1089,11 @@ export default {
 				console.log(this.form.application_impactee);
             });
         },
+        //Récupération de l'id du cosip et le ré-insérer dans l'incident après un update 
+        getCosipIdIncident(curCos){
+            this.form.cosip_id = curCos
+            console.log("L'id cosip de cet incident : " + this.form.cosip_id)
+        }
     },
 
     watch: {
