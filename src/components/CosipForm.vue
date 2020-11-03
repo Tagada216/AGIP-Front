@@ -752,14 +752,14 @@
 							<el-form-item label="Responsabilité" prop="responsabilite">
 								<el-radio-group v-model="form.responsabilite_id">
 									<div style="margin-bottom: 10px;">
-										<el-radio 
+										<el-radio
 											v-for="item in remoteEnum.responsabilite"
 											:key="item.id"
 											:label="item.nom"
-											:value="item.id">
+											:value="item.id" >
 										</el-radio>
 									</div>
-								</el-radio-group>
+								</el-radio-group >
 							</el-form-item>
 						</el-col>
 						<el-col :span="12">
@@ -1059,14 +1059,14 @@ export default {
 						trigger: 'change',						
 					},
 				],
-				/*responsabilite: [
+				responsabilite: [
 					{
 						type: 'array',
 						required: true,
 						message: 'Aucune selection',
 						trigger: 'change',						
 					},
-				],*/
+				],
 				date_detection: [
 					{
 						required:true,
@@ -1094,7 +1094,35 @@ export default {
 						message: 'Champ non rempli',
 						trigger: 'change',
 					},
-				],							
+				],
+				description_impactBDDF: [
+					{
+						required:true,
+						message: 'Champ non rempli',
+						trigger: 'change',
+					},
+				],	
+				priorite_idBDDF: [
+					{
+						required:true,
+						message: 'Champ non rempli',
+						trigger: 'change',
+					},
+				],
+				description_impactBPF: [
+					{
+						required:true,
+						message: 'Champ non rempli',
+						trigger: 'change',
+					},
+				],	
+				priorite_idBPF: [
+					{
+						required:true,
+						message: 'Champ non rempli',
+						trigger: 'change',
+					},
+				],						
 			},
 
             // Les lignes suivantes sont des variables nécessaires au modal de suppression
@@ -1318,6 +1346,7 @@ export default {
 						this.form.action_retablissement=response.data[0].action_retablissement
 						this.form.date_premiere_com = response.data[0].date_premier_com;
 						this.form.cause = response.data[0].cause;
+						this.form.responsabilite_id=response.data[0].responsabilite
 						//this.form.date_detection = response.data[0].date_detection;
 						const dateDebut = new Date(response.data[0].date_debut);
 						var numeroMois = dateDebut.getMonth()+1
@@ -1399,7 +1428,15 @@ export default {
 					this.form.action_retablissement=response.data[0].action_retablissement;
 					this.form.plan_action=response.data[0].plan_action;
 					this.form.date_debut=response.data[0].date_debut;	
-					this.form.impactReseauCDN=response.data[0].description_impact
+
+					this.form.description_impactCDN=response.data[0].description_impact
+					this.form.description_impactBDDF=response.data[0].description_impact
+					this.form.description_impactBPF=response.data[0].description_impact
+					
+					this.form.responsabilite_id=response.data[0].responsabilite
+					this.form.priorite_idCDN=response.data[0].priorite
+					this.form.priorite_idBDDF=response.data[0].priorite
+					this.form.priorite_idBPF=response.data[0].priorite
 					const dateDebut = new Date(response.data[0].date_debut);
 					var numeroMois = dateDebut.getMonth()+1					
 					
@@ -1414,13 +1451,40 @@ export default {
 
 					this.form.semaine_cosip=dateDebut.getFullYear()+"/S"+semaineCosip
 
-											// Ajout d'un 0 devant le mois si celui-ci est inférieur strict à 10
+					// Ajout d'un 0 devant le mois si celui-ci est inférieur strict à 10
 						if(numeroMois<10)
 						{
 							numeroMois="0"+numeroMois
 						}
 
 						this.form.mois_cosip=dateDebut.getFullYear()+"/"+numeroMois;
+						if(response.data[0].statut==5)
+						{
+							this.form.statut_id="Terminé"
+						}
+
+						for (const ens_id of response.data[0].id_enseigne.split('/')) {
+							this.form.enseigne_impactee.push(parseInt(ens_id));
+						}
+
+						for (
+							let index = 0;
+							index < response.data[0].reference_id.split('/').length;
+							index++
+						) {
+							const id = response.data[0].reference_id.split('/')[index];
+							const ref = response.data[0].reference.split('/')[index];
+							this.form.references.push({
+								reference_id: id,
+								reference: ref,
+							});
+						}
+						
+						for (const app of response.data[0].display_name.split('|||')) {
+							console.log({display_name: app });
+							
+							this.form.application_impactee.push({display_name: app })
+						}		
 						
 				})
 		},
