@@ -241,13 +241,13 @@
 											<el-form-item label="Impact Avéré" prop="impact_avereBDDF">
 												<el-select
 													id="impact_avereBDDF"
-													v-model="valueImpactBDDF"
+													v-model="form.valueImpactBDDF"
 												>
 													<el-option
-														v-for="item in optionsImpactAvere"
-														:key="item.value"
-														:label="item.label"
-														:value="item.value"
+														v-for="item in remoteEnum.gravite"
+														:key="item.id"
+														:label="item.Nom"
+														:value="item.id"
 													></el-option>
 												</el-select>
 											</el-form-item>
@@ -418,13 +418,13 @@
 											<el-form-item label="Impact Avéré" prop="impact_avereCDN">
 												<el-select
 													id="impact_avereCDN"
-													v-model="valueImpactCDN"
+													v-model="form.valueImpactCDN"
 												>
 													<el-option
-														v-for="item in optionsImpactAvere"
-														:key="item.value"
-														:label="item.label"
-														:value="item.value"
+														v-for="item in remoteEnum.gravite"
+														:key="item.id"
+														:label="item.Nom"
+														:value="item.id"
 													></el-option>
 												</el-select>
 											</el-form-item>
@@ -590,13 +590,13 @@
 											<el-form-item label="Impact Avéré" prop="impact_avereBPF">
 												<el-select
 													id="impact_avereBPF"
-													v-model="valueImpactBPF"
+													v-model="form.valueImpactBPF"
 												>
 													<el-option
-														v-for="item in optionsImpactAvere"
-														:key="item.value"
-														:label="item.label"
-														:value="item.value"
+														v-for="item in remoteEnum.gravite"
+														:key="item.id"
+														:label="item.Nom"
+														:value="item.id"
 													></el-option>
 												</el-select>
 											</el-form-item>
@@ -896,13 +896,12 @@ export default {
 
 			value:'',
 
-			valueImpactCDN:'',
-			valueImpactBDDF:'',
-			valueImpactBPF:'',
+
 
 			radio:0,
             // Données énumérées venant de l'API
             remoteEnum: {
+				gravite:[],
                 priorites: [],
                 statut: [],
                 enseignes: [],
@@ -932,6 +931,9 @@ export default {
 				priorite_idCDN: '', //
 				priorite_idBDDF: '', //
 				priorite_idBPF:'',
+				valueImpactCDN:'',
+				valueImpactBDDF:'',
+				valueImpactBPF:'',
                 enseigne_impactee: [],
 				application_impactee: [],
 				responsabilite_id:'',
@@ -1317,7 +1319,6 @@ export default {
 			{
 				var idIncident=window.location.href.substr(test+1)
 			}
-
 			// On récupère les informations de l'incident à dupliquer et on les affiche dans les champs correspondant
 			if(idIncident!=undefined)
 			{
@@ -1346,29 +1347,22 @@ export default {
 						this.form.action_retablissement=response.data[0].action_retablissement
 						this.form.date_premiere_com = response.data[0].date_premier_com;
 						this.form.cause = response.data[0].cause;
-						this.form.responsabilite_id=response.data[0].responsabilite
 						//this.form.date_detection = response.data[0].date_detection;
 						const dateDebut = new Date(response.data[0].date_debut);
 						var numeroMois = dateDebut.getMonth()+1
-
 						this.form.description_impactCDN=response.data[0].description_impact
 						this.form.description_impactBDDF=response.data[0].description_impact
 						this.form.description_impactBPF=response.data[0].description_impact
-
 						this.form.priorite_idCDN=response.data[0].priorite
 						this.form.priorite_idBDDF=response.data[0].priorite
 						this.form.priorite_idBPF=response.data[0].priorite
 						
-
-
 						// Ajout d'un 0 devant le mois si celui-ci est inférieur strict à 10
 						if(numeroMois<10)
 						{
 							numeroMois="0"+numeroMois
 						}
-
 						this.form.mois_cosip=dateDebut.getFullYear()+"/"+numeroMois;
-
 						//Calcul du numéro de la semaine en fonction de la date de début
 						var jour = dateDebut.getDay();
 						dateDebut.setDate(dateDebut.getDate() - (jour + 6) % 7 + 3);
@@ -1377,18 +1371,14 @@ export default {
 						dateDebut.setDate(4)
 						var semaineCosip = Math.round((ms - dateDebut.valueOf()) / (7*864e5))+1
 						//Fin du calcul
-
 						this.form.semaine_cosip=dateDebut.getFullYear()+"/S"+semaineCosip
-
 						if(response.data[0].statut==5)
 						{
 							this.form.statut_id="Terminé"
 						}
-
 						for (const ens_id of response.data[0].id_enseigne.split('/')) {
 							this.form.enseigne_impactee.push(parseInt(ens_id));
 						}
-
 						for (
 							let index = 0;
 							index < response.data[0].reference_id.split('/').length;
@@ -1412,19 +1402,26 @@ export default {
 				}
 		},
 
+
 		//Méthode GetCosip() pour l'update d'un incdent déjà dans le cosip
 		//On récupére les données du tableau et on les incères dans le formulaire 
 		getCosip(idCos){
+
+			var test = window.location.href.indexOf('=')
+			if(test!=-1)
+			{
+				var idCos=window.location.href.substr(test+1)
+			}
 			console.log("Début de la requête " + idCos)		
 			Axios.get('http://localhost:5000/api/cosip/'+ idCos).then(
 				response => {
 					this.form.description=response.data[0].description;
 					this.form.statut_id=response.data[0].statut_id;
-					console.log(response.data[0].statut)
 					this.form.cause=response.data[0].cause;
 					this.form.origine=response.data[0].origine;
 					this.form.date_detection=response.data[0].date_detection;
 					this.form.date_premiere_com=response.data[0].date_premier_com;
+					this.form.date_fin=response.data[0].date_fin;
 					this.form.action_retablissement=response.data[0].action_retablissement;
 					this.form.plan_action=response.data[0].plan_action;
 					this.form.date_debut=response.data[0].date_debut;	
@@ -1433,7 +1430,15 @@ export default {
 					this.form.description_impactBDDF=response.data[0].description_impact
 					this.form.description_impactBPF=response.data[0].description_impact
 					
+					console.log("La référence est: " + response.data[0].reference)
+					this.form.references = response.data[0].reference;
+					console.log("L'id de la référence est: " + response.data[0].reference_id)
+					this.form.enseigne_impactee = [];
 					this.form.responsabilite_id=response.data[0].responsabilite
+
+					this.form.valueImpactCDN=response.data[0].gravite_id
+					this.form.valueImpactBPF=response.data[0].gravite_id
+					this.form.valueImpactBDDF=response.data[0].gravite_id
 					this.form.priorite_idCDN=response.data[0].priorite
 					this.form.priorite_idBDDF=response.data[0].priorite
 					this.form.priorite_idBPF=response.data[0].priorite
@@ -1452,40 +1457,17 @@ export default {
 					this.form.semaine_cosip=dateDebut.getFullYear()+"/S"+semaineCosip
 
 					// Ajout d'un 0 devant le mois si celui-ci est inférieur strict à 10
-						if(numeroMois<10)
-						{
-							numeroMois="0"+numeroMois
-						}
+					if(numeroMois<10)
+					{
+						numeroMois="0"+numeroMois
+					}
 
-						this.form.mois_cosip=dateDebut.getFullYear()+"/"+numeroMois;
-						if(response.data[0].statut==5)
-						{
-							this.form.statut_id="Terminé"
-						}
-
-						for (const ens_id of response.data[0].id_enseigne.split('/')) {
-							this.form.enseigne_impactee.push(parseInt(ens_id));
-						}
-
-						for (
-							let index = 0;
-							index < response.data[0].reference_id.split('/').length;
-							index++
-						) {
-							const id = response.data[0].reference_id.split('/')[index];
-							const ref = response.data[0].reference.split('/')[index];
-							this.form.references.push({
-								reference_id: id,
-								reference: ref,
-							});
-						}
-						
-						for (const app of response.data[0].display_name.split('|||')) {
-							console.log({display_name: app });
-							
-							this.form.application_impactee.push({display_name: app })
-						}		
-						
+					this.form.mois_cosip=dateDebut.getFullYear()+"/"+numeroMois;
+					if(response.data[0].statut==5)
+					{
+						this.form.statut_id="Terminé"
+					}	
+											
 				})
 		},
 
@@ -1540,7 +1522,12 @@ export default {
                 .then(response => {
                     this.remoteEnum.priorites = response.data;
                 });
-
+			//Obtention gravité avérée 
+			this.$http
+				.get('http://localhost:5000/api/incidents/gravite')
+				.then(response =>{
+					this.remoteEnum.gravite = response.data;
+				});
             // Obtention des statuts
             this.$http
                 .get('http://localhost:5000/api/incidents/statut')

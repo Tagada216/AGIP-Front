@@ -91,7 +91,7 @@ export default {
         onRowSelected(event) {
             if (event.node.selected) {
                 this.$emit('incidentSelected', event.data.id);
-                this.$emit('probsSelected', event.data.id);
+                this.$emit('CosipSelected', event.data.id);
             }
         },
     },

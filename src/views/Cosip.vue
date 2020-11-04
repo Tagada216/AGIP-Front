@@ -1,7 +1,19 @@
 <template>
     <div style="100vh">
-        <base-header title="COSIP"></base-header>
-        
+        <base-header title="COSIP">
+            <el-tooltip class="item" effect="light" content="Export Excel" placement="bottom-end">
+                <button class="header-btn">
+                    <download-excel
+                        :fetch="fetchMainCourrante"
+                        :before-generate="startDownload"
+						:name="exportFileName"
+                    >
+                        <i class="fas fa-file-excel"></i>
+                    </download-excel>
+                </button>
+            </el-tooltip>
+        </base-header>
+
         <splitpanes watch-slots class="default-theme" horizontal>
             <div splitpanes-size="0" splitpanes-max="2"></div>
 
@@ -10,7 +22,7 @@
                 splitpanes-min="15"
                 splitpanes-max="100"
                 style="height: 100%"
-                @probsSelected="updateRef"
+                @CosipSelected="updateRef"
 				dataLink="http://localhost:5000/api/cosip/"
             />
 
