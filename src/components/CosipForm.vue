@@ -861,7 +861,6 @@ export default {
 		this.validateImpactReseauCDN()
 		this.validateImpactClientCDN()
 		this.verifCheckEnseignesImpactees()
-		this.getCosip(this.reference)
     },
 
     props: {
@@ -895,7 +894,7 @@ export default {
 			}],
 
 			value:'',
-
+			idUpdate:'',
 
 
 			radio:0,
@@ -982,7 +981,8 @@ export default {
 				eteceCDN:''
 			},
 
-			rules:{  // Régles de validation des champs requis du formulaire
+			rules:{  
+				// Régles de validation des champs requis du formulaire
 				date_debut: [
 					{
 						required:true,
@@ -1061,14 +1061,14 @@ export default {
 						trigger: 'change',						
 					},
 				],
-				responsabilite: [
+/*				responsabilite: [
 					{
 						type: 'array',
 						required: true,
 						message: 'Aucune selection',
 						trigger: 'change',						
 					},
-				],
+				],*/
 				date_detection: [
 					{
 						required:true,
@@ -1183,6 +1183,24 @@ export default {
 							window.location.href = 'http://localhost:8080/#/cosip'
 						});
 						
+		},
+		onUpdate(idCos){
+			console.log("La référence est : "+ idCos)
+			//On update ou enregistre les données dans la BDD 
+			this.$http
+				.post(
+					'http://localhost:5000/api/update-cosip/'+ idCos,
+					this.form
+				)
+				.then(result => {
+					this.$message({
+						dangerouslyUseHTMLString: true,
+						message:
+							"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+						type: 'success',
+					});
+				});
+			
 		},
 		//Méthode de récupération de l'url courante afin de modifier le bouton de validation du formulaire en "crétation" ou "Modification"
 		verifURL(){
@@ -1407,11 +1425,7 @@ export default {
 		//On récupére les données du tableau et on les incères dans le formulaire 
 		getCosip(idCos){
 
-			var test = window.location.href.indexOf('=')
-			if(test!=-1)
-			{
-				var idCos=window.location.href.substr(test+1)
-			}
+
 			console.log("Début de la requête " + idCos)		
 			Axios.get('http://localhost:5000/api/cosip/'+ idCos).then(
 				response => {
@@ -1430,12 +1444,13 @@ export default {
 					this.form.description_impactBDDF=response.data[0].description_impact
 					this.form.description_impactBPF=response.data[0].description_impact
 					
-					console.log("La référence est: " + response.data[0].reference)
 					this.form.references = response.data[0].reference;
-					console.log("L'id de la référence est: " + response.data[0].reference_id)
-					this.form.enseigne_impactee = [];
-					this.form.responsabilite_id=response.data[0].responsabilite
 
+					const idResp = response.data[0].resposable_id;
+					this.form.responsabilite_id
+
+					console.log("L'id de l'entite: "+response.data[0].responsable_id)
+					console.log("Nom responsable : "+ response.data[0].responsable_nom)
 					this.form.valueImpactCDN=response.data[0].gravite_id
 					this.form.valueImpactBPF=response.data[0].gravite_id
 					this.form.valueImpactBDDF=response.data[0].gravite_id
@@ -1445,6 +1460,10 @@ export default {
 					const dateDebut = new Date(response.data[0].date_debut);
 					var numeroMois = dateDebut.getMonth()+1					
 					
+					this.form.enseigne_impactee = [];
+					console.log("Les enseignes impactées sont : " + response.data[0].enseigne_nom)
+					this.form.references = [];
+					this.form.application_impactee = [];
 					//Calcul du numéro de la semaine en fonction de la date de début
 					var jour = dateDebut.getDay();
 					dateDebut.setDate(dateDebut.getDate() - (jour + 6) % 7 + 3);
@@ -1467,7 +1486,45 @@ export default {
 					{
 						this.form.statut_id="Terminé"
 					}	
-											
+					
+				//Gestion pour la récupération des référence et applications
+                for (
+                    let index = 0;
+                    index < response.data[0].reference_id.split('/').length; // récupération de la référence et stop séparation au caractère / 
+					index++
+                ) {
+                    const id = response.data[0].reference_id.split('/')[index];
+                    const ref = response.data[0].reference.split('/')[index];
+                    this.form.references.push({
+                        reference_id: id,
+						reference: ref, 
+                    });
+				}
+				//Récupération des applications 
+				for(
+					let index =0;
+					index < response.data[0].code_irt.split('/').length;
+					index++
+				){
+					const itr = response.data[0].code_irt.split('/')[index];
+					const app = response.data[0].application.split('|')[index];
+					this.form.application_impactee.push({
+						code_irt: itr,
+						display_name: app,
+					});
+				}
+
+				//Récupération des enseignes et affichage des cards
+				
+				for(
+					let index =0;
+					index < response.data[0].enseigne_id.split('/').length;
+					index++
+				){
+					const idEns = response.data[0].enseigne_id.split('/')[index];
+					this.form.enseigne_impactee.push(parseInt(idEns));
+				}
+
 				})
 		},
 

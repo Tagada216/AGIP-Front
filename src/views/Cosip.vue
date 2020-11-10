@@ -4,7 +4,7 @@
             <el-tooltip class="item" effect="light" content="Export Excel" placement="bottom-end">
                 <button class="header-btn">
                     <download-excel
-                        :fetch="fetchMainCourrante"
+                        :fetch="fetchCosip"
                         :before-generate="startDownload"
 						:name="exportFileName"
                     >
@@ -43,6 +43,7 @@ import Splitpanes from 'splitpanes';
 import 'splitpanes/dist/splitpanes.css';
 import CosipForm from '@/components/CosipForm.vue';
 import methods from '@/components/CosipForm';
+import JsonExcel from 'vue-json-excel';
 import Axios from 'axios';
 import { constants } from 'crypto';
 
@@ -57,7 +58,8 @@ export default {
     components: {
         Grid,
         Splitpanes,
-        CosipForm
+        CosipForm,
+        'download-excel': JsonExcel,
     },
     
     methods:{
@@ -65,7 +67,21 @@ export default {
             this.curId = id;
             console.log("Id actuel : " + this.curId)
         },
+        async fetchCosip() {
+            const response = await this.$http.get(
+                'http://localhost:5000/api/cosip'
+            )
+            return response.data;
+        },
+		startDownload(){
+        	this.exportFileName = this.getExportTitle()
+		},
 
+		getExportTitle(){
+			const now = new Date()
+			return `Main Courante ${now.toLocaleDateString().replace(/\//g,'-')} ${now.toLocaleTimeString()}`
+			
+		},
 
 
     }
