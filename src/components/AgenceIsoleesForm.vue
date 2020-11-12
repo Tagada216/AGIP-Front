@@ -61,12 +61,7 @@
 <script>
 import Vue from 'vue';
 import Axios from 'axios';
-// import { importSpecifier, thisTypeAnnotation, identifier } from 'babel-types';
 import readXlsxFile from 'read-excel-file';
-// import { setTimeout } from 'timers';
-// import { constants } from 'crypto';
-// import { log, isNull } from 'util';
-// import { arraySlugToHeader, arraySlugifier, arrayToJSON } from '../etlUtils';
 import fs from 'fs';
 import VModal from 'vue-js-modal';
 import XLSX from 'xlsx';
@@ -111,6 +106,7 @@ export default {
 
 			// Données du formulaire agence
 			agence: {
+				incident_id: 0,
 				references: '', //
 				is_faux_incident: false, //
 				date_debut: '', //
@@ -411,7 +407,7 @@ export default {
 		isExcel(file) {
 			return /\.(xlsx|xls|xlsm|csv)$/.test(file.name);
 		},
-	
+
 		//Permet d'incrementé le name des inputs
 		insetNameInput() {
 			var setInputName = document.querySelectorAll('input[class=switch]');
@@ -450,27 +446,124 @@ export default {
 							// console.log(refHeadData);
 							// On parcourt toutes les références du tBody
 							for (const bodyData of this.tableData) {
-								var getInputs = document.querySelectorAll('input[class=switch]');
+								var getInputs = document.querySelectorAll(
+									'input[class=switch]'
+								);
 								for (var i = 0; i < getInputs.length; i++) {
 									var getTdTBody = getInputs[i].parentNode,
 										getTrOfTBody = getTdTBody.parentNode;
-									//On récupère la (les) référence(s) checkées et les enlèves du tableau 
+									//On récupère la (les) référence(s) checkées et les enlèves du tableau
 									if (getInputs[i].checked == true) {
-										if (getTrOfTBody.childNodes[1].innerHTML == bodyData[0]) {
+										if (
+											getTrOfTBody.childNodes[1]
+												.innerHTML == bodyData[0]
+										) {
 											// console.log(bodyData);
 											// console.log(bodyData[0]);
 											// console.log(getTrOfTBody.childNodes[1].innerHTML);
 											this.tableData.pop(bodyData);
-											
 										}
 									}
 								}
+								// console.log(this.tableData);
 								// On parcourt toutes les références de la main courante
-								for (const refBodyData of bodyData) {
-									// console.log(refBodyData);
-									for (var p = 0; p <= response.data.length;p++) {
-										const reponse = response.data[p];
-										console.log(reponse.reference);
+								for (var p = 0; p < response.data.length; p++) {
+									const reponse = response.data[p];
+									// Si la référence existe déjà, ont la met à jours
+									// console.log(reponse);
+									if (
+										reponse.reference.includes(bodyData[0])
+									) {
+										// Si l'état de l'incident est "En cours"
+										if (bodyData[7].includes('En cours')) {
+											this.agence.incident_id =
+												response.data[p].incident_id;
+											this.curID =
+												response.data[p].incident_id;
+
+											console.log(
+												bodyData[0] + ' En cours'
+											);
+											console.log(this.incident_id);
+										} else {
+											this.agence.incident_id =
+												response.data[p].incident_id;
+											this.curID =
+												response.data[p].incident_id;
+												console.log(bodyData);
+											// window.open(
+											// 	'/#/maj-agence/id=' +
+											// 		this.incident_id
+											// );
+											// Axios.get(
+											// 	'http://localhost:5000/api/main-courante/'+ this.agence.incident_id
+											// ).then(response => {
+												this.agence.incident_id;
+												if(bodyData[6].includes("P0")){
+													this.agence.priorite_id = 1;
+												}else if(bodyData[6].includes("P1")){
+													this.agence.priorite_id = 2;
+												}else if(bodyData[6].includes("P2")){
+													this.agence.priorite_id = 3;
+												}else if(bodyData[6].includes("P3")){
+													this.agence.priorite_id = 4;
+												}else if(bodyData[6].includes("P4")){
+													this.agence.priorite_id = 5;
+												}
+												this.$http
+													.put(
+														'http://localhost:5000/api/main-courante-update-agence/',
+														this.agence
+													)
+													.then(result => {
+														this.$message({
+															dangerouslyUseHTMLString: true,
+															message:
+																"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+															type: 'success',
+														});
+													});
+											// });
+											console.log(bodyData[0] + ' Clos');
+										}
+										// console.log(reponse);
+										// var idIncident = reponse.incident_id;
+										// console.log(idIncident);
+										// console.log(bodyData);
+										// this.agence.idIncident = idIncident;
+										// this.agence.references = bodyData[0]
+										// this.agence.enseigne_impactee = "CDN";
+										// if(bodyData[6].includes("P0")){
+										// 	this.agence.priorite_id = 1;
+										// 	console.log("P0");
+										// } else if(bodyData[6].includes("P1")){
+										// 	this.agence.priorite_id = 2;
+										// 	console.log("P1");
+										// }else if(bodyData[6].includes("P2")){
+										// 	this.agence.priorite_id = 3;
+										// 	console.log("P2");
+										// }else if(bodyData[6].includes("P3")){
+										// 	this.agence.priorite_id = 4;
+										// 	console.log("P3");
+										// }else if(bodyData[6].includes("P4")){
+										// 	this.agence.priorite_id = 5;
+										// 	console.log("P4");
+										// }
+										// On enregistre en base de données
+										// this.$http
+										// 	.put(
+										// 		'http://localhost:5000/api/main-courante-update-agence/',
+										// 		this.agence
+										// 	)
+										// 	.then(result => {
+										// 		this.$message({
+										// 			dangerouslyUseHTMLString: true,
+										// 			message:
+										// 				"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+										// 			type: 'success',
+										// 		});
+										// 	});
+										// window.location.reload();
 									}
 								}
 							}
@@ -481,23 +574,6 @@ export default {
 		},
 	},
 
-	// Si la référence existe déjà, ont la met à jours
-	// // On enregistre en base de données
-	// this.$http
-	// 	.put(
-	// 		'http://localhost:5000/api/main-courante',
-	// 		this.agence
-	// 	)
-	// 	.then(result => {
-	// 		this.$message({
-	// 			dangerouslyUseHTMLString: true,
-	// 			message:
-	// 				"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-	// 			type: 'success',
-	// 		});
-	// 	});
-	// window.location.reload();
-	// }
 	// Sinon on effectue une insertion
 	// else {
 	// On exclu la première ligne du fichier Excel
