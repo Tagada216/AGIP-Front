@@ -896,7 +896,6 @@ export default {
 			value:'',
 			idUpdate:'',
 
-
 			radio:0,
             // Données énumérées venant de l'API
             remoteEnum: {
@@ -913,7 +912,8 @@ export default {
 				references: [], //
 				reference:'',
 				probleme:'',
-                incident_id: 0,
+				incident_id: 0,
+				cosip_id: 0,
                 is_faux_incident: false, //
                 date_debut: '', //
                 date_fin: null, //
@@ -933,6 +933,8 @@ export default {
 				valueImpactCDN:'',
 				valueImpactBDDF:'',
 				valueImpactBPF:'',
+				classification_id: 0,
+				gravite_id: 0,
                 enseigne_impactee: [],
 				application_impactee: [],
 				responsabilite_id:'',
@@ -1184,12 +1186,11 @@ export default {
 						});
 						
 		},
-		onUpdate(idCos){
-			console.log("La référence est : "+ idCos)
+		onUpdate(){
 			//On update ou enregistre les données dans la BDD 
 			this.$http
-				.post(
-					'http://localhost:5000/api/update-cosip/'+ idCos,
+				.put(
+					'http://localhost:5000/api/update-cosip/' +  this.form.cosip_id,
 					this.form
 				)
 				.then(result => {
@@ -1429,8 +1430,12 @@ export default {
 			console.log("Début de la requête " + idCos)		
 			Axios.get('http://localhost:5000/api/cosip/'+ idCos).then(
 				response => {
+				//Données récupéré et injecté dans le formulaire d'update
+					this.form.incident_id=response.data[0].id
+					this.form.cosip_id = response.data[0].cosip_id
 					this.form.description=response.data[0].description;
 					this.form.statut_id=response.data[0].statut_id;
+					this.form.priorite_id=response.data[0].priorite_id
 					this.form.cause=response.data[0].cause;
 					this.form.origine=response.data[0].origine;
 					this.form.date_detection=response.data[0].date_detection;
@@ -1439,18 +1444,14 @@ export default {
 					this.form.action_retablissement=response.data[0].action_retablissement;
 					this.form.plan_action=response.data[0].plan_action;
 					this.form.date_debut=response.data[0].date_debut;	
-
+					this.form.classification_id=response.data[0].classification_id
 					this.form.description_impactCDN=response.data[0].description_impact
 					this.form.description_impactBDDF=response.data[0].description_impact
 					this.form.description_impactBPF=response.data[0].description_impact
-					
+					this.form.gravite_id=response.data[0].gravite_id
 					this.form.references = response.data[0].reference;
 
 					const idResp = response.data[0].resposable_id;
-					this.form.responsabilite_id
-
-					console.log("L'id de l'entite: "+response.data[0].responsable_id)
-					console.log("Nom responsable : "+ response.data[0].responsable_nom)
 					this.form.valueImpactCDN=response.data[0].gravite_id
 					this.form.valueImpactBPF=response.data[0].gravite_id
 					this.form.valueImpactBDDF=response.data[0].gravite_id
@@ -1461,9 +1462,9 @@ export default {
 					var numeroMois = dateDebut.getMonth()+1					
 					
 					this.form.enseigne_impactee = [];
-					console.log("Les enseignes impactées sont : " + response.data[0].enseigne_nom)
 					this.form.references = [];
 					this.form.application_impactee = [];
+
 					//Calcul du numéro de la semaine en fonction de la date de début
 					var jour = dateDebut.getDay();
 					dateDebut.setDate(dateDebut.getDate() - (jour + 6) % 7 + 3);

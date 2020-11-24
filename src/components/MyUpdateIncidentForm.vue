@@ -1060,8 +1060,8 @@ export default {
                 this.form.enseigne_impactee = [];
 				this.form.references = [];
                 this.form.application_impactee = [];
-                let idcos = response.data[0].cosip_id
-                this.getCosipIdIncident(idcos)
+                this.form.cosip_id = response.data[0].cosip_id
+                
 
                 for (const ens_id of response.data[0].id_enseigne.split('/')) {
 					this.form.enseigne_impactee.push(parseInt(ens_id));
@@ -1089,11 +1089,7 @@ export default {
 				console.log(this.form.application_impactee);
             });
         },
-        //Récupération de l'id du cosip et le ré-insérer dans l'incident après un update 
-        getCosipIdIncident(curCos){
-            this.form.cosip_id = curCos
-            console.log("L'id cosip de cet incident : " + this.form.cosip_id)
-        }
+
     },
 
     watch: {
