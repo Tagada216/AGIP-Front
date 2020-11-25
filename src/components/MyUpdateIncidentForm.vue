@@ -629,17 +629,20 @@ export default {
 						this.isValid(this.form.references[i].reference.toUpperCase()))
 				    {
 						this.form.references[i].reference = this.form.references[i].reference.toUpperCase();
-						//console.log(this.form.references[i].reference);
+						
 						//console.log(this.form.references[i].reference.toUpperCase());
 						//console.log(this.form.references[i].reference.length);
 						//console.log("OK ");
 
-				    }else{
+				    }else if (this.form.references.length < 1){
+                        console.log(this.form.references.length)
+                        console.log(this.form.references[i].reference);
 						this.$message({
 								dangerouslyUseHTMLString: true,
 								message:
 									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Si il y à plus de deux références veuillez remplir les champs au format : \"P00IN-0000000\".</p>",
-								type: 'error',
+                                type: 'error',
+                                
 							});
 							return false;
                     }

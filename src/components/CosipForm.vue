@@ -241,7 +241,7 @@
 											<el-form-item label="Impact Avéré" prop="impact_avereBDDF">
 												<el-select
 													id="impact_avereBDDF"
-													v-model="form.valueImpactBDDF"
+													v-model="form.gravite_id"
 												>
 													<el-option
 														v-for="item in remoteEnum.gravite"
@@ -418,7 +418,7 @@
 											<el-form-item label="Impact Avéré" prop="impact_avereCDN">
 												<el-select
 													id="impact_avereCDN"
-													v-model="form.valueImpactCDN"
+													v-model="form.gravite_id"
 												>
 													<el-option
 														v-for="item in remoteEnum.gravite"
@@ -590,7 +590,7 @@
 											<el-form-item label="Impact Avéré" prop="impact_avereBPF">
 												<el-select
 													id="impact_avereBPF"
-													v-model="form.valueImpactBPF"
+													v-model="form.gravite_id"
 												>
 													<el-option
 														v-for="item in remoteEnum.gravite"
@@ -750,7 +750,7 @@
 					<el-row :gutter="20">
 						<el-col :span="12">
 							<el-form-item label="Responsabilité" prop="responsabilite">
-								<el-radio-group v-model="form.responsabilite_id">
+								<el-radio-group v-model="form.entite_responsable">
 									<div style="margin-bottom: 10px;">
 										<el-radio
 											v-for="item in remoteEnum.responsabilite"
@@ -933,11 +933,14 @@ export default {
 				valueImpactCDN:'',
 				valueImpactBDDF:'',
 				valueImpactBPF:'',
-				classification_id: 0,
+				impact_avereCDN:0,
+				impact_avereBDDF:0,
+				impact_avereBPF:0,
+				classification_id: 1,
 				gravite_id: 0,
                 enseigne_impactee: [],
 				application_impactee: [],
-				responsabilite_id:'',
+				entite_responsable:'',
 				numChangement:'',
 				mois_cosip:'',
 				semaine_cosip:'',
@@ -1157,6 +1160,7 @@ export default {
 
 		//Sauvegarde d'un incident dans le cosip via le formulaire 
 	onSubmit(){
+
 					// On récupère l'id de l'incident situé après le '=' dans l'url 
 					var test = window.location.href.indexOf('=')
 					if(test!=-1)
@@ -1188,6 +1192,8 @@ export default {
 		},
 		onUpdate(){
 			//On update ou enregistre les données dans la BDD 
+			console.log(this.form)
+			console.log(this.form.entite_responsable)
 			this.$http
 				.put(
 					'http://localhost:5000/api/update-cosip/' +  this.form.cosip_id,
@@ -1200,6 +1206,7 @@ export default {
 							"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
 						type: 'success',
 					});
+					window.location.href = 'http://localhost:8080/#/cosip'
 				});
 			
 		},
@@ -1345,6 +1352,8 @@ export default {
 					response => {
 						console.log(response.data[0].statut)
 						this.form.incident_id=idIncident
+						this.form.incident_id=response.data[0].id
+						this.form.cosip_id = response.data[0].cosip_id
 						this.form.description=response.data[0].description
 						//this.form.description_impact=response.data[0].description_impact
 						this.form.priorite_id=response.data[0].priorite
@@ -1361,6 +1370,7 @@ export default {
                 		this.form.enseigne_impactee = [];
 						this.form.references = [];
 						this.form.application_impactee = [];
+						this.form.gravite_id=response.data[0].gravite_id
 						this.form.plan_action=response.data[0].plan_action
 						this.form.origine=response.data[0].origine
 						this.form.action_retablissement=response.data[0].action_retablissement
@@ -1426,8 +1436,7 @@ export default {
 		//On récupére les données du tableau et on les incères dans le formulaire 
 		getCosip(idCos){
 
-
-			console.log("Début de la requête " + idCos)		
+			console.log('Je suis appelé getCosip()')	
 			Axios.get('http://localhost:5000/api/cosip/'+ idCos).then(
 				response => {
 				//Données récupéré et injecté dans le formulaire d'update
@@ -1444,12 +1453,13 @@ export default {
 					this.form.action_retablissement=response.data[0].action_retablissement;
 					this.form.plan_action=response.data[0].plan_action;
 					this.form.date_debut=response.data[0].date_debut;	
-					this.form.classification_id=response.data[0].classification_id
+				//	this.form.classification_id=response.data[0].classification_id
 					this.form.description_impactCDN=response.data[0].description_impact
 					this.form.description_impactBDDF=response.data[0].description_impact
 					this.form.description_impactBPF=response.data[0].description_impact
 					this.form.gravite_id=response.data[0].gravite_id
 					this.form.references = response.data[0].reference;
+					this.form.entite_responsable = response.data[0].entite_responsable
 
 					const idResp = response.data[0].resposable_id;
 					this.form.valueImpactCDN=response.data[0].gravite_id
