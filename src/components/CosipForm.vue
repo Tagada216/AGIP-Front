@@ -92,6 +92,22 @@
 								</el-select>
 							</el-form-item>
 						</el-col>
+						<el-col :span="6">
+							<el-form-item label="Priorité" prop="priorite_id">
+								<el-select
+									id="priorite_id"
+									v-model="form.priorite_id"
+									>
+									<el-option
+										v-for="item in remoteEnum.priorites"
+										:key="item.id"
+										:label="item.priorite"
+										:value="item.id"
+									></el-option>
+								</el-select>
+							</el-form-item>
+						</el-col>
+
                     </el-row>
 
 					<el-form-item label="Résumé" prop="description">
@@ -115,6 +131,22 @@
 							v-model="form.cause"
 						></el-input>
 					</el-form-item>
+					<el-row :span="3">
+							<el-form-item label="Cause Racine" prop="cause_racine_id">
+								<el-select
+									id="cause_racine_id"
+									v-model="form.cause_racine_id"
+									>
+									<el-option
+										v-for="item in remoteEnum.causes_racine"
+										:key="item.id"
+										:label="item.nom"
+										:value="item.id"
+									></el-option>
+								</el-select>
+							</el-form-item>
+					</el-row>
+
 
                     <el-form-item label="Origine"
 						prop="origine"
@@ -222,20 +254,6 @@
 								<el-tab-pane label="BDDF" name="tabBDDF">
 									<el-form-item v-show="formulaireBDDF">
 										<el-row :gutter="20">
-										<el-col :span="6">
-											<el-form-item label="Priorité" prop="priorite_idBDDF">
-												<el-select
-													v-model="form.priorite_idBDDF"
-												>
-													<el-option
-														v-for="item in remoteEnum.priorites"
-														:key="item.id"
-														:label="item.priorite"
-														:value="item.id"
-													></el-option>
-												</el-select>
-											</el-form-item>
-										</el-col>
 
 										<el-col :span="6">
 											<el-form-item label="Impact Avéré" prop="impact_avereBDDF">
@@ -253,7 +271,9 @@
 											</el-form-item>
 										</el-col>
 										<el-col :span="6">
-											Criticité
+											<el-form-item label="Criticité">
+											{{classification}}
+											</el-form-item>
 										</el-col>
 									</el-row>
 									<el-row :gutter="20">
@@ -398,21 +418,6 @@
 								<el-tab-pane label="CDN" name="tabCDN">
 									<el-form-item v-show="formulaireCDN">
 										<el-row :gutter="20">
-										<el-col :span="6">
-											<el-form-item label="Priorité" prop="priorite_idCDN">
-												<el-select
-													id="priorite_idCDN"
-													v-model="form.priorite_idCDN"
-												>
-													<el-option
-														v-for="item in remoteEnum.priorites"
-														:key="item.id"
-														:label="item.priorite"
-														:value="item.id"
-													></el-option>
-												</el-select>
-											</el-form-item>
-										</el-col>
 
 										<el-col :span="6">
 											<el-form-item label="Impact Avéré" prop="impact_avereCDN">
@@ -430,7 +435,9 @@
 											</el-form-item>
 										</el-col>
 										<el-col :span="6">
-											Criticité
+											<el-form-item label="Criticité">
+											{{classification}}
+											</el-form-item>
 										</el-col>
 									</el-row>
 									<el-row :gutter="20">
@@ -570,22 +577,7 @@
 								<el-tab-pane label="BPF" name="tabBPF">
 									<el-form-item v-show="formulaireBPF">
 										<el-row :gutter="20">
-										<el-col :span="6">
-											<el-form-item label="Priorité" prop="priorite_idBPF">
-												<el-select
-													id="priorite_idBPF"
-													v-model="form.priorite_idBPF"
-												>
-													<el-option
-														v-for="item in remoteEnum.priorites"
-														:key="item.id"
-														:label="item.priorite"
-														:value="item.id"
-													></el-option>
-												</el-select>
-											</el-form-item>
-										</el-col>
-
+										
 										<el-col :span="6">
 											<el-form-item label="Impact Avéré" prop="impact_avereBPF">
 												<el-select
@@ -602,7 +594,9 @@
 											</el-form-item>
 										</el-col>
 										<el-col :span="6">
-											Criticité
+											<el-form-item label="Criticité">
+											{{classification}}
+											</el-form-item>
 										</el-col>
 									</el-row>
 									<el-row :gutter="20">
@@ -749,17 +743,17 @@
                 	</el-card>
 					<el-row :gutter="20">
 						<el-col :span="12">
-							<el-form-item label="Responsabilité" prop="responsabilite">
-								<el-radio-group v-model="form.entite_responsable">
+							<el-form-item label="Responsabilité" prop="entite_responsable">
+								<el-select v-model="form.entite_responsable">
 									<div style="margin-bottom: 10px;">
-										<el-radio
+										<el-option
 											v-for="item in remoteEnum.responsabilite"
 											:key="item.id"
 											:label="item.nom"
 											:value="item.id" >
-										</el-radio>
+										</el-option>
 									</div>
-								</el-radio-group >
+								</el-select >
 							</el-form-item>
 						</el-col>
 						<el-col :span="12">
@@ -878,7 +872,7 @@ export default {
 			url:'',
 			checkedImpactBDDF: false,
 			isCosip: false,
-
+			classification:'',
 
 			optionsImpactAvere: [{
 				value:'Elevé',
@@ -905,6 +899,7 @@ export default {
                 enseignes: [],
 				application_impactee: [],
 				responsabilite:[],
+				causes_racine:[],
             },
 
             // Données du formulaire
@@ -918,7 +913,9 @@ export default {
                 date_debut: '', //
                 date_fin: null, //
                 description: '', //
-                cause: '',
+				cause: '',
+				cause_racine:'',
+				cause_racine_id:'',
                 origine: '',
                 action_retablissement: '',
                 plan_action: '',
@@ -927,17 +924,14 @@ export default {
 				description_impactBPF: '', //
                 description_contournement: 'Aucun contournement', //
                 is_contournement: false, //
-				priorite_idCDN: '', //
-				priorite_idBDDF: '', //
-				priorite_idBPF:'',
+				priorite_id: '', //
 				valueImpactCDN:'',
 				valueImpactBDDF:'',
 				valueImpactBPF:'',
-				impact_avereCDN:0,
-				impact_avereBDDF:0,
-				impact_avereBPF:0,
-				classification_id: 1,
-				gravite_id: 0,
+				impact_avereCDN:'',
+				impact_avereBDDF:'',
+				impact_avereBPF:'',
+				gravite_id: '',
                 enseigne_impactee: [],
 				application_impactee: [],
 				entite_responsable:'',
@@ -988,6 +982,34 @@ export default {
 
 			rules:{  
 				// Régles de validation des champs requis du formulaire
+				cause_racine_id:[
+					{
+						required:true,
+						message: 'Champ non rempli',
+						trigger: 'change',
+					},
+				],
+				/*impact_avereBDDF: [
+					{
+						required:true,
+						message: 'Champ non rempli',
+						trigger: 'change',
+					},
+				],
+				impact_avereCDN: [
+					{
+						required:true,
+						message: 'Champ non rempli',
+						trigger: 'change',
+					},
+				],				
+				impact_avereBPF: [
+					{
+						required:true,
+						message: 'Champ non rempli',
+						trigger: 'change',
+					},
+				],*/
 				date_debut: [
 					{
 						required:true,
@@ -1066,14 +1088,13 @@ export default {
 						trigger: 'change',						
 					},
 				],
-/*				responsabilite: [
+				entite_responsable: [
 					{
-						type: 'array',
 						required: true,
 						message: 'Aucune selection',
 						trigger: 'change',						
 					},
-				],*/
+				],
 				date_detection: [
 					{
 						required:true,
@@ -1095,13 +1116,6 @@ export default {
 						trigger: 'change',
 					},
 				],	
-				priorite_idCDN: [
-					{
-						required:true,
-						message: 'Champ non rempli',
-						trigger: 'change',
-					},
-				],
 				description_impactBDDF: [
 					{
 						required:true,
@@ -1109,27 +1123,13 @@ export default {
 						trigger: 'change',
 					},
 				],	
-				priorite_idBDDF: [
-					{
-						required:true,
-						message: 'Champ non rempli',
-						trigger: 'change',
-					},
-				],
 				description_impactBPF: [
 					{
 						required:true,
 						message: 'Champ non rempli',
 						trigger: 'change',
 					},
-				],	
-				priorite_idBPF: [
-					{
-						required:true,
-						message: 'Champ non rempli',
-						trigger: 'change',
-					},
-				],						
+				],							
 			},
 
             // Les lignes suivantes sont des variables nécessaires au modal de suppression
@@ -1160,7 +1160,8 @@ export default {
 
 		//Sauvegarde d'un incident dans le cosip via le formulaire 
 	onSubmit(){
-
+			this.$refs['form'].validate(valid => {
+				if (valid) {
 					// On récupère l'id de l'incident situé après le '=' dans l'url 
 					var test = window.location.href.indexOf('=')
 					if(test!=-1)
@@ -1188,12 +1189,22 @@ export default {
 							});
 							window.location.href = 'http://localhost:8080/#/cosip'
 						});
+				} else {
+					this.$message({
+						dangerouslyUseHTMLString: true,
+						message:
+							"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Tous les <strong>Champs requis</strong> n'ont pas été remplis.</p>",
+						type: 'error',
+					});
+					return false;
+			}
+		});
 						
 		},
 		onUpdate(){
+			this.$refs['form'].validate(valid => {
+				if (valid) {
 			//On update ou enregistre les données dans la BDD 
-			console.log(this.form)
-			console.log(this.form.entite_responsable)
 			this.$http
 				.put(
 					'http://localhost:5000/api/update-cosip/' +  this.form.cosip_id,
@@ -1208,7 +1219,16 @@ export default {
 					});
 					window.location.href = 'http://localhost:8080/#/cosip'
 				});
-			
+			} else {
+					this.$message({
+						dangerouslyUseHTMLString: true,
+						message:
+							"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Tous les <strong>Champs requis</strong> n'ont pas été remplis.</p>",
+						type: 'error',
+					});
+					return false;
+			}				
+		});
 		},
 		//Méthode de récupération de l'url courante afin de modifier le bouton de validation du formulaire en "crétation" ou "Modification"
 		verifURL(){
@@ -1382,9 +1402,7 @@ export default {
 						this.form.description_impactCDN=response.data[0].description_impact
 						this.form.description_impactBDDF=response.data[0].description_impact
 						this.form.description_impactBPF=response.data[0].description_impact
-						this.form.priorite_idCDN=response.data[0].priorite
-						this.form.priorite_idBDDF=response.data[0].priorite
-						this.form.priorite_idBPF=response.data[0].priorite
+						this.form.priorite_id=response.data[0].priorite
 						
 						// Ajout d'un 0 devant le mois si celui-ci est inférieur strict à 10
 						if(numeroMois<10)
@@ -1450,6 +1468,7 @@ export default {
 					this.form.date_detection=response.data[0].date_detection;
 					this.form.date_premiere_com=response.data[0].date_premier_com;
 					this.form.date_fin=response.data[0].date_fin;
+					this.form.commentaire = response.data[0].comment;
 					this.form.action_retablissement=response.data[0].action_retablissement;
 					this.form.plan_action=response.data[0].plan_action;
 					this.form.date_debut=response.data[0].date_debut;	
@@ -1459,9 +1478,10 @@ export default {
 					this.form.description_impactBPF=response.data[0].description_impact
 					this.form.gravite_id=response.data[0].gravite_id
 					this.form.references = response.data[0].reference;
-					this.form.entite_responsable = response.data[0].entite_responsable
-
-					const idResp = response.data[0].resposable_id;
+					this.classification = response.data[0].classification
+					this.form.entite_responsable = response.data[0].responsable_nom
+					this.form.cause_racine = response.data[0].cause_racine
+					this.form.cause_racine_id = response.data[0].cause_racine_id
 					this.form.valueImpactCDN=response.data[0].gravite_id
 					this.form.valueImpactBPF=response.data[0].gravite_id
 					this.form.valueImpactBDDF=response.data[0].gravite_id
@@ -1622,6 +1642,12 @@ export default {
 				.then(response => {
 					this.remoteEnum.responsabilite = response.data;
 				});
+			this.$http
+				.get('http://localhost:5000/api/incidents/cause-racine')
+				.then(response => {
+					this.remoteEnum.causes_racine = response.data;
+				});
+
         },
 
         ////////////////////////////////////////
