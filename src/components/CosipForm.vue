@@ -110,13 +110,13 @@
 
                     </el-row>
 
-					<el-form-item label="Résumé" prop="description">
+					<el-form-item label="Résumé" prop="cosip_resume">
                         <el-input
-                            id="description"
+                            id="cosip_resume"
                             type="textarea"
                             :autosize="{ minRows: 4, maxRows: 8 }"
                             placeholder="Résumé"
-                            v-model="form.description"
+                            v-model="form.cosip_resume"
                         ></el-input>
                     </el-form-item>
 
@@ -743,7 +743,7 @@
                 	</el-card>
 					<el-row :gutter="20">
 						<el-col :span="12">
-							<el-form-item label="Responsabilité" prop="entite_responsable">
+							<el-form-item label="Responsabilité" prop="entite_responsable_id">
 								<el-select v-model="form.entite_responsable">
 									<div style="margin-bottom: 10px;">
 										<el-option
@@ -918,7 +918,8 @@ export default {
 				cause_racine_id:'',
                 origine: '',
                 action_retablissement: '',
-                plan_action: '',
+				plan_action: '',
+				cosip_resume:'',
 				description_impactCDN: '', //
 				description_impactBDDF: '', //
 				description_impactBPF: '', //
@@ -935,6 +936,7 @@ export default {
                 enseigne_impactee: [],
 				application_impactee: [],
 				entite_responsable:'',
+				entite_responsable_id:'',
 				numChangement:'',
 				mois_cosip:'',
 				semaine_cosip:'',
@@ -1017,7 +1019,7 @@ export default {
 						trigger: 'change',
 					},
 				],
-				description: [
+				cosip_resume: [
 					{
 						required: true,
 						message: 'Champ non rempli',
@@ -1374,7 +1376,7 @@ export default {
 						this.form.incident_id=idIncident
 						this.form.incident_id=response.data[0].id
 						this.form.cosip_id = response.data[0].cosip_id
-						this.form.description=response.data[0].description
+						this.form.cosip_resume=response.data[0].cosip_resume
 						//this.form.description_impact=response.data[0].description_impact
 						this.form.priorite_id=response.data[0].priorite
 						this.form.date_debut = response.data[0].date_debut;
@@ -1460,7 +1462,7 @@ export default {
 				//Données récupéré et injecté dans le formulaire d'update
 					this.form.incident_id=response.data[0].id
 					this.form.cosip_id = response.data[0].cosip_id
-					this.form.description=response.data[0].description;
+					this.form.cosip_resume=response.data[0].cosip_resume;
 					this.form.statut_id=response.data[0].statut_id;
 					this.form.priorite_id=response.data[0].priorite_id
 					this.form.cause=response.data[0].cause;
@@ -1472,6 +1474,8 @@ export default {
 					this.form.action_retablissement=response.data[0].action_retablissement;
 					this.form.plan_action=response.data[0].plan_action;
 					this.form.date_debut=response.data[0].date_debut;	
+					console.log(response.data[0].enseigne_id)
+					console.log(response.data[0].enseigne_nom)
 				//	this.form.classification_id=response.data[0].classification_id
 					this.form.description_impactCDN=response.data[0].description_impact
 					this.form.description_impactBDDF=response.data[0].description_impact
@@ -1480,6 +1484,7 @@ export default {
 					this.form.references = response.data[0].reference;
 					this.classification = response.data[0].classification
 					this.form.entite_responsable = response.data[0].responsable_nom
+					this.form.entite_responsable_id = response.data[0].entite_responsable_id
 					this.form.cause_racine = response.data[0].cause_racine
 					this.form.cause_racine_id = response.data[0].cause_racine_id
 					this.form.valueImpactCDN=response.data[0].gravite_id
