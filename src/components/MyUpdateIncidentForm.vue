@@ -441,6 +441,7 @@ export default {
                 cause: '',
                 cosip_id:'',
                 origine: '',
+                gravite_id:'',
                 action_retablissement: '',
                 plan_action: '',
                 description_impact: '', //
@@ -1030,6 +1031,7 @@ export default {
         getIncident(idIncident) {
             // Obtention de l'incident
             console.log("Début de la requête")
+            console.log(this.form)
             Axios.get(
                 'http://localhost:5000/api/main-courante/' + idIncident
             ).then(response => {
@@ -1047,6 +1049,7 @@ export default {
                     response.data[0].date_communication_tdc;
                 this.form.date_qualification_p01 =
                     response.data[0].date_qualif_p01;
+                this.form.gravite_id = response.data[0].gravite_id;
                 this.form.date_premiere_com = response.data[0].date_premier_com;
                 this.form.cause = response.data[0].cause;
                 this.form.action_retablissement = response.data[0].action_retablissement;

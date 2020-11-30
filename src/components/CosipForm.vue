@@ -364,13 +364,13 @@
 											</el-card>
 										</el-col>
 									</el-row>
-									<el-form-item label="Impact" prop="description_impactBDDF" style="margin-bottom:20px;">
+									<el-form-item label="Impact" prop="description_impact" style="margin-bottom:20px;">
 										<el-input
-											id="description_impactBDDF"
+											id="description_impact"
 											type="textarea"
 											:autosize="{ minRows: 4, maxRows: 8 }"
 											placeholder="Impact"
-											v-model="form.description_impactBDDF"
+											v-model="form.description_impact"
 										></el-input>
 									</el-form-item>
 									<el-table :data="form.application_impactee" border style="margin-bottom:20px;">
@@ -523,13 +523,13 @@
 											</el-card>
 										</el-col>
 									</el-row>
-									<el-form-item label="Impact" prop="description_impactCDN" style="margin-bottom:20px;">
+									<el-form-item label="Impact" prop="description_impact" style="margin-bottom:20px;">
 										<el-input
-											id="description_impactCDN"
+											id="description_impact"
 											type="textarea"
 											:autosize="{ minRows: 4, maxRows: 8 }"
 											placeholder="Impact"
-											v-model="form.description_impactCDN"
+											v-model="form.description_impact"
 										></el-input>
 									</el-form-item>
 									<el-table :data="form.application_impactee" border style="margin-bottom:20px;">
@@ -687,13 +687,13 @@
 											</el-card>
 										</el-col>
 									</el-row>
-									<el-form-item label="Impact" prop="description_impactBPF" style="margin-bottom:20px;">
+									<el-form-item label="Impact" prop="description_impact" style="margin-bottom:20px;">
 										<el-input
-											id="description_impactBPF"
+											id="description_impact"
 											type="textarea"
 											:autosize="{ minRows: 4, maxRows: 8 }"
 											placeholder="Impact"
-											v-model="form.description_impactBPF"
+											v-model="form.description_impact"
 										></el-input>
 									</el-form-item>
 									<el-table :data="form.application_impactee" border style="margin-bottom:20px;">
@@ -920,9 +920,7 @@ export default {
                 action_retablissement: '',
 				plan_action: '',
 				cosip_resume:'',
-				description_impactCDN: '', //
-				description_impactBDDF: '', //
-				description_impactBPF: '', //
+				description_impact: '', //
                 description_contournement: 'Aucun contournement', //
                 is_contournement: false, //
 				priorite_id: '', //
@@ -1235,11 +1233,8 @@ export default {
 		//Méthode de récupération de l'url courante afin de modifier le bouton de validation du formulaire en "crétation" ou "Modification"
 		verifURL(){
 			this.url = window.location.href
-			console.log("isCosip: "+ this.isCosip)
-			console.log("L'URL de la page est: " + this.url)
 			if(this.url == "http://localhost:8080/#/cosip"){
 				this.isCosip = true
-				console.log("isCosip: "+ this.isCosip)
 			}
 		},
 		// Méthode qui permet d'afficher ou non la card impact réseau BPF
@@ -1372,7 +1367,6 @@ export default {
 			{
 				Axios.get('http://localhost:5000/api/main-courante/' + idIncident).then(
 					response => {
-						console.log(response.data[0].statut)
 						this.form.incident_id=idIncident
 						this.form.incident_id=response.data[0].id
 						this.form.cosip_id = response.data[0].cosip_id
@@ -1456,7 +1450,7 @@ export default {
 		//On récupére les données du tableau et on les incères dans le formulaire 
 		getCosip(idCos){
 
-			console.log('Je suis appelé getCosip()')	
+
 			Axios.get('http://localhost:5000/api/cosip/'+ idCos).then(
 				response => {
 				//Données récupéré et injecté dans le formulaire d'update
@@ -1474,12 +1468,8 @@ export default {
 					this.form.action_retablissement=response.data[0].action_retablissement;
 					this.form.plan_action=response.data[0].plan_action;
 					this.form.date_debut=response.data[0].date_debut;	
-					console.log(response.data[0].enseigne_id)
-					console.log(response.data[0].enseigne_nom)
 				//	this.form.classification_id=response.data[0].classification_id
-					this.form.description_impactCDN=response.data[0].description_impact
-					this.form.description_impactBDDF=response.data[0].description_impact
-					this.form.description_impactBPF=response.data[0].description_impact
+					this.form.description_impact=response.data[0].description_impact
 					this.form.gravite_id=response.data[0].gravite_id
 					this.form.references = response.data[0].reference;
 					this.classification = response.data[0].classification
@@ -1667,7 +1657,6 @@ export default {
                     ? apps.filter(this.createAppFilter(requete))
                     : apps;
                 retour(results);
-                //console.log(retour);
             } else {
                 retour([{ nom: '' }]);
             }

@@ -51,7 +51,8 @@ export default {
 
     data(){
         return{
-            curId: ''
+            curId: '',
+            exportFileName: "Référentiel Incidents Majeurs"
         }
     },
 
@@ -74,12 +75,12 @@ export default {
             return response.data;
         },
 		startDownload(){
-        	this.exportFileName = this.getExportTitle()
+            this.exportFileName = this.getExportTitle()
 		},
 
 		getExportTitle(){
 			const now = new Date()
-			return `Main Courante ${now.toLocaleDateString().replace(/\//g,'-')} ${now.toLocaleTimeString()}`
+			return `Référentiel Incidents Majeurs ${now.toLocaleDateString().replace(/\//g,'-')} ${now.toLocaleTimeString()}`
 			
 		},
 
