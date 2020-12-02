@@ -364,13 +364,13 @@
 											</el-card>
 										</el-col>
 									</el-row>
-									<el-form-item label="Impact" prop="description_impact" style="margin-bottom:20px;">
+									<el-form-item label="Impact" prop="description_impactBDDF" style="margin-bottom:20px;">
 										<el-input
-											id="description_impact"
+											id="description_impactBDDF"
 											type="textarea"
 											:autosize="{ minRows: 4, maxRows: 8 }"
 											placeholder="Impact"
-											v-model="form.description_impact"
+											v-model="form.description_impactBDDF"
 										></el-input>
 									</el-form-item>
 									<el-table :data="form.application_impactee" border style="margin-bottom:20px;">
@@ -523,13 +523,13 @@
 											</el-card>
 										</el-col>
 									</el-row>
-									<el-form-item label="Impact" prop="description_impact" style="margin-bottom:20px;">
+									<el-form-item label="Impact" prop="description_impactCDN" style="margin-bottom:20px;">
 										<el-input
-											id="description_impact"
+											id="description_impactCDN"
 											type="textarea"
 											:autosize="{ minRows: 4, maxRows: 8 }"
 											placeholder="Impact"
-											v-model="form.description_impact"
+											v-model="form.description_impactCDN"
 										></el-input>
 									</el-form-item>
 									<el-table :data="form.application_impactee" border style="margin-bottom:20px;">
@@ -687,13 +687,13 @@
 											</el-card>
 										</el-col>
 									</el-row>
-									<el-form-item label="Impact" prop="description_impact" style="margin-bottom:20px;">
+									<el-form-item label="Impact" prop="description_impactBPF" style="margin-bottom:20px;">
 										<el-input
-											id="description_impact"
+											id="description_impactBPF"
 											type="textarea"
 											:autosize="{ minRows: 4, maxRows: 8 }"
 											placeholder="Impact"
-											v-model="form.description_impact"
+											v-model="form.description_impactBPF"
 										></el-input>
 									</el-form-item>
 									<el-table :data="form.application_impactee" border style="margin-bottom:20px;">
@@ -921,6 +921,9 @@ export default {
 				plan_action: '',
 				cosip_resume:'',
 				description_impact: '', //
+				description_impactCDN: '',
+				description_impactBDDF: '',
+				description_impactBPF: '',												
                 description_contournement: 'Aucun contournement', //
                 is_contournement: false, //
 				priorite_id: '', //
@@ -931,7 +934,8 @@ export default {
 				impact_avereBDDF:'',
 				impact_avereBPF:'',
 				gravite_id: '',
-                enseigne_impactee: [],
+				enseigne_impactee: [],
+				desc_impact_enseigne:[],
 				application_impactee: [],
 				entite_responsable:'',
 				entite_responsable_id:'',
@@ -1109,7 +1113,7 @@ export default {
 						trigger: 'change',
 					},
 				],
-				description_impactCDN: [
+			/*	description_impactCDN: [
 					{
 						required:true,
 						message: 'Champ non rempli',
@@ -1129,7 +1133,7 @@ export default {
 						message: 'Champ non rempli',
 						trigger: 'change',
 					},
-				],							
+				],	*/						
 			},
 
             // Les lignes suivantes sont des variables nécessaires au modal de suppression
@@ -1202,6 +1206,9 @@ export default {
 						
 		},
 		onUpdate(){
+			//Push les impacts des enseignes dans le tableau 
+			this.form.desc_impact_enseigne.push( this.form.description_impactBDDF,this.form.description_impactCDN, this.form.description_impactBPF)
+			console.log(this.form)
 			this.$refs['form'].validate(valid => {
 				if (valid) {
 			//On update ou enregistre les données dans la BDD 
@@ -1480,9 +1487,6 @@ export default {
 					this.form.valueImpactCDN=response.data[0].gravite_id
 					this.form.valueImpactBPF=response.data[0].gravite_id
 					this.form.valueImpactBDDF=response.data[0].gravite_id
-					this.form.priorite_idCDN=response.data[0].priorite
-					this.form.priorite_idBDDF=response.data[0].priorite
-					this.form.priorite_idBPF=response.data[0].priorite
 					const dateDebut = new Date(response.data[0].date_debut);
 					var numeroMois = dateDebut.getMonth()+1					
 					
