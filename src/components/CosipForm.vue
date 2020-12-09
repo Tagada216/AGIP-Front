@@ -256,10 +256,10 @@
 										<el-row :gutter="20">
 
 										<el-col :span="6">
-											<el-form-item label="Impact Avéré" prop="impact_avereBDDF">
+											<el-form-item label="Impact Avéré" prop="gravite_idBDDF">
 												<el-select
 													id="impact_avereBDDF"
-													v-model="form.gravite_id"
+													v-model="form.impact_avereBDDF"
 												>
 													<el-option
 														v-for="item in remoteEnum.gravite"
@@ -272,7 +272,7 @@
 										</el-col>
 										<el-col :span="6">
 											<el-form-item label="Criticité">
-											{{classification}}
+											{{classificationBDDF}}
 											</el-form-item>
 										</el-col>
 									</el-row>
@@ -420,10 +420,10 @@
 										<el-row :gutter="20">
 
 										<el-col :span="6">
-											<el-form-item label="Impact Avéré" prop="impact_avereCDN">
+											<el-form-item label="Impact Avéré" prop="gravite_idCDN">
 												<el-select
-													id="impact_avereCDN"
-													v-model="form.gravite_id"
+													id="gravite_id"
+													v-model="form.impact_avereCDN"
 												>
 													<el-option
 														v-for="item in remoteEnum.gravite"
@@ -436,7 +436,7 @@
 										</el-col>
 										<el-col :span="6">
 											<el-form-item label="Criticité">
-											{{classification}}
+											{{classificationCDN}}
 											</el-form-item>
 										</el-col>
 									</el-row>
@@ -579,10 +579,10 @@
 										<el-row :gutter="20">
 										
 										<el-col :span="6">
-											<el-form-item label="Impact Avéré" prop="impact_avereBPF">
+											<el-form-item label="Impact Avéré" prop="gravite_idBPF">
 												<el-select
 													id="impact_avereBPF"
-													v-model="form.gravite_id"
+													v-model="form.impact_avereBPF"
 												>
 													<el-option
 														v-for="item in remoteEnum.gravite"
@@ -595,7 +595,7 @@
 										</el-col>
 										<el-col :span="6">
 											<el-form-item label="Criticité">
-											{{classification}}
+											{{classificationBPF}}
 											</el-form-item>
 										</el-col>
 									</el-row>
@@ -872,7 +872,9 @@ export default {
 			url:'',
 			checkedImpactBDDF: false,
 			isCosip: false,
-			classification:'',
+			classificationBDDF:'',
+			classificationCDN:'',
+			classificationBPF:'',
 
 			optionsImpactAvere: [{
 				value:'Elevé',
@@ -889,6 +891,7 @@ export default {
 
 			value:'',
 			idUpdate:'',
+			tab_enseignes:  [],
 
 			radio:0,
             // Données énumérées venant de l'API
@@ -933,7 +936,9 @@ export default {
 				impact_avereCDN:'',
 				impact_avereBDDF:'',
 				impact_avereBPF:'',
-				gravite_id: '',
+				gravite_idCDN: '',
+				gravite_idBPF: '',
+				gravite_idBDDF: '',
 				enseigne_impactee: [],
 				desc_impact_enseigne:[],
 				application_impactee: [],
@@ -1421,14 +1426,17 @@ export default {
 						dateDebut.setDate(4)
 						var semaineCosip = Math.round((ms - dateDebut.valueOf()) / (7*864e5))+1
 						//Fin du calcul
+
 						this.form.semaine_cosip=dateDebut.getFullYear()+"/S"+semaineCosip
 						if(response.data[0].statut==5)
 						{
 							this.form.statut_id="Terminé"
 						}
+
 						for (const ens_id of response.data[0].id_enseigne.split('/')) {
 							this.form.enseigne_impactee.push(parseInt(ens_id));
 						}
+
 						for (
 							let index = 0;
 							index < response.data[0].reference_id.split('/').length;
@@ -1475,18 +1483,13 @@ export default {
 					this.form.action_retablissement=response.data[0].action_retablissement;
 					this.form.plan_action=response.data[0].plan_action;
 					this.form.date_debut=response.data[0].date_debut;	
-				//	this.form.classification_id=response.data[0].classification_id
 					this.form.description_impact=response.data[0].description_impact
-					this.form.gravite_id=response.data[0].gravite_id
 					this.form.references = response.data[0].reference;
-					this.classification = response.data[0].classification
 					this.form.entite_responsable = response.data[0].responsable_nom
 					this.form.entite_responsable_id = response.data[0].entite_responsable_id
 					this.form.cause_racine = response.data[0].cause_racine
 					this.form.cause_racine_id = response.data[0].cause_racine_id
-					this.form.valueImpactCDN=response.data[0].gravite_id
-					this.form.valueImpactBPF=response.data[0].gravite_id
-					this.form.valueImpactBDDF=response.data[0].gravite_id
+					this.form.enseigne_id=response.data[0].enseigne_id
 					const dateDebut = new Date(response.data[0].date_debut);
 					var numeroMois = dateDebut.getMonth()+1					
 					
@@ -1551,13 +1554,46 @@ export default {
 					index < response.data[0].enseigne_id.split('/').length;
 					index++
 				){
+					
 					const idEns = response.data[0].enseigne_id.split('/')[index];
 					this.form.enseigne_impactee.push(parseInt(idEns));
+					const desImpact = response.data[0].description_impact.split('/')[index]
+					const graviteA = response.data[0].gravite_id.split('/')[index] 
+					const graviteNom = response.data[0].gravite_nom.split('/')[index]
+					const criticite = response.data[0].classification.split('/')[index]
+					this.tab_enseignes.push({
+						enseigne_id: idEns,
+						desc: desImpact,
+						gravite: graviteNom,
+						id_grav: graviteA,
+						class: criticite
+					})
+				switch(this.tab_enseignes[index].enseigne_id){
+					case "1" :
+						this.form.description_impactBDDF = this.tab_enseignes[index].desc
+						this.form.impact_avereBDDF = this.tab_enseignes[index].gravite
+						this.classificationBDDF = this.tab_enseignes[index].class
+						this.form.gravite_idBDDF = this.tab_enseignes[index].id_grav
+						break;
+					case "2" :
+						this.form.description_impactCDN = this.tab_enseignes[index].desc
+						this.form.impact_avereCDN = this.tab_enseignes[index].gravite
+						this.classificationCDN = this.tab_enseignes[index].class
+						this.form.gravite_idCDN = this.tab_enseignes[index].id_grav
+						break;
+					case "3":
+						this.form.impact_avereBPF = this.tab_enseignes[index].gravite
+						this.form.description_impactBPF = this.tab_enseignes[index].desc
+						this.classificationBPF = this.tab_enseignes[index].class
+						this.form.gravite_idBPF = this.tab_enseignes[index].id_grav
+						break;
+					}
 				}
 
+				
 				})
 		},
-
+			
         // Cette méthode est lancée quand un champ d'appli impacté s'est vu selectionné une appli parmis les propositions
         // Quand tel est le cas, on insere les données de l'appli (CI et trigramme) pour pouvoir la relier en BDD
         appSelected(appSelection){
