@@ -66,6 +66,7 @@ import fs from 'fs';
 import VModal from 'vue-js-modal';
 import XLSX from 'xlsx';
 import { get } from 'https';
+import { type } from 'os';
 
 Vue.use(VModal, { componentName: 'modal' });
 
@@ -93,6 +94,9 @@ export default {
 			tableHeadFinal: [],
 			tableHead: [],
 			tableRow: [],
+			agenceTable: [],
+			filterResult: {},
+			 refUpdate : {},
 
 			loading: false,
 
@@ -107,7 +111,7 @@ export default {
 			// Données du formulaire agence
 			agence: {
 				incident_id: 0,
-				references: '', //
+				reference: '', //
 				is_faux_incident: false, //
 				date_debut: '', //
 				date_fin: null, //
@@ -117,12 +121,13 @@ export default {
 				is_contournement: false, //
 				priorite_id: '', //
 				statut_id: '', //
-				enseigne_impactee: '',
+				enseigne_impactee: 0,
 				application_impactee: [],
 				cause: '',
 				is_agence: true,
 				service_metier: '',
 				observations: '',
+				nbUtilisateur: null,
 			},
 		};
 	},
@@ -438,166 +443,167 @@ export default {
 		//////Partie Agence/////////
 		submit() {
 			Axios.get('http://localhost:5000/api/reference').then(response => {
-				// On parcourt toutes les références du tHead
-				for (const headData of this.tableHeadFinal) {
-					//On récupère ces valeurs
-					for (const refHeadData of headData) {
-						if (refHeadData.includes('Réf')) {
-							// console.log(refHeadData);
-							// On parcourt toutes les références du tBody
-							for (const bodyData of this.tableData) {
-								var getInputs = document.querySelectorAll(
-									'input[class=switch]'
-								);
-								for (var i = 0; i < getInputs.length; i++) {
-									var getTdTBody = getInputs[i].parentNode,
-										getTrOfTBody = getTdTBody.parentNode;
-									//On récupère la (les) référence(s) checkées et les enlèves du tableau
-									if (getInputs[i].checked == true) {
-										if (
-											getTrOfTBody.childNodes[1]
-												.innerHTML == bodyData[0]
-										) {
-											// console.log(bodyData);
-											// console.log(bodyData[0]);
-											// console.log(getTrOfTBody.childNodes[1].innerHTML);
-											this.tableData.pop(bodyData);
-										}
-									}
-								}
-								// console.log(this.tableData);
-								// On parcourt toutes les références de la main courante
-								for (var p = 0; p < response.data.length; p++) {
-									const reponse = response.data[p];
-									// Si la référence existe déjà, ont la met à jours
-									// console.log(reponse);
-									if (
-										reponse.reference.includes(bodyData[0])
-									) {
-										// Si l'état de l'incident est "En cours"
-										if (bodyData[7].includes('En cours')) {
-											this.agence.incident_id =
-												response.data[p].incident_id;
-											this.curID =
-												response.data[p].incident_id;
+				var i = 0;
+				var reponse;
+				do {
+					for (var j = 0; j < response.data.length; j++) {
+						if (
+							this.tableData[i][0].includes(
+								response.data[j].reference
+							)
+						) {
+							this.agence.incident_id =
+								response.data[j].incident_id;
+							// console.log(this.agence.incident_id);
+						}
+					}
 
-											console.log(
-												bodyData[0] + ' En cours'
-											);
-											console.log(this.incident_id);
-										} else {
-											this.agence.incident_id =
-												response.data[p].incident_id;
-											this.curID =
-												response.data[p].incident_id;
-												console.log(bodyData);
-											// window.open(
-											// 	'/#/maj-agence/id=' +
-											// 		this.incident_id
-											// );
-											// Axios.get(
-											// 	'http://localhost:5000/api/main-courante/'+ this.agence.incident_id
-											// ).then(response => {
-												this.agence.incident_id;
-												if(bodyData[6].includes("P0")){
-													this.agence.priorite_id = 1;
-												}else if(bodyData[6].includes("P1")){
-													this.agence.priorite_id = 2;
-												}else if(bodyData[6].includes("P2")){
-													this.agence.priorite_id = 3;
-												}else if(bodyData[6].includes("P3")){
-													this.agence.priorite_id = 4;
-												}else if(bodyData[6].includes("P4")){
-													this.agence.priorite_id = 5;
-												}
-												this.$http
-													.put(
-														'http://localhost:5000/api/main-courante-update-agence/',
-														this.agence
-													)
-													.then(result => {
-														this.$message({
-															dangerouslyUseHTMLString: true,
-															message:
-																"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-															type: 'success',
-														});
-													});
-											// });
-											console.log(bodyData[0] + ' Clos');
-										}
-										// console.log(reponse);
-										// var idIncident = reponse.incident_id;
-										// console.log(idIncident);
-										// console.log(bodyData);
-										// this.agence.idIncident = idIncident;
-										// this.agence.references = bodyData[0]
-										// this.agence.enseigne_impactee = "CDN";
-										// if(bodyData[6].includes("P0")){
-										// 	this.agence.priorite_id = 1;
-										// 	console.log("P0");
-										// } else if(bodyData[6].includes("P1")){
-										// 	this.agence.priorite_id = 2;
-										// 	console.log("P1");
-										// }else if(bodyData[6].includes("P2")){
-										// 	this.agence.priorite_id = 3;
-										// 	console.log("P2");
-										// }else if(bodyData[6].includes("P3")){
-										// 	this.agence.priorite_id = 4;
-										// 	console.log("P3");
-										// }else if(bodyData[6].includes("P4")){
-										// 	this.agence.priorite_id = 5;
-										// 	console.log("P4");
-										// }
-										// On enregistre en base de données
-										// this.$http
-										// 	.put(
-										// 		'http://localhost:5000/api/main-courante-update-agence/',
-										// 		this.agence
-										// 	)
-										// 	.then(result => {
-										// 		this.$message({
-										// 			dangerouslyUseHTMLString: true,
-										// 			message:
-										// 				"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-										// 			type: 'success',
-										// 		});
-										// 	});
-										// window.location.reload();
-									}
-								}
+					this.agence.reference = this.tableData[i][0];
+
+					var dateDebut = new Date(this.tableData[i][1]);
+					dateDebut.toString(`dd,mm,yyyy`);
+					this.agence.date_debut = dateDebut;
+					this.agence.enseigne_impactee = 1;
+
+					var dateFin = new Date(this.tableData[i][2]);
+					dateFin.toString(`dd,mm,yyyy`);
+
+					this.agence.service_metier = this.tableData[i][3];
+					this.agence.description = this.tableData[i][4];
+					if (typeof this.agence.nbUtilisateur === 'number') {
+						this.agence.nbUtilisateur = this.tableData[i][5];
+					}else if(typeof this.agence.nbUtilisateur === 'string'){
+						this.agence.nbUtilisateur = 0;
+					}
+					
+
+					if (this.tableData[i][6].includes('P0')) {
+						this.agence.priorite_id = 1;
+					} else if (this.tableData[i][6].includes('P1')) {
+						this.agence.priorite_id = 2;
+					} else if (this.tableData[i][6].includes('P2')) {
+						this.agence.priorite_id = 3;
+					} else if (this.tableData[i][6].includes('P3')) {
+						this.agence.priorite_id = 4;
+					} else if (this.tableData[i][6].includes('P4')) {
+						this.agence.priorite_id = 5;
+					}
+
+					if (this.tableData[i][7].includes('En cours')) {
+						this.agence.statut_id = 2;
+						this.agence.date_fin = 'Incident en cours';
+					} else if (this.tableData[i][7].includes('Clos')) {
+						this.agence.statut_id = 5;
+						this.agence.date_fin = dateFin;
+					}
+
+					this.agence.cause = this.tableData[i][8];
+
+					this.agence.is_agence;
+
+					this.agenceTable.push(this.agence);
+
+					this.agence = {
+						incident_id: 0,
+						reference: '', //
+						is_faux_incident: false, //
+						date_debut: '', //
+						date_fin: null, //
+						description: '', //
+						description_impact: '', //
+						description_contournement: 'Aucun contournement', //
+						is_contournement: false, //
+						priorite_id: '', //
+						statut_id: '', //
+						enseigne_impactee: 0,
+						application_impactee: [],
+						cause: '',
+						is_agence: true,
+						service_metier: '',
+						observations: '',
+						nbUtilisateur: null,
+					};
+					i++;
+				} while (i < this.tableData.length);
+
+				var a = this.agenceTable.filter(this.comparer(response.data));
+
+				for (let i = 0; i < a.length; i++) {
+					console.log('valeur non identique', a[i]);
+
+					this.$http
+						.post('http://localhost:5000/api/create-agence/', a[i])
+						.then(result => {
+							this.$message({
+								dangerouslyUseHTMLString: true,
+								message:
+									"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+								type: 'success',
+							});
+							loadingInstance.close();
+						});
+				}
+
+				this.agenceTable.forEach(element => {
+					this.filterResult = response.data.filter(
+						ref => element.reference === ref.reference
+					);
+
+						console.log(this.isChecked);
+					// console.log('Le filter ', this.filterResult)
+
+					if (this.filterResult.length >= 1) {
+						
+
+						for (let i = 0; i < this.agenceTable.length; i++) {
+							if (
+								this.agenceTable[i].reference.includes(
+									this.filterResult[0].reference
+								)
+							) {
+								this.refUpdate = this.agenceTable[i];
+								console.log('valeurs existantes',this.refUpdate);
+
+								this.$http
+									.put(
+										'http://localhost:5000/api/update-agence/',
+										this.refUpdate
+									)
+
+									.then(result => {
+										this.$message({
+											dangerouslyUseHTMLString: true,
+											message:
+												"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+											type: 'success',
+										});
+									});
+
+								// console.log(
+								// 	'valeurs existantes',
+								// 	this.refUpdate
+								// );
+
+								this.refUpdate = {};
 							}
 						}
 					}
-				}
+				});
+
+				this.agenceTable = [];
 			});
 		},
-	},
 
-	// Sinon on effectue une insertion
-	// else {
-	// On exclu la première ligne du fichier Excel
-	// if (row[0].includes('Réf')) {
-	// 	console.log('je suis le ot Réf');
-	// } else {
-	// 	this.agence.references = row[0];
-	// 	console.log('Références non identiques');
-	// 	this.$http
-	// 		.post(
-	// 			'http://localhost:5000/api/creation-incident_main-courante',
-	// 			this.agence
-	// 		)
-	// 		.then(result => {
-	// 			this.$message({
-	// 				dangerouslyUseHTMLString: true,
-	// 				message:
-	// 					"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-	// 				type: 'success',
-	// 			});
-	// 		});
-	// }
-	// }
-	// console.log(response.data[p].reference);
+		comparer(tableau) {
+			return function(current) {
+				return (
+					tableau.filter(function(other) {
+						return other.reference == current.reference;
+					}).length == 0
+				);
+			};
+		},
+	},
 
 	computed: {
 		description() {
