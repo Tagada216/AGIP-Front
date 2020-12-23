@@ -527,11 +527,11 @@ export default {
 
 				var difValueBetweenTables = this.agenceTable.filter(this.comparer(response.data));
 
-				for (let i = 0; i < a.length; i++) {
+				for (let i = 0; i < difValueBetweenTables.length; i++) {
 					console.log('valeur non identique', difValueBetweenTables[i]);
 
 					this.$http
-						.post('http://localhost:5000/api/create-agence/', a[i])
+						.post('http://localhost:5000/api/create-agence/', difValueBetweenTables[i])
 						.then(result => {
 							this.$message({
 								dangerouslyUseHTMLString: true,
