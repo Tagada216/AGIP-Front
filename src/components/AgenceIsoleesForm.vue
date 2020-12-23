@@ -266,7 +266,6 @@ export default {
 		// },
 
 		//Permet de lire le(s) fichier(s) et de les enregistrers dans un ou des tableaux
-
 		readerData(rawFile) {
 			this.loading = true;
 			return new Promise((resolve, reject) => {
@@ -526,10 +525,10 @@ export default {
 					i++;
 				} while (i < this.tableData.length);
 
-				var a = this.agenceTable.filter(this.comparer(response.data));
+				var difValueBetweenTables = this.agenceTable.filter(this.comparer(response.data));
 
 				for (let i = 0; i < a.length; i++) {
-					console.log('valeur non identique', a[i]);
+					console.log('valeur non identique', difValueBetweenTables[i]);
 
 					this.$http
 						.post('http://localhost:5000/api/create-agence/', a[i])
@@ -549,7 +548,6 @@ export default {
 						ref => element.reference === ref.reference
 					);
 
-						console.log(this.isChecked);
 					// console.log('Le filter ', this.filterResult)
 
 					if (this.filterResult.length >= 1) {
