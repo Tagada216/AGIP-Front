@@ -55,36 +55,32 @@ import Axios from 'axios';
 import JsonExcel from 'vue-json-excel';
 import { constants } from 'crypto';
 import methods from '@/components/MyUpdateIncidentForm';
+import { AgGridVue } from 'ag-grid-vue';
 
 export default {
-
     data() {
         return { 
 			curID: 1,
 			exportFileName: "Main Courante"
 		}
 	},
-
     components: {
         Grid,
         Splitpanes,
         UpdateIncidentForm,
         'download-excel': JsonExcel,
     },
-
     methods: {
         updateID(id) {
             this.curID = id;
             console.log("L'id est " + this.curID)
         },
-
         async fetchMainCourrante() {
             const response = await this.$http.get(
                 'http://localhost:5000/api/main-courante/formated'
             )
             return response.data;
 		},
-
 		duplicate(){
 			console.log(this.curID)
 			window.location.href="/#/new-incident/id="+this.curID
@@ -93,7 +89,6 @@ export default {
 				console.log("ID non existant")
 			}	
 		},
-
 		cosip() {
 			window.location.href='/#/cosip/id='+this.curID
 			if (this.incident_id==undefined)
@@ -107,7 +102,6 @@ export default {
 		startDownload(){
         	this.exportFileName = this.getExportTitle()
 		},
-
 		getExportTitle(){
 			const now = new Date()
 			return `Main Courante ${now.toLocaleDateString().replace(/\//g,'-')} ${now.toLocaleTimeString()}`
@@ -115,24 +109,18 @@ export default {
 		},
 	},
 }
-
 </script>
 
 <style lang="sass">
-
 div.splitpanes
   height: calc(100vh - 71px)
-
 div.splitpanes__pane
   overflow: auto
-
 #pane_1
   &div
     height: 100%
-
 #pane_2
     background-color: white
-
 div.default-theme.splitpanes--horizontal
     >div.splitpanes__splitter
         background-color: #2a2a2e
@@ -142,7 +130,6 @@ div.default-theme.splitpanes--horizontal
             background-color: white
         &::after
             background-color: white
-
 .header-btn
     line-height: 70px
     height: 70px
