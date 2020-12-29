@@ -1201,7 +1201,7 @@ export default {
 						for (const ens_id of response.data[0].id_enseigne.split('/')) {
 							this.form.enseigne_impactee.push(parseInt(ens_id));
 						}
-
+						//Récupération de la ou les références de l'incident 
 						for (
 							let index = 0;
 							index < response.data[0].reference_id.split('/').length;
@@ -1214,7 +1214,7 @@ export default {
 								reference: ref,
 							});
 						}
-						
+						//Récupération des applications impactées 
 						for (const app of response.data[0].display_name.split('|||')) {
 							console.log({display_name: app });
 							

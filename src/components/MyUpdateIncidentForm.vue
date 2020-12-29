@@ -304,37 +304,6 @@
             </el-col>
         </el-row>
 
-					<el-form-item label="Origine">
-						<el-input
-							id="origine"
-							type="textarea"
-							:autosize="{ minRows: 4, maxRows: 8 }"
-							placeholder="Origine"
-							v-model="form.origine"
-						></el-input>
-					</el-form-item>
-
-					<el-form-item label="Action de rétablissement" prop="action_retablissement">
-						<el-input
-							id="action_retablissement"
-							type="textarea"
-							:autosize="{ minRows: 4, maxRows: 8 }"
-							placeholder="Action de rétablissement"
-							v-model="form.action_retablissement"
-						></el-input>
-					</el-form-item>
-
-					<el-form-item label="Plan d'action" prop="plan_action">
-						<el-input
-							id="plan_action"
-							type="textarea"
-							:autosize="{ minRows: 4, maxRows: 8 }"
-							placeholder="Plan d'action"
-							v-model="form.plan_action"
-						></el-input>
-					</el-form-item>
-				<!-- Fin Infos générales incident -->
-	
 
 		<!-- Modal de confirmation de suppression d'une reférence problème -->
 		<el-dialog
@@ -407,6 +376,9 @@ export default {
 	},
 	data() {
 		return {
+			classificationBDDF:'',
+			classificationCDN:'',
+			classificationBPF:'',
 			// Données énumérées venant de l'API
 			remoteEnum: {
 				priorites: [],
@@ -440,6 +412,21 @@ export default {
                 date_communication_TDC: '',
                 date_qualification_p01: '',
 				date_premiere_com: '',
+				valueImpactCDN:'',
+				valueImpactBDDF:'',
+				valueImpactBPF:'',
+				impact_avereCDN:'',
+				impact_avereBDDF:'',
+				impact_avereBPF:'',
+				gravite_idCDN: '',
+				gravite_idBPF: '',   
+				gravite_idBDDF: '',
+				enseigne_impactee: [],
+				desc_impact_enseigne:[],
+				description_impact: '', //
+				description_impactCDN: '',
+				description_impactBDDF: '',
+				description_impactBPF: ''
 			},
 
 			// Règles de validation pour le formulaire
@@ -541,6 +528,7 @@ export default {
 			this.form.application_impactee[appIndex] = appSelection;
 		},
 		onSubmit() {
+			console.log(this.form)
 			// Vérification si les champs son vide ne pas enregistrer la valeur null retourner par défaut par vueJS avec le v-model
 			if (
 				this.form.cause == 'null' ||
@@ -558,6 +546,16 @@ export default {
 			}
 			this.$refs['form'].validate(valid => {
 				if (valid) {
+
+					if((this.form.cosip_id != null)&& (this.form.cosip_id != "") ){
+							this.$message({
+							dangerouslyUseHTMLString: true,
+							message:
+								"<h2 style='font-family: arial'>Cet incident est au cosip</h2> <p style='font-family: arial'>==> Modifier le depuis l'onglet <strong>Cosip</strong></p>",
+							type: 'error',
+						});
+						return false;
+					}
 					/*// On vérifie qu'il y a au moins une référence
                     if (this.form.references.length == 0) {
                         alert('Aucune donnée dans les références');
@@ -639,10 +637,7 @@ export default {
 							].reference = this.form.references[
 								i
 							].reference.toUpperCase();
-							//console.log(this.form.references[i].reference);
-							//console.log(this.form.references[i].reference.toUpperCase());
-							//console.log(this.form.references[i].reference.length);
-							//console.log("OK ");
+
 						} else {
 							this.$message({
 								dangerouslyUseHTMLString: true,
@@ -666,9 +661,7 @@ export default {
 							return false;
 						}
 					}
-					console.log(this.incident_id);
 					this.curID = this.incident_id;
-					console.log(this.curID);
 					// On enregistre en base de données
 					this.$http
 						.put(
@@ -685,8 +678,7 @@ export default {
 							window.location.reload();
 						});
 				} else {
-					/*console.log('error');
-                    return false;*/
+
 					this.$message({
 						dangerouslyUseHTMLString: true,
 						message:
@@ -724,8 +716,6 @@ export default {
 											this.curID =
 												response.data[p].incident_id;
 
-											console.log(row[0] + ' En cours');
-											console.log(this.incident_id);
 										}
 										// Sinon si l'état de l'incident est "Clos"
 										else {
@@ -737,7 +727,7 @@ export default {
 												'/#/maj-agence/id=' +
 													this.incident_id
 											);
-											console.log(row[0] + ' Clos');
+											
 										}
 									}
 								}
@@ -980,7 +970,6 @@ export default {
 					? apps.filter(this.createAppFilter(requete))
 					: apps;
 				retour(results);
-				//console.log(retour);
 			} else {
 				retour([{ nom: '' }]);
 			}
@@ -1007,12 +996,9 @@ export default {
 		// Récupère les informations d'un incident pour l'insérer dans le formulaire
         getIncident(idIncident) {
             // Obtention de l'incident
-            console.log("Début de la requête")
-            console.log(this.form)
             Axios.get(
                 'http://localhost:5000/api/main-courante/' + idIncident
             ).then(response => {
-                console.log(response.data[0].description)
                 this.form.incident_id = this.incident_id;
                 this.form.description = response.data[0].description;
                 this.form.date_debut = response.data[0].date_debut;
@@ -1044,32 +1030,91 @@ export default {
 				this.form.references = [];
                 this.form.application_impactee = [];
                 this.form.cosip_id = response.data[0].cosip_id
-                
+                console.log("La référence récup : ", response.data[0].reference)
 
                 for (const ens_id of response.data[0].id_enseigne.split('/')) {
 					this.form.enseigne_impactee.push(parseInt(ens_id));
 				}
-				for (
-					let index = 0;
-					index < response.data[0].reference_id.split('/').length;
-					index++
-				) {
-					const id = response.data[0].reference_id.split('/')[index];
-					const ref = response.data[0].reference.split('/')[index];
-					this.form.references.push({
-						reference_id: id,
-						reference: ref,
-					});
-				}
+
 
 				for (const app of response.data[0].display_name.split('|||')) {
-					console.log({display_name: app });
+				
 					
                     this.form.application_impactee.push({display_name: app })
                 }
+				console.log("Nb ref ", response.data[0].reference_id.split('/').length)
+				//Gestion pour la récupération des référence 
+                for (
+                    let index = 0;
+                    index < response.data[0].reference_id.split('/').length; // récupération de la référence et stop séparation au caractère / 
+					index++
+                ) {
+                    const id = response.data[0].reference_id.split('/')[index];
+                    const ref = response.data[0].reference.split('/')[index];
+                    this.form.references.push({
+                        reference_id: id,
+						reference: ref, 
+                    });
+				}
+				//Récupération des applications 
+				for(
+					let index =0;
+					index < response.data[0].code_irt.split('/').length;
+					index++
+				){
+					const itr = response.data[0].code_irt.split('/')[index];
+					const app = response.data[0].application.split('|')[index];
+					this.form.application_impactee.push({
+						code_irt: itr,
+						display_name: app,
+					});
+				}
+
+				//Récupération des enseignes et affichage des cards
 				
-				console.log(this.form.application_impactee);
-            });
+				for(
+					let index =0;
+					index < response.data[0].enseigne_id.split('/').length;
+					index++
+				){
+					
+					const idEns = response.data[0].enseigne_id.split('/')[index];
+					this.form.enseigne_impactee.push(parseInt(idEns));
+					const desImpact = response.data[0].description_impact.split('/')[index]
+					const graviteA = response.data[0].gravite_id.split('/')[index] 
+					const graviteNom = response.data[0].gravite_nom.split('/')[index]
+					const criticite = response.data[0].classification.split('/')[index]
+					this.tab_enseignes.push({
+						enseigne_id: idEns,
+						desc: desImpact,
+						gravite: graviteNom,
+						id_grav: graviteA,
+						class: criticite
+					})
+				switch(this.tab_enseignes[index].enseigne_id){
+					case "1" :
+						this.form.description_impactBDDF = this.tab_enseignes[index].desc
+						this.form.impact_avereBDDF = this.tab_enseignes[index].gravite
+						this.classificationBDDF = this.tab_enseignes[index].class
+						this.form.gravite_idBDDF = this.tab_enseignes[index].id_grav
+						break;
+					case "2" :
+						this.form.description_impactCDN = this.tab_enseignes[index].desc
+						this.form.impact_avereCDN = this.tab_enseignes[index].gravite
+						this.classificationCDN = this.tab_enseignes[index].class
+						this.form.gravite_idCDN = this.tab_enseignes[index].id_grav
+						break;
+					case "3":
+						this.form.impact_avereBPF = this.tab_enseignes[index].gravite
+						this.form.description_impactBPF = this.tab_enseignes[index].desc
+						this.classificationBPF = this.tab_enseignes[index].class
+						this.form.gravite_idBPF = this.tab_enseignes[index].id_grav
+						break;
+					}
+				}
+
+				
+				})
         },
 
     },

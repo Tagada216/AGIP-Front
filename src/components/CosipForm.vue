@@ -1436,7 +1436,7 @@ export default {
 						for (const ens_id of response.data[0].id_enseigne.split('/')) {
 							this.form.enseigne_impactee.push(parseInt(ens_id));
 						}
-
+						//Gestion pour la récupération des référence 
 						for (
 							let index = 0;
 							index < response.data[0].reference_id.split('/').length;
@@ -1449,7 +1449,7 @@ export default {
 								reference: ref,
 							});
 						}
-						
+						//Récupération des applications
 						for (const app of response.data[0].display_name.split('|||')) {
 							console.log({display_name: app });
 							
@@ -1520,7 +1520,7 @@ export default {
 						this.form.statut_id="Terminé"
 					}	
 					
-				//Gestion pour la récupération des référence et applications
+				//Gestion pour la récupération des référence 
                 for (
                     let index = 0;
                     index < response.data[0].reference_id.split('/').length; // récupération de la référence et stop séparation au caractère / 
