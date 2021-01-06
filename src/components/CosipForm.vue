@@ -1177,6 +1177,20 @@ export default {
 					{
 						var idIncident=window.location.href.substr(test+1)
 					}
+					//On vérifie si l'incident n'est pas ne résolu dans ce cas on demande une date de fin
+					if (
+					this.form.statut_id === 5 &&
+					this.form.date_fin === null
+					) {
+						this.$message({
+							dangerouslyUseHTMLString: true,
+							message:
+								"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Le Statut de l'incident est en <strong>Résolu</strong> le champs <strong>Fin de l'incident est obligatoire</strong> .</p>",
+								type: 'error',
+							});
+						return false;
+					}
+
 					// On enregistre en base de données
 					this.$http
 						.post(
@@ -1206,7 +1220,8 @@ export default {
 						type: 'error',
 					});
 					return false;
-			}
+				}
+
 		});
 						
 		},

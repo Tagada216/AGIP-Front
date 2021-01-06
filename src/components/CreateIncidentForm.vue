@@ -14,7 +14,7 @@
 					<el-table :data="form.references" border>
 						<el-table-column label="Référence">
 							<template slot-scope="scope">
-								<el-input 
+								<el-input
 									v-model.trim="
                                         form.references[scope.$index].reference
                                     "
@@ -267,8 +267,6 @@ import readXlsxFile from 'read-excel-file';
 import { Loading } from 'element-ui';
 import { Transform } from 'stream';
 
-
-
 export default {
 	components: { MyUpdateIncidentForm },
 	created() {
@@ -280,7 +278,7 @@ export default {
 			type: Number,
 		},
 	},
-	
+
 	data() {
 		return {
 			// Données énumérées venant de l'API
@@ -290,7 +288,7 @@ export default {
 				enseignes: [],
 				application_impactee: [],
 			},
-			
+
 			// Données du formulaire
 			form: {
 				references: [], //
@@ -393,9 +391,9 @@ export default {
 			ajoutIncidentsAgencesVisible: false,
 		};
 	},
-	
+
 	methods: {
-		isValid(value){
+		isValid(value) {
 			return /^P\d{2,}[IN|PB|CH|RQ]{2,}[-]{1,}\d{7,}$/.test(value);
 		},
 		// Cette méthode est lancée quand un champ d'appli impacté s'est vu selectionné une appli parmis les propositions
@@ -407,14 +405,11 @@ export default {
 			this.form.application_impactee[appIndex] = appSelection;
 		},
 
-		
-
 		// Méthode exécuté par le bouton "Sauvegarder".
 		// Elle gère la validation du formulaire ainsi que l'envoie des données vers l'API
 		submit() {
 			//console.log(this.form.application_impactee);
-			
-			
+
 			this.$refs['form'].validate(valid => {
 				if (valid) {
 					// On vérifie qu'il y a au moins une référence
@@ -457,44 +452,54 @@ export default {
 							return false;
 						}
 					}
-		
-		        	// On parcourt tous les champs référence
-			    	for(
-					let i = 0;
-					i< this.form.references.length;
-					i++
-					){
-					// Si le premier champs est vide on écrit "A venir"
-				    	if(this.form.references.length == 1 && this.form.references[i].reference == '' && this.form.statut_id != 5){
-								
-                            this.form.references[i].reference = 'A venir';
-						}
-						else if ((this.form.references.length == 1 && this.form.references[i].reference == '') ||
-								 (this.form.references.length == 1 && this.form.references[i].reference == 'A venir'))
-						{
+
+					// On parcourt tous les champs référence
+					for (let i = 0; i < this.form.references.length; i++) {
+						// Si le premier champs est vide on écrit "A venir"
+						if (
+							this.form.references.length == 1 &&
+							this.form.references[i].reference == '' &&
+							this.form.statut_id != 5
+						) {
+							this.form.references[i].reference = 'A venir';
+						} else if (
+							(this.form.references.length == 1 &&
+								this.form.references[i].reference == '') ||
+							(this.form.references.length == 1 &&
+								this.form.references[i].reference == 'A venir')
+						) {
 							this.form.references[i].reference = 'A venir';
 						}
-					// Si il y à plusieurs champs, les champs doivent êtres remplis d'une références obligatoirement et au bon format
-				    	else if (this.form.references.length >= 1 &&
-								 this.form.references[i].reference.length >=1 && 
-								 this.isValid(this.form.references[i].reference.toUpperCase())
-								)
-				    {
-						this.form.references[i].reference = this.form.references[i].reference.toUpperCase();
-						//console.log(this.form.references[i].reference);
-						//console.log(this.form.references[i].reference.toUpperCase());
-						//console.log(this.form.references[i].reference.length);
-						//console.log("OK ");
-				    }else{
-						this.$message({
+						// Si il y à plusieurs champs, les champs doivent êtres remplis d'une références obligatoirement et au bon format
+						else if (
+							this.form.references.length >= 1 &&
+							this.form.references[i].reference.length >= 1 &&
+							this.isValid(
+								this.form.references[i].reference.toUpperCase()
+							)
+						) {
+							this.form.references[
+								i
+							].reference = this.form.references[
+								i
+							].reference.toUpperCase();
+							//console.log(this.form.references[i].reference);
+							//console.log(this.form.references[i].reference.toUpperCase());
+							//console.log(this.form.references[i].reference.length);
+							//console.log("OK ");
+						} else {
+							this.$message({
 								dangerouslyUseHTMLString: true,
 								message:
 									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Si il y à plus de deux <strong>Références</strong> </br><strong>ou</strong></br>==> Si le <strong>Statut est Résolu<strong/> veuillez remplir le(s) champs <strong>Référence</strong> au format : \"P00IN-0000000\".</p>",
 								type: 'error',
 							});
 							return false;
-					}
-					if(this.form.statut_id === 5 && this.form.date_fin === null){
+						}
+						if (
+							this.form.statut_id === 5 &&
+							this.form.date_fin === null
+						) {
 							this.$message({
 								dangerouslyUseHTMLString: true,
 								message:
@@ -502,12 +507,11 @@ export default {
 								type: 'error',
 							});
 							return false;
-					}	
-				}
-				
+						}
+					}
+
 					console.log(this.form);
-					
-					
+
 					// On enregistre en base de données
 					this.$http
 						.post(
@@ -537,31 +541,36 @@ export default {
 						type: 'error',
 					});
 					return false;
-			
 				}
 			});
-			
 		},
-		
+
 		///////Partie Agence/////////
 		importer() {
 			readXlsxFile(this.$refs.fichierAgence.files[0]).then(rows => {
-				
 				var agencesJSON = arrayToJSON(rows);
 				console.log(agencesJSON);
 				//console.log(this.remoteEnum);
 				for (const agence of agencesJSON) {
 					agence.debut.setHours(agence.debut.getHours() - 14);
-					agence.fin_incident == null ? undefined : agence.fin_incident.setHours(agence.fin_incident.getHours() - 14);
+					agence.fin_incident == null
+						? undefined
+						: agence.fin_incident.setHours(
+								agence.fin_incident.getHours() - 14
+						  );
 					// Statut
-					agence.etat.includes('Clos') ? agence.etat=5 : agence.etat=2
+					agence.etat.includes('Clos')
+						? (agence.etat = 5)
+						: (agence.etat = 2);
 					// Priorité
-					agence.prio = this.remoteEnum.priorites.find(el => el.priorite == agence.prio).id
+					agence.prio = this.remoteEnum.priorites.find(
+						el => el.priorite == agence.prio
+					).id;
 					console.log(agence);
 				}
 				for (const row of rows) {
 					// Si le statut est en cours on ajoute l'incident dans la main courante
-					if (row[7].includes('En cours')== true) {
+					if (row[7].includes('En cours') == true) {
 						//this.ajoutIncidentsAgencesVisible=true
 						Axios.get(
 							'http://localhost:5000/api/main-courante'
@@ -899,7 +908,7 @@ export default {
 			this.delConfirmationModalVisible = true;
 		},
 		handleCreate() {
-			this.form.references.push({ reference: '' });	
+			this.form.references.push({ reference: '' });
 		},
 		// Les handler pour la table et le modal des applis impactees
 		confirmDeleteApp() {

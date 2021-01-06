@@ -227,83 +227,73 @@
                                         form.application_impactee[scope.$index]
                                             .display_name
                                     "
-                                    :fetch-suggestions="getMatchingApplications"
-                                    value-key="display_name"
-                                    @select="appSelected"
-                                ></el-autocomplete>
-                            </template>
-                        </el-table-column>
-                        <el-table-column width="60">
-                            <template slot="header">
-                                <el-button
-                                    type="primary"
-                                    icon="el-icon-plus"
-                                    circle
-                                    @click="handleCreateApp()"
-                                />
-                            </template>
-                            <template slot-scope="scope">
-                                <el-button
-                                    type="danger"
-                                    icon="el-icon-delete"
-                                    circle
-                                    @click="handleDeleteApp(scope.$index)"
-                                />
-                            </template>
-                        </el-table-column>
-                        <template slot="empty">
-                            <span class="arrayFormEmpty">Aucune donnée</span>
-                        </template>
-                    </el-table>
+									:fetch-suggestions="getMatchingApplications"
+									value-key="display_name"
+									@select="appSelected"
+								></el-autocomplete>
+							</template>
+						</el-table-column>
+						<el-table-column width="60">
+							<template slot="header">
+								<el-button type="primary" icon="el-icon-plus" circle @click="handleCreateApp()" />
+							</template>
+							<template slot-scope="scope">
+								<el-button
+									type="danger"
+									icon="el-icon-delete"
+									circle
+									@click="handleDeleteApp(scope.$index)"
+								/>
+							</template>
+						</el-table-column>
+						<template slot="empty">
+							<span class="arrayFormEmpty">Aucune donnée</span>
+						</template>
+					</el-table>
 
-                    <el-form-item label="Cause">
-                        <el-input
-                            id="cause"
-                            type="textarea"
-                            :autosize="{ minRows: 4, maxRows: 8 }"
-                            placeholder="Cause"
-                            v-model="form.cause"
-                        >
-                        </el-input>
-                    </el-form-item>
+					<el-form-item label="Cause">
+						<el-input
+							id="cause"
+							type="textarea"
+							:autosize="{ minRows: 4, maxRows: 8 }"
+							placeholder="Cause"
+							v-model="form.cause"
+						></el-input>
+					</el-form-item>
 
-                    <el-form-item label="Origine">
-                        <el-input
-                            id="origine"
-                            type="textarea"
-                            :autosize="{ minRows: 4, maxRows: 8 }"
-                            placeholder="Origine"
-                            v-model="form.origine"
-                        ></el-input>
-                    </el-form-item>
+					<el-form-item label="Origine">
+						<el-input
+							id="origine"
+							type="textarea"
+							:autosize="{ minRows: 4, maxRows: 8 }"
+							placeholder="Origine"
+							v-model="form.origine"
+						></el-input>
+					</el-form-item>
 
-                    <el-form-item
-                        label="Action de rétablissement"
-                        prop="action_retablissement"
-                    >
-                        <el-input
-                            id="action_retablissement"
-                            type="textarea"
-                            :autosize="{ minRows: 4, maxRows: 8 }"
-                            placeholder="Action de rétablissement"
-                            v-model="form.action_retablissement"
-                        ></el-input>
-                    </el-form-item>
+					<el-form-item label="Action de rétablissement" prop="action_retablissement">
+						<el-input
+							id="action_retablissement"
+							type="textarea"
+							:autosize="{ minRows: 4, maxRows: 8 }"
+							placeholder="Action de rétablissement"
+							v-model="form.action_retablissement"
+						></el-input>
+					</el-form-item>
 
-                    <el-form-item label="Plan d'action" prop="plan_action">
-                        <el-input
-                            id="plan_action"
-                            type="textarea"
-                            :autosize="{ minRows: 4, maxRows: 8 }"
-                            placeholder="Plan d'action"
-                            v-model="form.plan_action"
-                        ></el-input>
-                    </el-form-item>
-                </el-card>
-                <!-- Fin Infos générales incident -->
-            </el-col>
-        </el-row>
-
+					<el-form-item label="Plan d'action" prop="plan_action">
+						<el-input
+							id="plan_action"
+							type="textarea"
+							:autosize="{ minRows: 4, maxRows: 8 }"
+							placeholder="Plan d'action"
+							v-model="form.plan_action"
+						></el-input>
+					</el-form-item>
+				</el-card>
+				<!-- Fin Infos générales incident -->
+			</el-col>
+		</el-row>
 
 		<!-- Modal de confirmation de suppression d'une reférence problème -->
 		<el-dialog
@@ -376,9 +366,9 @@ export default {
 	},
 	data() {
 		return {
-			classificationBDDF:'',
-			classificationCDN:'',
-			classificationBPF:'',
+			classificationBDDF: '',
+			classificationCDN: '',
+			classificationBPF: '',
 			// Données énumérées venant de l'API
 			remoteEnum: {
 				priorites: [],
@@ -387,46 +377,46 @@ export default {
 				application_impactee: [],
 			},
 
-            // Données du formulaire
-            form: {
-                incident_id: 0,
-                references: [], //
-                is_faux_incident: false, //
-                date_debut: '', //
-                date_fin: null, //
-                description: '', //
-                cause: '',
-                cosip_id:'',
-                origine: '',
-                gravite_id:'',
-                action_retablissement: '',
-                plan_action: '',
-                description_impact: '', //
-                description_contournement: 'Aucun contournement', //
-                is_contournement: false, //
-                priorite_id: '', //
-                statut_id: '', //
-                enseigne_impactee: [],
-                application_impactee: [],
-                date_detection: '',
-                date_communication_TDC: '',
-                date_qualification_p01: '',
+			// Données du formulaire
+			form: {
+				incident_id: 0,
+				references: [], //
+				is_faux_incident: false, //
+				date_debut: '', //
+				date_fin: null, //
+				description: '', //
+				cause: '',
+				cosip_id: '',
+				origine: '',
+				gravite_id: '',
+				action_retablissement: '',
+				plan_action: '',
+				description_impact: '', //
+				description_contournement: 'Aucun contournement', //
+				is_contournement: false, //
+				priorite_id: '', //
+				statut_id: '', //
+				enseigne_impactee: [],
+				application_impactee: [],
+				date_detection: '',
+				date_communication_TDC: '',
+				date_qualification_p01: '',
 				date_premiere_com: '',
-				valueImpactCDN:'',
-				valueImpactBDDF:'',
-				valueImpactBPF:'',
-				impact_avereCDN:'',
-				impact_avereBDDF:'',
-				impact_avereBPF:'',
+				valueImpactCDN: '',
+				valueImpactBDDF: '',
+				valueImpactBPF: '',
+				impact_avereCDN: '',
+				impact_avereBDDF: '',
+				impact_avereBPF: '',
 				gravite_idCDN: '',
-				gravite_idBPF: '',   
+				gravite_idBPF: '',
 				gravite_idBDDF: '',
 				enseigne_impactee: [],
-				desc_impact_enseigne:[],
+				desc_impact_enseigne: [],
 				description_impact: '', //
 				description_impactCDN: '',
 				description_impactBDDF: '',
-				description_impactBPF: ''
+				description_impactBPF: '',
 			},
 
 			// Règles de validation pour le formulaire
@@ -528,7 +518,7 @@ export default {
 			this.form.application_impactee[appIndex] = appSelection;
 		},
 		onSubmit() {
-			console.log(this.form)
+			console.log(this.form);
 			// Vérification si les champs son vide ne pas enregistrer la valeur null retourner par défaut par vueJS avec le v-model
 			if (
 				this.form.cause == 'null' ||
@@ -546,9 +536,11 @@ export default {
 			}
 			this.$refs['form'].validate(valid => {
 				if (valid) {
-
-					if((this.form.cosip_id != null)&& (this.form.cosip_id != "") ){
-							this.$message({
+					if (
+						this.form.cosip_id != null &&
+						this.form.cosip_id != ''
+					) {
+						this.$message({
 							dangerouslyUseHTMLString: true,
 							message:
 								"<h2 style='font-family: arial'>Cet incident est au cosip</h2> <p style='font-family: arial'>==> Modifier le depuis l'onglet <strong>Cosip</strong></p>",
@@ -637,14 +629,12 @@ export default {
 							].reference = this.form.references[
 								i
 							].reference.toUpperCase();
-
 						} else {
 							this.$message({
 								dangerouslyUseHTMLString: true,
 								message:
 									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Si il y à plus de deux références veuillez remplir les champs au format : \"P00IN-0000000\".</p>",
-                                type: 'error',
-                                
+								type: 'error',
 							});
 							return false;
 						}
@@ -678,7 +668,6 @@ export default {
 							window.location.reload();
 						});
 				} else {
-
 					this.$message({
 						dangerouslyUseHTMLString: true,
 						message:
@@ -715,7 +704,6 @@ export default {
 												response.data[p].incident_id;
 											this.curID =
 												response.data[p].incident_id;
-
 										}
 										// Sinon si l'état de l'incident est "Clos"
 										else {
@@ -727,7 +715,6 @@ export default {
 												'/#/maj-agence/id=' +
 													this.incident_id
 											);
-											
 										}
 									}
 								}
@@ -994,142 +981,176 @@ export default {
 		},
 		////////////////////////////////////////
 		// Récupère les informations d'un incident pour l'insérer dans le formulaire
-        getIncident(idIncident) {
-            // Obtention de l'incident
-            Axios.get(
-                'http://localhost:5000/api/main-courante/' + idIncident
-            ).then(response => {
-                this.form.incident_id = this.incident_id;
-                this.form.description = response.data[0].description;
-                this.form.date_debut = response.data[0].date_debut;
-                this.form.date_fin = response.data[0].date_fin;
-                this.form.description_impact =
-                    response.data[0].description_impact;
-                this.form.statut_id = response.data[0].statut;
-                this.form.priorite_id = response.data[0].priorite;
-                this.form.date_detection = response.data[0].date_detection;
-                this.form.date_communication_TDC =
-                    response.data[0].date_communication_tdc;
-                this.form.date_qualification_p01 =
-                    response.data[0].date_qualif_p01;
-                this.form.gravite_id = response.data[0].gravite_id;
-                this.form.date_premiere_com = response.data[0].date_premier_com;
-                this.form.cause = response.data[0].cause;
-                this.form.action_retablissement = response.data[0].action_retablissement;
-                this.form.origine = response.data[0].origine;
-                this.form.plan_action = response.data[0].plan_action;
+		getIncident(idIncident) {
+			// Obtention de l'incident
+			Axios.get(
+				'http://localhost:5000/api/main-courante/' + idIncident
+			).then(response => {
+				this.form.incident_id = this.incident_id;
+				this.form.description = response.data[0].description;
+				this.form.date_debut = response.data[0].date_debut;
+				this.form.date_fin = response.data[0].date_fin;
+				this.form.description_impact =
+					response.data[0].description_impact;
+				this.form.statut_id = response.data[0].statut;
+				this.form.priorite_id = response.data[0].priorite;
+				this.form.date_detection = response.data[0].date_detection;
+				this.form.date_communication_TDC =
+					response.data[0].date_communication_tdc;
+				this.form.date_qualification_p01 =
+					response.data[0].date_qualif_p01;
+				this.form.gravite_id = response.data[0].gravite_id;
+				this.form.date_premiere_com = response.data[0].date_premier_com;
+				this.form.cause = response.data[0].cause;
+				this.form.action_retablissement =
+					response.data[0].action_retablissement;
+				this.form.origine = response.data[0].origine;
+				this.form.plan_action = response.data[0].plan_action;
 
-                this.form.is_faux_incident = response.data[0].is_faux_incident
-                    ? true
-                    : false;
-                this.form.is_contournement = response.data[0].is_contournement
-                    ? true
-                    : false;
-                this.form.description_contournement = response.data[0].description_contournement
-                this.form.enseigne_impactee = [];
+				this.form.is_faux_incident = response.data[0].is_faux_incident
+					? true
+					: false;
+				this.form.is_contournement = response.data[0].is_contournement
+					? true
+					: false;
+				this.form.description_contournement =
+					response.data[0].description_contournement;
+				this.form.enseigne_impactee = [];
 				this.form.references = [];
-                this.form.application_impactee = [];
-                this.form.cosip_id = response.data[0].cosip_id
-                console.log("La référence récup : ", response.data[0].reference)
+				this.form.application_impactee = [];
+				this.form.cosip_id = response.data[0].cosip_id;
 
-                for (const ens_id of response.data[0].id_enseigne.split('/')) {
+				for (const ens_id of response.data[0].id_enseigne.split('/')) {
 					this.form.enseigne_impactee.push(parseInt(ens_id));
 				}
 
-
-				for (const app of response.data[0].display_name.split('|||')) {
-				
-					
-                    this.form.application_impactee.push({display_name: app })
-                }
-				console.log("Nb ref ", response.data[0].reference_id.split('/').length)
-				//Gestion pour la récupération des référence 
-                for (
-                    let index = 0;
-                    index < response.data[0].reference_id.split('/').length; // récupération de la référence et stop séparation au caractère / 
+				//Gestion pour la récupération des référence
+				for (
+					let index = 0;
+					index < response.data[0].reference_id.split('/').length; // récupération de la référence et stop séparation au caractère /
 					index++
-                ) {
-                    const id = response.data[0].reference_id.split('/')[index];
-                    const ref = response.data[0].reference.split('/')[index];
-                    this.form.references.push({
-                        reference_id: id,
-						reference: ref, 
-                    });
+				) {
+					const id = response.data[0].reference_id.split('/')[index];
+					const ref = response.data[0].reference.split('/')[index];
+					this.form.references.push({
+						reference_id: id,
+						reference: ref,
+					});
 				}
-				//Récupération des applications 
-				for(
-					let index =0;
+				// for (const app of response.data[0].display_name.split('|||')) {
+				// 	this.form.application_impactee.push({ display_name: app });
+				// }
+				//Récupération des applications
+				for (
+					let index = 0;
 					index < response.data[0].code_irt.split('/').length;
 					index++
-				){
+				) {
+					console.log('Length de code  irt',response.data[0].code_irt.split('/').length)
+					console.log("ITR des app : ",response.data[0].code_irt )
 					const itr = response.data[0].code_irt.split('/')[index];
-					const app = response.data[0].application.split('|')[index];
+					const app = response.data[0].display_name.split('|||')[index];
+					const  tri = response.data[0].trigramme.split('/')[index];
+					console.log("Le display name: ",response.data[0].display_name )
 					this.form.application_impactee.push({
 						code_irt: itr,
 						display_name: app,
+						trigramme: tri
 					});
 				}
 
 				//Récupération des enseignes et affichage des cards
-				
-				for(
-					let index =0;
+				if((this.form.cosip_id !== "") && (this.form.cosip_id !== null)){
+					console.log('Je suis dans le if car je suis au cosip ', this.form.cosip_id)
+				for (
+					let index = 0;
 					index < response.data[0].enseigne_id.split('/').length;
 					index++
-				){
-					
-					const idEns = response.data[0].enseigne_id.split('/')[index];
+				) {
+					const idEns = response.data[0].enseigne_id.split('/')[
+						index
+					];
 					this.form.enseigne_impactee.push(parseInt(idEns));
-					const desImpact = response.data[0].description_impact.split('/')[index]
-					const graviteA = response.data[0].gravite_id.split('/')[index] 
-					const graviteNom = response.data[0].gravite_nom.split('/')[index]
-					const criticite = response.data[0].classification.split('/')[index]
+					const desImpact = response.data[0].description_impact.split(
+						'/'
+					)[index];
+					const graviteA = response.data[0].gravite_id.split('/')[
+						index
+					];
+					const graviteNom = response.data[0].gravite_nom.split('/')[
+						index
+					];
+					const criticite = response.data[0].classification.split(
+						'/'
+					)[index];
 					this.tab_enseignes.push({
 						enseigne_id: idEns,
 						desc: desImpact,
 						gravite: graviteNom,
 						id_grav: graviteA,
-						class: criticite
-					})
-				switch(this.tab_enseignes[index].enseigne_id){
-					case "1" :
-						this.form.description_impactBDDF = this.tab_enseignes[index].desc
-						this.form.impact_avereBDDF = this.tab_enseignes[index].gravite
-						this.classificationBDDF = this.tab_enseignes[index].class
-						this.form.gravite_idBDDF = this.tab_enseignes[index].id_grav
-						break;
-					case "2" :
-						this.form.description_impactCDN = this.tab_enseignes[index].desc
-						this.form.impact_avereCDN = this.tab_enseignes[index].gravite
-						this.classificationCDN = this.tab_enseignes[index].class
-						this.form.gravite_idCDN = this.tab_enseignes[index].id_grav
-						break;
-					case "3":
-						this.form.impact_avereBPF = this.tab_enseignes[index].gravite
-						this.form.description_impactBPF = this.tab_enseignes[index].desc
-						this.classificationBPF = this.tab_enseignes[index].class
-						this.form.gravite_idBPF = this.tab_enseignes[index].id_grav
-						break;
+						class: criticite,
+					});
+					switch (this.tab_enseignes[index].enseigne_id) {
+						case '1':
+							this.form.description_impactBDDF = this.tab_enseignes[
+								index
+							].desc;
+							this.form.impact_avereBDDF = this.tab_enseignes[
+								index
+							].gravite;
+							this.classificationBDDF = this.tab_enseignes[
+								index
+							].class;
+							this.form.gravite_idBDDF = this.tab_enseignes[
+								index
+							].id_grav;
+							break;
+						case '2':
+							this.form.description_impactCDN = this.tab_enseignes[
+								index
+							].desc;
+							this.form.impact_avereCDN = this.tab_enseignes[
+								index
+							].gravite;
+							this.classificationCDN = this.tab_enseignes[
+								index
+							].class;
+							this.form.gravite_idCDN = this.tab_enseignes[
+								index
+							].id_grav;
+							break;
+						case '3':
+							this.form.impact_avereBPF = this.tab_enseignes[
+								index
+							].gravite;
+							this.form.description_impactBPF = this.tab_enseignes[
+								index
+							].desc;
+							this.classificationBPF = this.tab_enseignes[
+								index
+							].class;
+							this.form.gravite_idBPF = this.tab_enseignes[
+								index
+							].id_grav;
+							break;
 					}
 				}
-
-				
-				})
-        },
-
-    },
+				}
+			});
+		},
+	},
 
 	// 			for (const app of response.data[0].display_name.split('|||')) {
 	// 				console.log({display_name: app });
-					
-    //                 this.form.application_impactee.push({display_name: app })
-    //             }
-				
-	// 			console.log(this.form.application_impactee);
-    //         });
-    //     },
 
-    // },
+	//                 this.form.application_impactee.push({display_name: app })
+	//             }
+
+	// 			console.log(this.form.application_impactee);
+	//         });
+	//     },
+
+	// },
 
 	// 				this.form.application_impactee.push({ display_name: app });
 	// 			}
@@ -1154,17 +1175,17 @@ export default {
 <style lang="sass">
  
 .card-header, .cell .el-input
-    margin: 0
+	margin: 0
 .el-card
-    margin-bottom: 20px
+	margin-bottom: 20px
 .el-checkbox-group
-    text-align: center
+	text-align: center
 .el-date-editor.el-input, .el-select, .el-autocomplete
-    width: 100%
+	width: 100%
 label.el-form-item__label
-    line-height: 15px
+	line-height: 15px
 th:first-child .cell
-    &::before
-        content: "* "
-        color: red
+	&::before
+		content: "* "
+		color: red
 </style>
