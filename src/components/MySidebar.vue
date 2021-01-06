@@ -102,15 +102,15 @@ export default {
 				//     title: 'Post-Mortem',
 				//     icon: 'fas fa-archive',
 				// },
-				{
-					header: true,
-					title: 'Problemes',
-				},
-				{
-					href: '/problemes',
-					title: 'Liste des problèmes',
-					icon: 'fas fa-hands-helping',
-				},
+				// {
+				// 	header: true,
+				// 	title: 'Problemes',
+				// },
+				// {
+				// 	href: '/problemes',
+				// 	title: 'Liste des problèmes',
+				// 	icon: 'fas fa-hands-helping',
+				// },
 				{
 					header: true,
 					title: 'Reportings',
