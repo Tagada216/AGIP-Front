@@ -519,6 +519,13 @@ export default {
 		},
 		onSubmit() {
 			console.log(this.form);
+
+			// Vérification Trigramme not udefined 
+			for(let i = 0; i < this.form.application_impactee.length; i++){
+				if(this.form.application_impactee[i].trigramme === undefined){
+					this.form.application_impactee[i].trigramme = "FFF"
+				}
+			}
 			// Vérification si les champs son vide ne pas enregistrer la valeur null retourner par défaut par vueJS avec le v-model
 			if (
 				this.form.cause == 'null' ||
@@ -1037,21 +1044,21 @@ export default {
 						reference: ref,
 					});
 				}
+
 				// for (const app of response.data[0].display_name.split('|||')) {
 				// 	this.form.application_impactee.push({ display_name: app });
 				// }
+
 				//Récupération des applications
 				for (
 					let index = 0;
 					index < response.data[0].code_irt.split('/').length;
 					index++
 				) {
-					console.log('Length de code  irt',response.data[0].code_irt.split('/').length)
-					console.log("ITR des app : ",response.data[0].code_irt )
 					const itr = response.data[0].code_irt.split('/')[index];
 					const app = response.data[0].display_name.split('|||')[index];
 					const  tri = response.data[0].trigramme.split('/')[index];
-					console.log("Le display name: ",response.data[0].display_name )
+
 					this.form.application_impactee.push({
 						code_irt: itr,
 						display_name: app,
@@ -1061,7 +1068,6 @@ export default {
 
 				//Récupération des enseignes et affichage des cards
 				if((this.form.cosip_id !== "") && (this.form.cosip_id !== null)){
-					console.log('Je suis dans le if car je suis au cosip ', this.form.cosip_id)
 				for (
 					let index = 0;
 					index < response.data[0].enseigne_id.split('/').length;
