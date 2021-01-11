@@ -53,7 +53,7 @@
 				</div>
 				<el-button type="primary" class="button-ok" @click="ok()">OK</el-button>
 			</modal>
-			<!-- Fin agenc es isolées-->
+			<!-- Fin agences isolées-->
 		</div>
 	</div>
 </template>
@@ -160,6 +160,8 @@ export default {
 			// 		console.log(this.files[i]);
 			// 	}
 			// }
+
+			
 			//Blocage de l'import de plusieurs fichiers
 			if (this.files.length > 1) {
 				this.$message({
