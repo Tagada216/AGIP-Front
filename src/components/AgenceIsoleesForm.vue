@@ -22,8 +22,10 @@
 		</div>
 		<div>
 			<!-- Agences isolées -->
-			<h4 class="card-header">Agences isolées</h4>
-			<el-button id="myButton" type="primary" class="button" @click="changeButton()">{{ buttonName }}</el-button>
+			<div class="agenceButton">
+				<el-button id="myButton" type="primary" class="button" @click="changeButton()">{{ buttonName }}</el-button>
+				<el-button id="cancelButton" type="danger" class="button" @click="onCancel()">Annuler</el-button>
+			</div>
 			<modal class="modal" name="importModal">
 				<div class="fileupload" :class="{ 'fileupload--slim': slim }">
 					<base-button v-if="slim">
@@ -96,7 +98,7 @@ export default {
 			tableRow: [],
 			agenceTable: [],
 			filterResult: {},
-			 refUpdate : {},
+			refUpdate: {},
 
 			loading: false,
 
@@ -114,20 +116,15 @@ export default {
 				reference: '', //
 				is_faux_incident: false, //
 				date_debut: '', //
-				date_fin: null, //
+				date_fin: '', //
 				description: '', //
-				description_impact: '', //
-				description_contournement: 'Aucun contournement', //
-				is_contournement: false, //
 				priorite_id: '', //
 				statut_id: '', //
 				enseigne_impactee: 0,
-				application_impactee: [],
 				cause: '',
 				is_agence: true,
 				service_metier: '',
-				observations: '',
-				nbUtilisateur: null,
+				nbUtilisateur: 0,
 			},
 		};
 	},
@@ -161,7 +158,6 @@ export default {
 			// 	}
 			// }
 
-			
 			//Blocage de l'import de plusieurs fichiers
 			if (this.files.length > 1) {
 				this.$message({
@@ -209,13 +205,19 @@ export default {
 		changeButtonName() {
 			var getTHead = document.getElementById('tableHead');
 			var getTBody = document.getElementById('tableBody');
-
 			var getValueButton = document.getElementById('myButton');
+			var cancelButton = document.getElementById('cancelButton');
+
 			if (getTHead && getTBody == '') {
 				this.buttonName = 'Importer';
 			} else {
 				this.buttonName = 'Sauvegarder';
+				cancelButton.style.display = 'inline-block';
 			}
+		},
+
+		onCancel() {
+			window.location.reload();
 		},
 
 		//ouvre la fenêtre modal
@@ -463,6 +465,7 @@ export default {
 
 					var dateDebut = new Date(this.tableData[i][1]);
 					dateDebut.toString(`dd,mm,yyyy`);
+
 					this.agence.date_debut = dateDebut;
 					this.agence.enseigne_impactee = 1;
 
@@ -471,12 +474,18 @@ export default {
 
 					this.agence.service_metier = this.tableData[i][3];
 					this.agence.description = this.tableData[i][4];
-					if (typeof this.agence.nbUtilisateur === 'number') {
-						this.agence.nbUtilisateur = this.tableData[i][5];
-					}else if(typeof this.agence.nbUtilisateur === 'string'){
+
+					if (
+						this.tableData[i][5] == 'NC' ||
+						this.tableData[i][5] == '_' ||
+						this.tableData[i][5] == ' _ ' ||
+						this.tableData[i][5] == ' - ' ||
+						this.tableData[i][5] == '-'
+					) {
 						this.agence.nbUtilisateur = 0;
+					} else {
+						this.agence.nbUtilisateur = this.tableData[i][5];
 					}
-					
 
 					if (this.tableData[i][6].includes('P0')) {
 						this.agence.priorite_id = 1;
@@ -492,10 +501,11 @@ export default {
 
 					if (this.tableData[i][7].includes('En cours')) {
 						this.agence.statut_id = 2;
-						this.agence.date_fin = 'Incident en cours';
+						this.agence.date_fin = '';
 					} else if (this.tableData[i][7].includes('Clos')) {
 						this.agence.statut_id = 5;
 						this.agence.date_fin = dateFin;
+						// console.log(this.agence.dateFin);
 					}
 
 					this.agence.cause = this.tableData[i][8];
@@ -509,31 +519,34 @@ export default {
 						reference: '', //
 						is_faux_incident: false, //
 						date_debut: '', //
-						date_fin: null, //
+						date_fin: '', //
 						description: '', //
-						description_impact: '', //
-						description_contournement: 'Aucun contournement', //
-						is_contournement: false, //
 						priorite_id: '', //
 						statut_id: '', //
 						enseigne_impactee: 0,
-						application_impactee: [],
 						cause: '',
 						is_agence: true,
 						service_metier: '',
-						observations: '',
-						nbUtilisateur: null,
+						nbUtilisateur: 0,
 					};
 					i++;
 				} while (i < this.tableData.length);
 
-				var difValueBetweenTables = this.agenceTable.filter(this.comparer(response.data));
+				var difValueBetweenTables = this.agenceTable.filter(
+					this.comparer(response.data)
+				);
 
 				for (let i = 0; i < difValueBetweenTables.length; i++) {
-					console.log('valeur non identique', difValueBetweenTables[i]);
+					// console.log(
+					// 	'valeur non identique',
+					// 	difValueBetweenTables[i]
+					// );
 
 					this.$http
-						.post('http://localhost:5000/api/create-agence/', difValueBetweenTables[i])
+						.post(
+							'http://localhost:5000/api/create-agence/',
+							difValueBetweenTables[i]
+						)
 						.then(result => {
 							this.$message({
 								dangerouslyUseHTMLString: true,
@@ -553,8 +566,6 @@ export default {
 					// console.log('Le filter ', this.filterResult)
 
 					if (this.filterResult.length >= 1) {
-						
-
 						for (let i = 0; i < this.agenceTable.length; i++) {
 							if (
 								this.agenceTable[i].reference.includes(
@@ -562,7 +573,10 @@ export default {
 								)
 							) {
 								this.refUpdate = this.agenceTable[i];
-								console.log('valeurs existantes',this.refUpdate);
+								// console.log(
+								// 	'valeurs existantes',
+								// 	this.refUpdate
+								// );
 
 								this.$http
 									.put(
@@ -617,7 +631,7 @@ export default {
 					// return `${this.files.length} fichiers sélectionnés.`;
 
 					//Blocage du téléchargement de plusieurs fichiers
-					return 'Plusieurs fichiers sélectionnés ! </br> Un seul fichier téléchargeable possible !';
+					return 'Plusieurs fichiers sélectionnés !  Un seul fichier téléchargeable possible !';
 			}
 		},
 	},
@@ -627,6 +641,16 @@ export default {
 <style lang="scss">
 $redColor: #ed1a3a;
 $blackColor: #2c3e50;
+
+#cancelButton {
+	display: none;
+	margin-left: 3em;
+}
+
+.agenceButton .el-button{
+	margin-top: 100px !important;
+	
+}
 
 .button {
 	padding: 15px 50px !important;
@@ -669,15 +693,6 @@ $blackColor: #2c3e50;
 	border-image-source: linear-gradient(to left, $blackColor, $redColor);
 }
 
-.card-header {
-	margin-top: 5em;
-	margin-bottom: 5em;
-}
-
-.card-header,
-.cell .el-input {
-	margin: 5em;
-}
 
 .fileupload {
 	position: relative;
@@ -719,6 +734,11 @@ $blackColor: #2c3e50;
 		margin-top: 1rem;
 		font-weight: 600;
 	}
+}
+
+#title{
+	margin-top: 3em;
+	margin-bottom: 3em;
 }
 
 .styled-table {
