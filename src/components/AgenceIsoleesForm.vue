@@ -431,24 +431,27 @@ export default {
 			var getInputs = document.querySelectorAll('input[class=switch]');
 
 			for (var i = 0; i < getInputs.length; i++) {
+				var getTdTBody = getInputs[i].parentNode,
+					getTrOfTBody = getTdTBody.parentNode;
+
 				if (getInputs[i].checked == true) {
-					var getTdTBody = getInputs[i].parentNode,
-						getTrOfTBody = getTdTBody.parentNode;
 					getTrOfTBody.style.color = '#D8E0DC';
 				} else {
 					getInputs[i].checked = false;
-					var getTdTBody = getInputs[i].parentNode,
-						getTrOfTBody = getTdTBody.parentNode;
 					getTrOfTBody.style.color = '#009879';
 				}
 			}
 		},
+
 
 		//////Partie Agence/////////
 		submit() {
 			Axios.get('http://localhost:5000/api/reference').then(response => {
 				var i = 0;
 				var reponse;
+				var getInputs = document.querySelectorAll(
+					'input[class=switch]'
+				);
 				do {
 					for (var j = 0; j < response.data.length; j++) {
 						if (
@@ -553,20 +556,29 @@ export default {
 					// 	difValueBetweenTables[i]
 					// );
 
-					this.$http.post(
-						'http://localhost:5000/api/create-agence/',
-						difValueBetweenTables[i]
-					);
-					// .then(result => {
-					// 	this.$message({
-					// 		dangerouslyUseHTMLString: true,
-					// 		message:
-					// 			"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-					// 		type: 'success',
-					// 	});
-					// 	loadingInstance.close();
-					// 	window.location.reload();
-					// });
+					for (let j = 0; j < getInputs.length; j++) {
+						var getTdTBody = getInputs[j].parentNode,
+							getTrOfTBody = getTdTBody.parentNode;
+
+						if (
+							getTrOfTBody.childNodes[1].innerHTML ==
+							difValueBetweenTables[i].reference
+						) {
+							console.log('je suis égale');
+							if (getInputs[i].checked == false) {
+								// console.log('je suis créé');
+								// console.log(difValueBetweenTables[i].reference);
+								this.$http.post(
+									'http://localhost:5000/api/create-agence/',
+									difValueBetweenTables[i]
+								);
+							}
+						} // else {
+						// 	console.log('je ne suis pas égale');
+						// 	console.log(getTrOfTBody.childNodes[1].innerHTML);
+						// 	console.log(difValueBetweenTables[i].reference);
+						// }
+					}
 				}
 
 				this.agenceTable.forEach(element => {
@@ -589,26 +601,34 @@ export default {
 								// 	this.refUpdate
 								// );
 
-								this.$http.put(
-									'http://localhost:5000/api/update-agence/',
-									this.refUpdate
-								);
+								for (let j = 0; j < getInputs.length; j++) {
+									var getTdTBody = getInputs[j].parentNode,
+										getTrOfTBody = getTdTBody.parentNode;
 
-								// .then(result => {
-								// 	this.$message({
-								// 		dangerouslyUseHTMLString: true,
-								// 		message:
-								// 			"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-								// 		type: 'success',
-								// 	});
-								// 	loadingInstance.close();
-								// 	window.location.reload();
-								// });
+									if (
+										getTrOfTBody.childNodes[1].innerHTML ==
+										this.refUpdate.reference
+									) {
+										// console.log('je suis égale');
+										if (getInputs[i].checked == false) {
+											// console.log('je suis mis à jour');
+											// console.log(
+											// 	this.refUpdate.reference
+											// );
+											this.$http.put(
+												'http://localhost:5000/api/update-agence/',
+												this.refUpdate
+											);
+										}
+									 } //else {
+									// 	console.log('je ne suis pas égale');
+									// 	console.log(
+									// 		getTrOfTBody.childNodes[1].innerHTML
+									// 	);
+									// 	console.log(this.refUpdate.reference);
+									// }
+								}
 
-								// console.log(
-								// 	'valeurs existantes',
-								// 	this.refUpdate
-								// );
 
 								this.refUpdate = {};
 							}
@@ -624,10 +644,8 @@ export default {
 						"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
 					type: 'success',
 				});
-				 setTimeout(window.location.reload(), 30000);
-
+				setTimeout(window.location.reload(), 30000);
 			});
-
 		},
 
 		comparer(tableau) {
