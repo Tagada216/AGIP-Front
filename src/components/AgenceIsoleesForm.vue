@@ -400,6 +400,7 @@ export default {
 								vm.tableHead = [];
 							} else {
 								vm.tableData.push(vm.tableRow);
+								// console.log(vm.tableData);
 								vm.tableRow = [];
 							}
 							this.loading = false;
@@ -460,6 +461,17 @@ export default {
 							// console.log(this.agence.incident_id);
 						}
 					}
+					var getTitle = document.getElementById('title').innerHTML;
+					if (getTitle.includes('CDN') || getTitle.includes('cdn')) {
+						this.agence.enseigne_impactee = 2;
+					} else if (
+						getTitle.includes('BDDF') ||
+						getTitle.includes('bddf')
+					) {
+						this.agence.enseigne_impactee = 1;
+					} else {
+						this.enseigne_impactee = null;
+					}
 
 					this.agence.reference = this.tableData[i][0];
 
@@ -467,7 +479,6 @@ export default {
 					dateDebut.toString(`dd,mm,yyyy`);
 
 					this.agence.date_debut = dateDebut;
-					this.agence.enseigne_impactee = 1;
 
 					var dateFin = new Date(this.tableData[i][2]);
 					dateFin.toString(`dd,mm,yyyy`);
@@ -482,7 +493,7 @@ export default {
 						this.tableData[i][5] == ' - ' ||
 						this.tableData[i][5] == '-'
 					) {
-						this.agence.nbUtilisateur = 0;
+						this.agence.nbUtilisateur = null;
 					} else {
 						this.agence.nbUtilisateur = this.tableData[i][5];
 					}
@@ -542,20 +553,20 @@ export default {
 					// 	difValueBetweenTables[i]
 					// );
 
-					this.$http
-						.post(
-							'http://localhost:5000/api/create-agence/',
-							difValueBetweenTables[i]
-						)
-						.then(result => {
-							this.$message({
-								dangerouslyUseHTMLString: true,
-								message:
-									"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-								type: 'success',
-							});
-							loadingInstance.close();
-						});
+					this.$http.post(
+						'http://localhost:5000/api/create-agence/',
+						difValueBetweenTables[i]
+					);
+					// .then(result => {
+					// 	this.$message({
+					// 		dangerouslyUseHTMLString: true,
+					// 		message:
+					// 			"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+					// 		type: 'success',
+					// 	});
+					// 	loadingInstance.close();
+					// 	window.location.reload();
+					// });
 				}
 
 				this.agenceTable.forEach(element => {
@@ -578,20 +589,21 @@ export default {
 								// 	this.refUpdate
 								// );
 
-								this.$http
-									.put(
-										'http://localhost:5000/api/update-agence/',
-										this.refUpdate
-									)
+								this.$http.put(
+									'http://localhost:5000/api/update-agence/',
+									this.refUpdate
+								);
 
-									.then(result => {
-										this.$message({
-											dangerouslyUseHTMLString: true,
-											message:
-												"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-											type: 'success',
-										});
-									});
+								// .then(result => {
+								// 	this.$message({
+								// 		dangerouslyUseHTMLString: true,
+								// 		message:
+								// 			"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+								// 		type: 'success',
+								// 	});
+								// 	loadingInstance.close();
+								// 	window.location.reload();
+								// });
 
 								// console.log(
 								// 	'valeurs existantes',
@@ -605,7 +617,17 @@ export default {
 				});
 
 				this.agenceTable = [];
+
+				this.$message({
+					dangerouslyUseHTMLString: true,
+					message:
+						"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+					type: 'success',
+				});
+				 setTimeout(window.location.reload(), 30000);
+
 			});
+
 		},
 
 		comparer(tableau) {
@@ -647,9 +669,8 @@ $blackColor: #2c3e50;
 	margin-left: 3em;
 }
 
-.agenceButton .el-button{
+.agenceButton .el-button {
 	margin-top: 100px !important;
-	
 }
 
 .button {
@@ -693,7 +714,6 @@ $blackColor: #2c3e50;
 	border-image-source: linear-gradient(to left, $blackColor, $redColor);
 }
 
-
 .fileupload {
 	position: relative;
 	display: flex;
@@ -736,7 +756,7 @@ $blackColor: #2c3e50;
 	}
 }
 
-#title{
+#title {
 	margin-top: 3em;
 	margin-bottom: 3em;
 }

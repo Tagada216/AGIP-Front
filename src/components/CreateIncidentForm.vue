@@ -527,7 +527,7 @@ export default {
 									"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
 								type: 'success',
 							});
-							window.location.reload();
+							setTimeout(window.location.reload(), 2500);
 						});
 				} else {
 					this.$message({
