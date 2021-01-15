@@ -102,14 +102,6 @@ export default {
 
 			loading: false,
 
-			// Données énumérées venant de l'API
-			remoteEnum: {
-				priorites: [],
-				statut: [],
-				enseignes: [],
-				application_impactee: [],
-			},
-
 			// Données du formulaire agence
 			agence: {
 				incident_id: 0,
@@ -118,12 +110,13 @@ export default {
 				date_debut: '', //
 				date_fin: '', //
 				description: '', //
+				description_impact: '',
 				priorite_id: '', //
 				statut_id: '', //
 				enseigne_impactee: 0,
 				cause: '',
 				is_agence: true,
-				service_metier: '',
+				application_impactee: '',
 				nbUtilisateur: 0,
 			},
 		};
@@ -443,6 +436,9 @@ export default {
 			}
 		},
 
+		isValidDate(d) {
+			return d instanceof Date && !isNaN(d);
+		},
 
 		//////Partie Agence/////////
 		submit() {
@@ -479,15 +475,66 @@ export default {
 					this.agence.reference = this.tableData[i][0];
 
 					var dateDebut = new Date(this.tableData[i][1]);
+					var recupDaysAndMounth = this.tableData[i][1].split('/');
+					// var recupYear = recupDaysAndMounth[2].split(' ');
+					// var recupHoursAndMins = recupYear[1].split(':');
+					// console.log(recupDaysAndMounth);
+					// console.log(recupYear);
+					// console.log(recupDaysAndMounth[0]);
+					// console.log(recupDaysAndMounth[1]);
+					dateDebut.setDate(recupDaysAndMounth[0]);
+					dateDebut.setMonth(recupDaysAndMounth[1]);
+					// dateDebut.setFullYear(recupYear[0]);
+					// if (recupHoursAndMins[0] == '') {
+					// 	recupHoursAndMins[0] = '00';
+					// 	dateDebut.setHours(recupHoursAndMins[0]);
+					// } else {
+					// 	dateDebut.setHours(recupHoursAndMins[0]);
+					// }
+					// dateDebut.setMinutes(recupHoursAndMins[1]);
 					dateDebut.toString(`dd,mm,yyyy`);
+					// console.log(dateDebut.getDate());
+					// console.log(dateDebut.getMonth());
+					// console.log(dateDebut.getFullYear());
+					// console.log(dateDebut.getHours());
+					// console.log(dateDebut.getMinutes());
 
 					this.agence.date_debut = dateDebut;
+					// console.log(this.agence.date_debut);
 
 					var dateFin = new Date(this.tableData[i][2]);
+					// if (dateFin != '' && dateFin != undefined) {
+					// 	recupDaysAndMounth = this.tableData[i][2].split('/');
+						// recupYear = recupDaysAndMounth[2].split(' ');
+						// recupHoursAndMins = recupYear[1].split(':');
+						// console.log(recupDaysAndMounth);
+						// console.log(recupYear);
+						// console.log(recupDaysAndMounth[0]);
+						// console.log(recupDaysAndMounth[1]);
+						// dateFin.setDate(recupDaysAndMounth[0]);
+						// dateFin.setMonth(recupDaysAndMounth[1]);
+						// dateFin.setFullYear(recupYear[0]);
+						// if (recupHoursAndMins[0] == '') {
+						// 	recupHoursAndMins[0] = '00';
+						// 	dateFin.setHours(recupHoursAndMins[0]);
+						// } else {
+						// 	dateFin.setHours(recupHoursAndMins[0]);
+						// }
+
+						// dateFin.setMinutes(recupHoursAndMins[1]);
+					// }
+
 					dateFin.toString(`dd,mm,yyyy`);
 
-					this.agence.service_metier = this.tableData[i][3];
-					this.agence.description = this.tableData[i][4];
+					// console.log(dateFin.getDate());
+					// console.log(dateFin.getMonth());
+					// console.log(dateFin.getFullYear());
+					// console.log(dateFin.getHours());
+					// console.log(dateFin.getMinutes());
+
+					this.agence.application_impactee = this.tableData[i][3];
+
+					this.agence.description = this.tableData[i][4].trim();
 
 					if (
 						this.tableData[i][5] == 'NC' ||
@@ -522,7 +569,11 @@ export default {
 						// console.log(this.agence.dateFin);
 					}
 
-					this.agence.cause = this.tableData[i][8];
+					this.agence.cause = this.tableData[i][8].trim();
+
+					this.agence.description_impact = this.tableData[
+						i
+					][10].trim();
 
 					this.agence.is_agence;
 
@@ -535,12 +586,13 @@ export default {
 						date_debut: '', //
 						date_fin: '', //
 						description: '', //
+						description_impact: '',
 						priorite_id: '', //
 						statut_id: '', //
 						enseigne_impactee: 0,
 						cause: '',
 						is_agence: true,
-						service_metier: '',
+						application_impactee: '',
 						nbUtilisateur: 0,
 					};
 					i++;
@@ -568,15 +620,32 @@ export default {
 							if (getInputs[i].checked == false) {
 								// console.log('je suis créé');
 								// console.log(difValueBetweenTables[i].reference);
-								this.$http.post(
-									'http://localhost:5000/api/create-agence/',
-									difValueBetweenTables[i]
-								);
+								// console.log(
+								// 	difValueBetweenTables[i].date_debut
+								// );
+								if (
+									difValueBetweenTables[i].date_debut != '' &&
+									difValueBetweenTables[i].date_debut !=
+										'Invalid Date'
+								) {
+									this.$http.post(
+										'http://localhost:5000/api/create-agence/',
+										difValueBetweenTables[i]
+									);
+								} else {
+									this.$message({
+										dangerouslyUseHTMLString: true,
+										message:
+											"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==>  <strong>Date(s) invalide(s)</strong> dans le fichier.</p>",
+										type: 'error',
+									});
+									return false;
+								}
 							}
-						} // else {
-						// 	console.log('je ne suis pas égale');
-						// 	console.log(getTrOfTBody.childNodes[1].innerHTML);
-						// 	console.log(difValueBetweenTables[i].reference);
+						} //else {
+						// console.log('je ne suis pas égale');
+						// console.log(getTrOfTBody.childNodes[1].innerHTML);
+						// console.log(difValueBetweenTables[i].reference);
 						// }
 					}
 				}
@@ -612,15 +681,25 @@ export default {
 										// console.log('je suis égale');
 										if (getInputs[i].checked == false) {
 											// console.log('je suis mis à jour');
-											// console.log(
-											// 	this.refUpdate.reference
-											// );
-											this.$http.put(
-												'http://localhost:5000/api/update-agence/',
-												this.refUpdate
+											console.log(
+												this.refUpdate.reference
 											);
+											// console.log(
+											// 	this.refUpdate.date_debut
+											// );
+											if (
+												this.refUpdate.date_debut !=
+													'' &&
+												this.refUpdate.date_debut !=
+													'Invalid Date'
+											) {
+												this.$http.put(
+													'http://localhost:5000/api/update-agence/',
+													this.refUpdate
+												);
+											}
 										}
-									 } //else {
+									} //else {
 									// 	console.log('je ne suis pas égale');
 									// 	console.log(
 									// 		getTrOfTBody.childNodes[1].innerHTML
@@ -628,10 +707,8 @@ export default {
 									// 	console.log(this.refUpdate.reference);
 									// }
 								}
-
-
-								this.refUpdate = {};
 							}
+							this.refUpdate = {};
 						}
 					}
 				});

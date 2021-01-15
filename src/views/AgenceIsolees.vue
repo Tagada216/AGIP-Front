@@ -37,7 +37,8 @@ export default {
 	},
 
 	data() {
-        return {};
+        return {
+        };
   	},
 
 	 methods:{
@@ -46,7 +47,7 @@ export default {
                 'http://localhost:5000/api/agence-isolees/formated'
             )
             return response.data;
-        },
+        }
    }
 };
 </script>

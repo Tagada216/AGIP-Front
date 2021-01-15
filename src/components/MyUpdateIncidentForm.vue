@@ -117,15 +117,15 @@
 				</el-card>
 				<!-- Fin Horodatage -->
 
-				<!-- Agences isolées -->
+				<!-- Agences isolées
 				<el-card>
 					<div slot="header">
 						<h4 class="card-header">Agences isolées</h4>
 					</div>
 					<input type="file" id="input" @click="importer()" style="margin-left:10px;" />
 				</el-card>
-				<!-- Fin agences isolées-->
-			</el-col>
+				 Fin agences isolées -->
+			 </el-col> 
 
 			<!-- Info Générales -->
 			<el-col :span="18">
@@ -999,7 +999,8 @@ export default {
             Axios.get(
                 'http://localhost:5000/api/main-courante/' + idIncident
             ).then(response => {
-                this.form.incident_id = this.incident_id;
+				this.form.incident_id = this.incident_id;
+				console.log(this.form.incident_id);
                 this.form.description = response.data[0].description;
                 this.form.date_debut = response.data[0].date_debut;
                 this.form.date_fin = response.data[0].date_fin;
@@ -1031,18 +1032,19 @@ export default {
                 this.form.application_impactee = [];
                 this.form.cosip_id = response.data[0].cosip_id
                 console.log("La référence récup : ", response.data[0].reference)
-
                 for (const ens_id of response.data[0].id_enseigne.split('/')) {
 					this.form.enseigne_impactee.push(parseInt(ens_id));
 				}
 
-
+				
 				for (const app of response.data[0].display_name.split('|||')) {
 				
-					
-                    this.form.application_impactee.push({display_name: app })
+				
+					this.form.application_impactee.push({display_name: app })
+					console.log(response.data[0].display_name);
                 }
-				console.log("Nb ref ", response.data[0].reference_id.split('/').length)
+				// console.log("Nb ref ", response.data[0].reference_id.split('/').length)
+				console.log("Nb ref ", response.data[0].reference_id);
 				//Gestion pour la récupération des référence 
                 for (
                     let index = 0;
@@ -1050,7 +1052,7 @@ export default {
 					index++
                 ) {
                     const id = response.data[0].reference_id.split('/')[index];
-                    const ref = response.data[0].reference.split('/')[index];
+					const ref = response.data[0].reference.split('/')[index];
                     this.form.references.push({
                         reference_id: id,
 						reference: ref, 

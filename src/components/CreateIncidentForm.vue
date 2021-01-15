@@ -79,12 +79,12 @@
 				<!-- Fin Horodatage -->
 
 				<!-- Agences isolées -->
-				<el-card>
+				<!-- <el-card>
 					<div slot="header">
 						<h4 class="card-header">Agences isolées</h4>
 					</div>
 					<input type="file" id="file" ref="fichierAgence" @change="importer" style="margin-left:10px;" />
-				</el-card>
+				</el-card> -->
 				<!-- Fin agences isolées-->
 			</el-col>
 
