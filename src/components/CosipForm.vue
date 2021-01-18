@@ -1169,6 +1169,13 @@ export default {
 
 		//Sauvegarde d'un incident dans le cosip via le formulaire 
 	onSubmit(){
+			console.log(this.form)
+			// Vérification Trigramme not udefined 
+			for(let i = 0; i < this.form.application_impactee.length; i++){
+				if((this.form.application_impactee[i].trigramme === undefined) && (this.form.application_impactee[i].code_irt !== undefined)){
+					this.form.application_impactee[i].trigramme = "FFF"
+				}
+			}
 			this.$refs['form'].validate(valid => {
 				if (valid) {
 					// On récupère l'id de l'incident situé après le '=' dans l'url 
@@ -1226,6 +1233,13 @@ export default {
 						
 		},
 		onUpdate(){
+			console.log(this.form)
+			// Vérification Trigramme not udefined 
+			for(let i = 0; i < this.form.application_impactee.length; i++){
+				if((this.form.application_impactee[i].trigramme === undefined) && (this.form.application_impactee[i].code_irt !== undefined)){
+					this.form.application_impactee[i].trigramme = "FFF"
+				}
+			}
 			//Push les impacts des enseignes dans le tableau 
 			this.form.desc_impact_enseigne.push( this.form.description_impactBDDF,this.form.description_impactCDN, this.form.description_impactBPF)
 			console.log(this.form)
@@ -1548,7 +1562,6 @@ export default {
 						reference: ref, 
                     });
 				}
-				//Récupération des applications 
 
 				//Récupération des applications
 				for (
