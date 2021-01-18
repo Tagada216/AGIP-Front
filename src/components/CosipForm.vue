@@ -1549,16 +1549,21 @@ export default {
                     });
 				}
 				//Récupération des applications 
-				for(
-					let index =0;
+
+				//Récupération des applications
+				for (
+					let index = 0;
 					index < response.data[0].code_irt.split('/').length;
 					index++
-				){
+				) {
 					const itr = response.data[0].code_irt.split('/')[index];
-					const app = response.data[0].application.split('|')[index];
+					const app = response.data[0].display_name.split('|||')[index];
+					const  tri = response.data[0].trigramme.split('/')[index];
+
 					this.form.application_impactee.push({
 						code_irt: itr,
 						display_name: app,
+						trigramme: tri
 					});
 				}
 
