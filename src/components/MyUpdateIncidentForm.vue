@@ -522,7 +522,7 @@ export default {
 
 			// Vérification Trigramme not udefined 
 			for(let i = 0; i < this.form.application_impactee.length; i++){
-				if(this.form.application_impactee[i].trigramme === undefined){
+				if((this.form.application_impactee[i].trigramme === undefined) && (this.form.application_impactee[i].code_irt !== undefined)){
 					this.form.application_impactee[i].trigramme = "FFF"
 				}
 			}
