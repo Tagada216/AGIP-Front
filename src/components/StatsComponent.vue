@@ -5,7 +5,7 @@
         <base-header title="Statistiques" />
             <el-card>
 				<div slot="header">
-					<h4 class="card-header">Statistiques des priorités par incidents</h4>
+					<h4 class="card-header">Statistiques des priorités</h4>
 				</div>
 			
             <div class="wrapper">
@@ -18,16 +18,32 @@
                 <div class="enseigne-row">P2
                     <div class="result">{{P2}}</div>
                 </div>
-                <div class="enseigne-row">P3
+                <!-- <div class="enseigne-row">P3
                     <div class="result">{{P3}}</div>
                 </div>
                 <div class="enseigne-row">P4
                     <div class="result">{{P4}}</div>
+                </div> -->
+                                <div class="enseigne-row">
+                    <vc-donut has-legend legend-placement="top" :sections="sections" :total="total" >Incidents/pritorité</vc-donut>
                 </div>
             </div>
         </el-card>
         <el-card>
-            <vc-donut has-legend legend-placement="top" :sections="sections">Incidents/pritorité</vc-donut>
+            <div slot="header">
+				<h4 class="card-header">Incidence des applications</h4>
+			</div>
+            <div class="wrapper">
+                <div class="enseigne-row">Application : 
+                    <div 
+                    v-for="item in display_incidence"
+                    :key="item.nom"
+                    >{{item.nom}}</div>
+                </div>
+                <div class="enseigne-row"> Nombres d'incidents Majeur :
+                    
+                </div>
+            </div>
         </el-card>
     </div>
 
@@ -36,17 +52,27 @@
 <script>
 export default {
     created(){
-        this.getIncPriorite()
+        this.getIncPriorite(),
+        this.getnbrAppIncidence()
     },
     data(){
         return {
+            display_incidence:[],
+            appIncidence:[],
             incident_priotites:[],
             P0: 0,
             P1: 0,
             P2: 0,
             P3: 0,
             P4: 0,
-            sections: [{ label:'P0', value: 0 }, { label:'P1', value: 65 },{ label:'P2', value: 20 },{ label:'P3', value: 0 },{ label:'P4',value: 0 }]
+            AllPriorite:0,
+            P0per: 0,
+            P1per: 0,
+            P2per: 0,
+            P3per: 0,
+            P4per: 0,
+            sections: [],
+            total: 0
         }
     },
     methods:{
@@ -56,11 +82,11 @@ export default {
                 .get('http://localhost:5000/api/stat/priorites')
                 .then(response => {
                     this.incident_priotites = response.data  
+                    this.AllPriorite = this.incident_priotites.length
                     for(let i=0; i< this.incident_priotites.length; i++){
-                        console.log(this.incident_priotites[i].priorite_id)
                         switch(this.incident_priotites[i].priorite_id){
                             case 1:
-                                this.P0++
+                                this.P0++ 
                                 break;
                             case 2:
                                 this.P1++
@@ -74,11 +100,38 @@ export default {
                             case 5:
                                 this.P4++
                                 break;
-
                         }
+                        
                     }
+                    //Calcul du pourcentage :
+                    this.P0per = Math.round((this.P0 / this.AllPriorite)*100)
+                    this.P1per = Math.round((this.P1 / this.AllPriorite)*100)
+                    this.P2per = Math.round((this.P2 / this.AllPriorite)*100)
+                    this.P3per = Math.round((this.P3 / this.AllPriorite)*100)
+                    this.P4per = Math.round((this.P4 / this.AllPriorite)*100)
+                    this.total = this.P0per + this.P1per + this.P2per + this.P3per+this.P4per
+                    this.sections.push( { label:'P0', value: this.P0per  }, { label:'P1', value: this.P1per },{ label:'P2', value: this.P2per },{ label:'P3', value: this.P3per },{ label:'P4',value: this.P4per })
                 });
         },
+
+        getnbrAppIncidence(){
+            this.$http
+                .get('http://localhost:5000/api/stat/applications')
+                .then(response =>{
+                    this.appIncidence = response.data
+                    console.log("Les incidences : ",this.appIncidence)
+                    for(let y=0; y<this.appIncidence.length; y++){
+                        if(this.appIncidence[y].nb_occurence > 2){
+                            this.display_incidence.push({
+                                nom: this.appIncidence[y].nom_appli,
+                                nb: this.appIncidence[y].nb_occurence
+                            })
+                        }
+                    }
+                    console.log("Display", this.display_incidence)
+                })
+        },
+
     }
 
 }
@@ -95,3 +148,5 @@ export default {
 .result
     font-weight: bold
 </style>
+
+}
