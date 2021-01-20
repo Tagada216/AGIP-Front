@@ -1,6 +1,6 @@
 <template>
 
-    <div style="100vh">
+    <div>
 
         <base-header title="Statistiques" />
             <el-card>
@@ -26,6 +26,9 @@
                 </div>
             </div>
         </el-card>
+        <el-card>
+            <vc-donut has-legend legend-placement="top" :sections="sections">Incidents/pritorité</vc-donut>
+        </el-card>
     </div>
 
     
@@ -43,9 +46,7 @@ export default {
             P2: 0,
             P3: 0,
             P4: 0,
-            remoteEnum:{
-                priorites:[]
-            }
+            sections: [{ label:'P0', value: 0 }, { label:'P1', value: 65 },{ label:'P2', value: 20 },{ label:'P3', value: 0 },{ label:'P4',value: 0 }]
         }
     },
     methods:{
