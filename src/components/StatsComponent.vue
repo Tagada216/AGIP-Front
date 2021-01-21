@@ -1,11 +1,14 @@
 <template>
 
     <div>
-
+        <div id="screenImg">
         <base-header title="Statistiques" />
             <el-card>
+                <div slot="header">
+					<h4 class="card-header"> {{current_month}} {{current_year}}</h4>
+				</div>
 				<div slot="header">
-					<h4 class="card-header">Statistiques des priorités</h4>
+					<h5 class="card-header">Statistiques des priorités</h5>
 				</div>
 			
             <div class="wrapper">
@@ -30,33 +33,42 @@
             </div>
         </el-card>
         <el-card>
-            <div slot="header">
-				<h4 class="card-header">Incidence des applications</h4>
-			</div>
+
             <div class="wrapper">
-                <div class="enseigne-row">Application : 
+                <div class="enseigne-row"> <h4> Incidence Application : </h4>
                     <div 
                     v-for="item in display_incidence"
                     :key="item.nom"
-                    >{{item.nom}}</div>
+                    >{{item.nom}} <br> <br> <h3> Nombres d'incidents:</h3> <h4>{{item.nb}}</h4> </div>
                 </div>
-                <div class="enseigne-row"> Nombres d'incidents Majeur :
-                    
+                <div class="enseigne-row"> <h4> Nombres d'incidents Majeur: </h4>
+                      <h4> {{nb_majeur}} </h4> 
                 </div>
             </div>
         </el-card>
+        </div>
+        <el-button type="primary" class="button" @click="exportPDF()">Exporter en PDF</el-button>
     </div>
 
     
 </template>
 <script>
+//Utilisation de html2cnvas pourscreen la page et ajouter l'image en PDF grace à jspdf
+import {jsPDF} from "jspdf";
+import html2canvas from 'html2canvas';
+
 export default {
     created(){
         this.getIncPriorite(),
-        this.getnbrAppIncidence()
+        this.getnbrAppIncidence(),
+        this.getIncMajeur(),
+        this.getCurrentMonth()
     },
     data(){
         return {
+            current_year:"",
+            current_month:"",
+            nb_majeur:0,
             display_incidence:[],
             appIncidence:[],
             incident_priotites:[],
@@ -119,7 +131,6 @@ export default {
                 .get('http://localhost:5000/api/stat/applications')
                 .then(response =>{
                     this.appIncidence = response.data
-                    console.log("Les incidences : ",this.appIncidence)
                     for(let y=0; y<this.appIncidence.length; y++){
                         if(this.appIncidence[y].nb_occurence > 2){
                             this.display_incidence.push({
@@ -128,9 +139,40 @@ export default {
                             })
                         }
                     }
-                    console.log("Display", this.display_incidence)
                 })
         },
+
+        getIncMajeur(){
+            this.$http
+                .get('http://localhost:5000/api/stat/majeur')
+                .then(response =>{
+                    this.nb_majeur = response.data
+                    this.nb_majeur = this.nb_majeur[0].nb_majeur
+                    console.log("Nb majeur : ",this.nb_majeur)
+
+
+                })
+        },
+        getCurrentMonth(){
+            var currentDate = new Date()
+            const monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+                                "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Décembre"
+                                ];
+ 
+            this.current_month  = monthNames[currentDate.getMonth()]
+            this.current_year = currentDate.getFullYear()
+        },
+
+        exportPDF(){
+            let fileName = "Statistiques_"+this.current_month+"_"+this.current_year+".pdf"
+            html2canvas(document.querySelector('#screenImg')).then(canvas =>{
+                const statPDF = new jsPDF({
+                                            orientation: 'l'})
+                statPDF.addImage(canvas, 30, 10, 250, 150)
+                statPDF.save(fileName)
+            })
+
+        }
 
     }
 
