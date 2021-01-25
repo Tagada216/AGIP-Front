@@ -16,16 +16,19 @@ import './globalComponents';
 import '../node_modules/ag-grid-community/dist/styles/ag-grid.css';
 import '../node_modules/ag-grid-community/dist/styles/ag-theme-balham.css';
 
+import Donut from 'vue-css-donut-chart';
+import 'vue-css-donut-chart/dist/vcdonut.css';
+
 
 Vue.config.productionTip = false;
 Vue.prototype.$http = require('axios');
-Vue.use(Element, {
-	locale},
+Vue.use(
+	Element, {locale},
 	VModal, {componentName: 'modal'},
-	
 );
+Vue.use(Donut);
 
 new Vue({
 	router,
 	render: h => h(App),
-}).$mount('#app');
+}).$mount('#app'); 

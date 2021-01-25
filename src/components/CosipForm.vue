@@ -1169,6 +1169,13 @@ export default {
 
 		//Sauvegarde d'un incident dans le cosip via le formulaire 
 	onSubmit(){
+			console.log(this.form)
+			// Vérification Trigramme not udefined 
+			for(let i = 0; i < this.form.application_impactee.length; i++){
+				if((this.form.application_impactee[i].trigramme === undefined) && (this.form.application_impactee[i].code_irt !== undefined)){
+					this.form.application_impactee[i].trigramme = "FFF"
+				}
+			}
 			this.$refs['form'].validate(valid => {
 				if (valid) {
 					// On récupère l'id de l'incident situé après le '=' dans l'url 
@@ -1177,6 +1184,20 @@ export default {
 					{
 						var idIncident=window.location.href.substr(test+1)
 					}
+					//On vérifie si l'incident n'est pas ne résolu dans ce cas on demande une date de fin
+					if (
+					this.form.statut_id === 5 &&
+					this.form.date_fin === null
+					) {
+						this.$message({
+							dangerouslyUseHTMLString: true,
+							message:
+								"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Le Statut de l'incident est en <strong>Résolu</strong> le champs <strong>Fin de l'incident est obligatoire</strong> .</p>",
+								type: 'error',
+							});
+						return false;
+					}
+
 					// On enregistre en base de données
 					this.$http
 						.post(
@@ -1206,11 +1227,19 @@ export default {
 						type: 'error',
 					});
 					return false;
-			}
+				}
+
 		});
 						
 		},
 		onUpdate(){
+			console.log(this.form)
+			// Vérification Trigramme not udefined 
+			for(let i = 0; i < this.form.application_impactee.length; i++){
+				if((this.form.application_impactee[i].trigramme === undefined) && (this.form.application_impactee[i].code_irt !== undefined)){
+					this.form.application_impactee[i].trigramme = "FFF"
+				}
+			}
 			//Push les impacts des enseignes dans le tableau 
 			this.form.desc_impact_enseigne.push( this.form.description_impactBDDF,this.form.description_impactCDN, this.form.description_impactBPF)
 			console.log(this.form)
@@ -1533,17 +1562,21 @@ export default {
 						reference: ref, 
                     });
 				}
-				//Récupération des applications 
-				for(
-					let index =0;
+
+				//Récupération des applications
+				for (
+					let index = 0;
 					index < response.data[0].code_irt.split('/').length;
 					index++
-				){
+				) {
 					const itr = response.data[0].code_irt.split('/')[index];
-					const app = response.data[0].application.split('|')[index];
+					const app = response.data[0].display_name.split('|||')[index];
+					const  tri = response.data[0].trigramme.split('/')[index];
+
 					this.form.application_impactee.push({
 						code_irt: itr,
 						display_name: app,
+						trigramme: tri
 					});
 				}
 
