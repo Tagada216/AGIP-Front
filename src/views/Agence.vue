@@ -6,15 +6,29 @@
 </template>
 <script>
 import PartieAgence from '@/components/PartieAgence';
+import Grid from '@/components/Grid.vue';
+import Splitpanes from 'splitpanes';
+import 'splitpanes/dist/splitpanes.css';
 
 export default {
     components: {
-		PartieAgence,
+    PartieAgence,
+    Grid,
+    Splitpanes,
     },
 
     data() {
         return {};
-	},
+  },
+  
+   methods:{
+      async fetchAgence() {
+            const response = await this.$http.get(
+                'http://localhost:5000/api/agence-isolees/formated'
+            )
+            return response.data;
+        },
+   }
 };
 </script>
 

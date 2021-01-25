@@ -22,8 +22,10 @@
 		</div>
 		<div>
 			<!-- Agences isolées -->
-			<h4 class="card-header">Agences isolées</h4>
-			<el-button id="myButton" type="primary" class="button" @click="changeButton()">{{ buttonName }}</el-button>
+			<div class="agenceButton">
+				<el-button id="myButton" type="primary" class="button" @click="changeButton()">{{ buttonName }}</el-button>
+				<el-button id="cancelButton" type="danger" class="button" @click="onCancel()">Annuler</el-button>
+			</div>
 			<modal class="modal" name="importModal">
 				<div class="fileupload" :class="{ 'fileupload--slim': slim }">
 					<base-button v-if="slim">
@@ -96,17 +98,9 @@ export default {
 			tableRow: [],
 			agenceTable: [],
 			filterResult: {},
-			 refUpdate : {},
+			refUpdate: {},
 
 			loading: false,
-
-			// Données énumérées venant de l'API
-			remoteEnum: {
-				priorites: [],
-				statut: [],
-				enseignes: [],
-				application_impactee: [],
-			},
 
 			// Données du formulaire agence
 			agence: {
@@ -114,20 +108,16 @@ export default {
 				reference: '', //
 				is_faux_incident: false, //
 				date_debut: '', //
-				date_fin: null, //
+				date_fin: '', //
 				description: '', //
-				description_impact: '', //
-				description_contournement: 'Aucun contournement', //
-				is_contournement: false, //
+				description_impact: '',
 				priorite_id: '', //
 				statut_id: '', //
 				enseigne_impactee: 0,
-				application_impactee: [],
 				cause: '',
 				is_agence: true,
-				service_metier: '',
-				observations: '',
-				nbUtilisateur: null,
+				application_impactee: '',
+				nbUtilisateur: 0,
 			},
 		};
 	},
@@ -161,7 +151,6 @@ export default {
 			// 	}
 			// }
 
-			
 			//Blocage de l'import de plusieurs fichiers
 			if (this.files.length > 1) {
 				this.$message({
@@ -209,13 +198,19 @@ export default {
 		changeButtonName() {
 			var getTHead = document.getElementById('tableHead');
 			var getTBody = document.getElementById('tableBody');
-
 			var getValueButton = document.getElementById('myButton');
+			var cancelButton = document.getElementById('cancelButton');
+
 			if (getTHead && getTBody == '') {
 				this.buttonName = 'Importer';
 			} else {
 				this.buttonName = 'Sauvegarder';
+				cancelButton.style.display = 'inline-block';
 			}
+		},
+
+		onCancel() {
+			window.location.reload();
 		},
 
 		//ouvre la fenêtre modal
@@ -398,6 +393,7 @@ export default {
 								vm.tableHead = [];
 							} else {
 								vm.tableData.push(vm.tableRow);
+								// console.log(vm.tableData);
 								vm.tableRow = [];
 							}
 							this.loading = false;
@@ -428,17 +424,20 @@ export default {
 			var getInputs = document.querySelectorAll('input[class=switch]');
 
 			for (var i = 0; i < getInputs.length; i++) {
+				var getTdTBody = getInputs[i].parentNode,
+					getTrOfTBody = getTdTBody.parentNode;
+
 				if (getInputs[i].checked == true) {
-					var getTdTBody = getInputs[i].parentNode,
-						getTrOfTBody = getTdTBody.parentNode;
 					getTrOfTBody.style.color = '#D8E0DC';
 				} else {
 					getInputs[i].checked = false;
-					var getTdTBody = getInputs[i].parentNode,
-						getTrOfTBody = getTdTBody.parentNode;
 					getTrOfTBody.style.color = '#009879';
 				}
 			}
+		},
+
+		isValidDate(d) {
+			return d instanceof Date && !isNaN(d);
 		},
 
 		//////Partie Agence/////////
@@ -446,6 +445,9 @@ export default {
 			Axios.get('http://localhost:5000/api/reference').then(response => {
 				var i = 0;
 				var reponse;
+				var getInputs = document.querySelectorAll(
+					'input[class=switch]'
+				);
 				do {
 					for (var j = 0; j < response.data.length; j++) {
 						if (
@@ -458,25 +460,93 @@ export default {
 							// console.log(this.agence.incident_id);
 						}
 					}
+					var getTitle = document.getElementById('title').innerHTML;
+					if (getTitle.includes('CDN') || getTitle.includes('cdn')) {
+						this.agence.enseigne_impactee = 2;
+					} else if (
+						getTitle.includes('BDDF') ||
+						getTitle.includes('bddf')
+					) {
+						this.agence.enseigne_impactee = 1;
+					} else {
+						this.enseigne_impactee = null;
+					}
 
 					this.agence.reference = this.tableData[i][0];
 
 					var dateDebut = new Date(this.tableData[i][1]);
+					var recupDaysAndMounth = this.tableData[i][1].split('/');
+					// var recupYear = recupDaysAndMounth[2].split(' ');
+					// var recupHoursAndMins = recupYear[1].split(':');
+					// console.log(recupDaysAndMounth);
+					// console.log(recupYear);
+					// console.log(recupDaysAndMounth[0]);
+					// console.log(recupDaysAndMounth[1]);
+					dateDebut.setDate(recupDaysAndMounth[0]);
+					dateDebut.setMonth(recupDaysAndMounth[1]);
+					// dateDebut.setFullYear(recupYear[0]);
+					// if (recupHoursAndMins[0] == '') {
+					// 	recupHoursAndMins[0] = '00';
+					// 	dateDebut.setHours(recupHoursAndMins[0]);
+					// } else {
+					// 	dateDebut.setHours(recupHoursAndMins[0]);
+					// }
+					// dateDebut.setMinutes(recupHoursAndMins[1]);
 					dateDebut.toString(`dd,mm,yyyy`);
+					// console.log(dateDebut.getDate());
+					// console.log(dateDebut.getMonth());
+					// console.log(dateDebut.getFullYear());
+					// console.log(dateDebut.getHours());
+					// console.log(dateDebut.getMinutes());
+
 					this.agence.date_debut = dateDebut;
-					this.agence.enseigne_impactee = 1;
+					// console.log(this.agence.date_debut);
 
 					var dateFin = new Date(this.tableData[i][2]);
+					// if (dateFin != '' && dateFin != undefined) {
+					// 	recupDaysAndMounth = this.tableData[i][2].split('/');
+						// recupYear = recupDaysAndMounth[2].split(' ');
+						// recupHoursAndMins = recupYear[1].split(':');
+						// console.log(recupDaysAndMounth);
+						// console.log(recupYear);
+						// console.log(recupDaysAndMounth[0]);
+						// console.log(recupDaysAndMounth[1]);
+						// dateFin.setDate(recupDaysAndMounth[0]);
+						// dateFin.setMonth(recupDaysAndMounth[1]);
+						// dateFin.setFullYear(recupYear[0]);
+						// if (recupHoursAndMins[0] == '') {
+						// 	recupHoursAndMins[0] = '00';
+						// 	dateFin.setHours(recupHoursAndMins[0]);
+						// } else {
+						// 	dateFin.setHours(recupHoursAndMins[0]);
+						// }
+
+						// dateFin.setMinutes(recupHoursAndMins[1]);
+					// }
+
 					dateFin.toString(`dd,mm,yyyy`);
 
-					this.agence.service_metier = this.tableData[i][3];
-					this.agence.description = this.tableData[i][4];
-					if (typeof this.agence.nbUtilisateur === 'number') {
+					// console.log(dateFin.getDate());
+					// console.log(dateFin.getMonth());
+					// console.log(dateFin.getFullYear());
+					// console.log(dateFin.getHours());
+					// console.log(dateFin.getMinutes());
+
+					this.agence.application_impactee = this.tableData[i][3];
+
+					this.agence.description = this.tableData[i][4].trim();
+
+					if (
+						this.tableData[i][5] == 'NC' ||
+						this.tableData[i][5] == '_' ||
+						this.tableData[i][5] == ' _ ' ||
+						this.tableData[i][5] == ' - ' ||
+						this.tableData[i][5] == '-'
+					) {
+						this.agence.nbUtilisateur = null;
+					} else {
 						this.agence.nbUtilisateur = this.tableData[i][5];
-					}else if(typeof this.agence.nbUtilisateur === 'string'){
-						this.agence.nbUtilisateur = 0;
 					}
-					
 
 					if (this.tableData[i][6].includes('P0')) {
 						this.agence.priorite_id = 1;
@@ -492,13 +562,18 @@ export default {
 
 					if (this.tableData[i][7].includes('En cours')) {
 						this.agence.statut_id = 2;
-						this.agence.date_fin = 'Incident en cours';
+						this.agence.date_fin = '';
 					} else if (this.tableData[i][7].includes('Clos')) {
 						this.agence.statut_id = 5;
 						this.agence.date_fin = dateFin;
+						// console.log(this.agence.dateFin);
 					}
 
-					this.agence.cause = this.tableData[i][8];
+					this.agence.cause = this.tableData[i][8].trim();
+
+					this.agence.description_impact = this.tableData[
+						i
+					][10].trim();
 
 					this.agence.is_agence;
 
@@ -509,40 +584,70 @@ export default {
 						reference: '', //
 						is_faux_incident: false, //
 						date_debut: '', //
-						date_fin: null, //
+						date_fin: '', //
 						description: '', //
-						description_impact: '', //
-						description_contournement: 'Aucun contournement', //
-						is_contournement: false, //
+						description_impact: '',
 						priorite_id: '', //
 						statut_id: '', //
 						enseigne_impactee: 0,
-						application_impactee: [],
 						cause: '',
 						is_agence: true,
-						service_metier: '',
-						observations: '',
-						nbUtilisateur: null,
+						application_impactee: '',
+						nbUtilisateur: 0,
 					};
 					i++;
 				} while (i < this.tableData.length);
 
-				var difValueBetweenTables = this.agenceTable.filter(this.comparer(response.data));
+				var difValueBetweenTables = this.agenceTable.filter(
+					this.comparer(response.data)
+				);
 
 				for (let i = 0; i < difValueBetweenTables.length; i++) {
-					console.log('valeur non identique', difValueBetweenTables[i]);
+					// console.log(
+					// 	'valeur non identique',
+					// 	difValueBetweenTables[i]
+					// );
 
-					this.$http
-						.post('http://localhost:5000/api/create-agence/', difValueBetweenTables[i])
-						.then(result => {
-							this.$message({
-								dangerouslyUseHTMLString: true,
-								message:
-									"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-								type: 'success',
-							});
-							loadingInstance.close();
-						});
+					for (let j = 0; j < getInputs.length; j++) {
+						var getTdTBody = getInputs[j].parentNode,
+							getTrOfTBody = getTdTBody.parentNode;
+
+						if (
+							getTrOfTBody.childNodes[1].innerHTML ==
+							difValueBetweenTables[i].reference
+						) {
+							console.log('je suis égale');
+							if (getInputs[i].checked == false) {
+								// console.log('je suis créé');
+								// console.log(difValueBetweenTables[i].reference);
+								// console.log(
+								// 	difValueBetweenTables[i].date_debut
+								// );
+								if (
+									difValueBetweenTables[i].date_debut != '' &&
+									difValueBetweenTables[i].date_debut !=
+										'Invalid Date'
+								) {
+									this.$http.post(
+										'http://localhost:5000/api/create-agence/',
+										difValueBetweenTables[i]
+									);
+								} else {
+									this.$message({
+										dangerouslyUseHTMLString: true,
+										message:
+											"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==>  <strong>Date(s) invalide(s)</strong> dans le fichier.</p>",
+										type: 'error',
+									});
+									return false;
+								}
+							}
+						} //else {
+						// console.log('je ne suis pas égale');
+						// console.log(getTrOfTBody.childNodes[1].innerHTML);
+						// console.log(difValueBetweenTables[i].reference);
+						// }
+					}
 				}
 
 				this.agenceTable.forEach(element => {
@@ -553,8 +658,6 @@ export default {
 					// console.log('Le filter ', this.filterResult)
 
 					if (this.filterResult.length >= 1) {
-						
-
 						for (let i = 0; i < this.agenceTable.length; i++) {
 							if (
 								this.agenceTable[i].reference.includes(
@@ -562,35 +665,63 @@ export default {
 								)
 							) {
 								this.refUpdate = this.agenceTable[i];
-								console.log('valeurs existantes',this.refUpdate);
-
-								this.$http
-									.put(
-										'http://localhost:5000/api/update-agence/',
-										this.refUpdate
-									)
-
-									.then(result => {
-										this.$message({
-											dangerouslyUseHTMLString: true,
-											message:
-												"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
-											type: 'success',
-										});
-									});
-
 								// console.log(
 								// 	'valeurs existantes',
 								// 	this.refUpdate
 								// );
 
-								this.refUpdate = {};
+								for (let j = 0; j < getInputs.length; j++) {
+									var getTdTBody = getInputs[j].parentNode,
+										getTrOfTBody = getTdTBody.parentNode;
+
+									if (
+										getTrOfTBody.childNodes[1].innerHTML ==
+										this.refUpdate.reference
+									) {
+										// console.log('je suis égale');
+										if (getInputs[i].checked == false) {
+											// console.log('je suis mis à jour');
+											console.log(
+												this.refUpdate.reference
+											);
+											// console.log(
+											// 	this.refUpdate.date_debut
+											// );
+											if (
+												this.refUpdate.date_debut !=
+													'' &&
+												this.refUpdate.date_debut !=
+													'Invalid Date'
+											) {
+												this.$http.put(
+													'http://localhost:5000/api/update-agence/',
+													this.refUpdate
+												);
+											}
+										}
+									} //else {
+									// 	console.log('je ne suis pas égale');
+									// 	console.log(
+									// 		getTrOfTBody.childNodes[1].innerHTML
+									// 	);
+									// 	console.log(this.refUpdate.reference);
+									// }
+								}
 							}
+							this.refUpdate = {};
 						}
 					}
 				});
 
 				this.agenceTable = [];
+
+				this.$message({
+					dangerouslyUseHTMLString: true,
+					message:
+						"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+					type: 'success',
+				});
+				setTimeout(window.location.reload(), 30000);
 			});
 		},
 
@@ -617,7 +748,7 @@ export default {
 					// return `${this.files.length} fichiers sélectionnés.`;
 
 					//Blocage du téléchargement de plusieurs fichiers
-					return 'Plusieurs fichiers sélectionnés ! </br> Un seul fichier téléchargeable possible !';
+					return 'Plusieurs fichiers sélectionnés !  Un seul fichier téléchargeable possible !';
 			}
 		},
 	},
@@ -627,6 +758,15 @@ export default {
 <style lang="scss">
 $redColor: #ed1a3a;
 $blackColor: #2c3e50;
+
+#cancelButton {
+	display: none;
+	margin-left: 3em;
+}
+
+.agenceButton .el-button {
+	margin-top: 100px !important;
+}
 
 .button {
 	padding: 15px 50px !important;
@@ -669,16 +809,6 @@ $blackColor: #2c3e50;
 	border-image-source: linear-gradient(to left, $blackColor, $redColor);
 }
 
-.card-header {
-	margin-top: 5em;
-	margin-bottom: 5em;
-}
-
-.card-header,
-.cell .el-input {
-	margin: 5em;
-}
-
 .fileupload {
 	position: relative;
 	display: flex;
@@ -719,6 +849,11 @@ $blackColor: #2c3e50;
 		margin-top: 1rem;
 		font-weight: 600;
 	}
+}
+
+#title {
+	margin-top: 3em;
+	margin-bottom: 3em;
 }
 
 .styled-table {
