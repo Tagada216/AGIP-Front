@@ -64,6 +64,7 @@ export default {
     },
     
     methods:{
+        //Récupération de l'id COSIP courant
         updateRef(id) {
             this.curId = id;
             console.log("Id actuel : " + this.curId)

@@ -776,7 +776,7 @@
             </el-col>
         </el-row>
 
-        <!-- Modal de confirmation de suppression d'une reférence problème -->
+        <!-- Modal de confirmation de suppression d'une reférence -->
         <el-dialog
             title="Demande de confirmation"
             :visible.sync="delConfirmationModalVisible"
@@ -1169,7 +1169,6 @@ export default {
 
 		//Sauvegarde d'un incident dans le cosip via le formulaire 
 	onSubmit(){
-			console.log(this.form)
 			// Vérification Trigramme not udefined 
 			for(let i = 0; i < this.form.application_impactee.length; i++){
 				if((this.form.application_impactee[i].trigramme === undefined) && (this.form.application_impactee[i].code_irt !== undefined)){
@@ -1698,18 +1697,19 @@ export default {
                     this.remoteEnum.enseignes = response.data;
                 });
 
-            // Obtention des application
+            // Obtention des applications
             this.$http
                 .get('http://localhost:5000/api/applications')
                 .then(response => {
                     this.remoteEnum.applications = response.data;
 				});
-				
+			// Obtention des entites 	
 			this.$http
 				.get('http://localhost:5000/api/incidents/entite')
 				.then(response => {
 					this.remoteEnum.responsabilite = response.data;
 				});
+			//Obtention des différentes cause racine 
 			this.$http
 				.get('http://localhost:5000/api/incidents/cause-racine')
 				.then(response => {
