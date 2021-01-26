@@ -1033,13 +1033,6 @@ export default {
 					this.form.enseigne_impactee.push(parseInt(ens_id));
 				}
 
-				
-				for (const app of response.data[0].display_name.split('|||')) {
-				
-				
-					this.form.application_impactee.push({display_name: app })
-					console.log(response.data[0].display_name);
-                }
 				// console.log("Nb ref ", response.data[0].reference_id.split('/').length)
 				console.log("Nb ref ", response.data[0].reference_id);
 				//Gestion pour la récupération des référence 
