@@ -721,7 +721,7 @@ export default {
 						"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
 					type: 'success',
 				});
-				// setTimeout(window.location.reload(), 30000);
+				setTimeout(window.location.reload(), 30000);
 			});
 		},
 
