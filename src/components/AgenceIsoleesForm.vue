@@ -655,7 +655,7 @@ export default {
 						ref => element.reference === ref.reference
 					);
 
-					// console.log('Le filter ', this.filterResult)
+					console.log('Le filter ', this.filterResult)
 
 					if (this.filterResult.length >= 1) {
 						for (let i = 0; i < this.agenceTable.length; i++) {
@@ -681,9 +681,9 @@ export default {
 										// console.log('je suis égale');
 										if (getInputs[i].checked == false) {
 											// console.log('je suis mis à jour');
-											console.log(
-												this.refUpdate.reference
-											);
+											// console.log(
+											// 	this.refUpdate.reference
+											// );
 											// console.log(
 											// 	this.refUpdate.date_debut
 											// );
@@ -721,7 +721,7 @@ export default {
 						"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
 					type: 'success',
 				});
-				setTimeout(window.location.reload(), 30000);
+				// setTimeout(window.location.reload(), 30000);
 			});
 		},
 

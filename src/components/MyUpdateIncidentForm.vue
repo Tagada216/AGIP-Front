@@ -990,33 +990,6 @@ export default {
 		},
 		////////////////////////////////////////
 		// Récupère les informations d'un incident pour l'insérer dans le formulaire
-<<<<<<< HEAD
-		getIncident(idIncident) {
-			// Obtention de l'incident
-			Axios.get(
-				'http://localhost:5000/api/main-courante/' + idIncident
-			).then(response => {
-				this.form.incident_id = this.incident_id;
-				this.form.description = response.data[0].description;
-				this.form.date_debut = response.data[0].date_debut;
-				this.form.date_fin = response.data[0].date_fin;
-				this.form.description_impact =
-					response.data[0].description_impact;
-				this.form.statut_id = response.data[0].statut;
-				this.form.priorite_id = response.data[0].priorite;
-				this.form.date_detection = response.data[0].date_detection;
-				this.form.date_communication_TDC =
-					response.data[0].date_communication_tdc;
-				this.form.date_qualification_p01 =
-					response.data[0].date_qualif_p01;
-				this.form.gravite_id = response.data[0].gravite_id;
-				this.form.date_premiere_com = response.data[0].date_premier_com;
-				this.form.cause = response.data[0].cause;
-				this.form.action_retablissement =
-					response.data[0].action_retablissement;
-				this.form.origine = response.data[0].origine;
-				this.form.plan_action = response.data[0].plan_action;
-=======
         getIncident(idIncident) {
             // Obtention de l'incident
             Axios.get(
@@ -1042,7 +1015,6 @@ export default {
                 this.form.action_retablissement = response.data[0].action_retablissement;
                 this.form.origine = response.data[0].origine;
                 this.form.plan_action = response.data[0].plan_action;
->>>>>>> 80c2f012fe1d5d5081ca741948eb0c3ac94c90b0
 
 				this.form.is_faux_incident = response.data[0].is_faux_incident
 					? true
@@ -1054,27 +1026,6 @@ export default {
 					response.data[0].description_contournement;
 				this.form.enseigne_impactee = [];
 				this.form.references = [];
-<<<<<<< HEAD
-				this.form.application_impactee = [];
-				this.form.cosip_id = response.data[0].cosip_id;
-
-				for (const ens_id of response.data[0].id_enseigne.split('/')) {
-					this.form.enseigne_impactee.push(parseInt(ens_id));
-				}
-
-				//Gestion pour la récupération des référence
-				for (
-					let index = 0;
-					index < response.data[0].reference_id.split('/').length; // récupération de la référence et stop séparation au caractère /
-					index++
-				) {
-					const id = response.data[0].reference_id.split('/')[index];
-					const ref = response.data[0].reference.split('/')[index];
-					this.form.references.push({
-						reference_id: id,
-						reference: ref,
-					});
-=======
                 this.form.application_impactee = [];
                 this.form.cosip_id = response.data[0].cosip_id
                 console.log("La référence récup : ", response.data[0].reference)
@@ -1103,7 +1054,6 @@ export default {
                         reference_id: id,
 						reference: ref, 
                     });
->>>>>>> 80c2f012fe1d5d5081ca741948eb0c3ac94c90b0
 				}
 
 				// for (const app of response.data[0].display_name.split('|||')) {
