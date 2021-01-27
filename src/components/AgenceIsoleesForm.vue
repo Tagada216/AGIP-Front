@@ -123,34 +123,10 @@ export default {
 	},
 
 	methods: {
-		//Permet de formater les dates
-		// dateFormate(date) {
-		// 	if (this.state.tickets == 'Début') {
-		// 		const event = new Date(Date.UTC(date));
-		// 		const options = {
-		// 			day: '2-digit',
-		// 			month: '2-digit',
-		// 			year: 'numeric',
-		// 		};
-		// 		return event.toLocaleDateString(undefined, options);
-		// 	} else {
-		// 		console.log(date);
-		// 	}
-		// },
-
 		//Permet de séléctionner un ou plusieurs fichiers et de les télécharger
 		fileSelected(e) {
 			const files = e.target.files;
 			this.files = [...files];
-			// console.log(this.files.length);
-
-			// Pour récupérer plusieurs fichiers si ont en à besoin
-			// if (this.files.length > 1) {
-			// 	for (var i = 0; i < this.files.length; i++) {
-			// 		console.log(this.files[i]);
-			// 	}
-			// }
-
 			//Blocage de l'import de plusieurs fichiers
 			if (this.files.length > 1) {
 				this.$message({
@@ -176,7 +152,6 @@ export default {
 
 			this.upload(rawFile);
 			setTimeout(this.changeButtonName(), 5000);
-			//console.log(rawFile);
 		},
 
 		//Change la fonctionnalité du bouton
@@ -195,6 +170,7 @@ export default {
 			}
 		},
 
+		// Change le nom du bouton 
 		changeButtonName() {
 			var getTHead = document.getElementById('tableHead');
 			var getTBody = document.getElementById('tableBody');
@@ -209,6 +185,7 @@ export default {
 			}
 		},
 
+		// fonctionnalité pour annuler
 		onCancel() {
 			window.location.reload();
 		},
@@ -229,20 +206,10 @@ export default {
 		//permet de récupérer le(s) fichier(s) et de les envoyer en lecture
 		upload(rawFile) {
 			this.$refs['excel-upload-input'].value; // Permet de ne pas sélectionner le même excel
-			// console.log(this.$refs['excel-upload-input'].value);
-
-			//Voir si fonction nécessaire en réunion
-			// if (!this.beforeUpload) {
-			// 	this.readerData(rawFile);
-			// 	return;
-			// }
-			// const before = this.beforeUpload(rawFile);
-			// if (before) {
-
 			this.readerData(rawFile);
-			// }
 		},
 
+		//permet de vider les tableaux
 		resetValue() {
 			this.tableHeadFinal = [];
 			this.tableData = [];
@@ -277,7 +244,8 @@ export default {
 				reader.onload = e => {
 					var data = e.target.result;
 					var workbook = XLSX.read(data, { type: 'binary' });
-					// console.log(workbook);
+
+
 					//Si le fichier Excel contient plusieurs feuilles
 					if (workbook.SheetNames.length > 1) {
 						for (var i = 0; i < workbook.SheetNames.length; i++) {
@@ -293,8 +261,6 @@ export default {
 								//Récupère les données du fichier par rapport à son nom
 								var theSheets = workbook.Sheets[theSheetNames];
 
-								//Variable qui ne me sert pas pour le moment(à voir si modif du code nécessaire)
-								// var temp = [];
 								vm.tableHead.unshift('Sélect');
 								for (var row = 1; ; row++) {
 									//Vérifie si la première cellule est vide
@@ -347,7 +313,6 @@ export default {
 								}
 							}
 						}
-						// console.log(vm.tableHeadFinal);
 					} else {
 						//Si le fichier contient une seul feuille
 						var sheetName = workbook.SheetNames[0];
@@ -393,7 +358,6 @@ export default {
 								vm.tableHead = [];
 							} else {
 								vm.tableData.push(vm.tableRow);
-								// console.log(vm.tableData);
 								vm.tableRow = [];
 							}
 							this.loading = false;
@@ -436,9 +400,9 @@ export default {
 			}
 		},
 
-		isValidDate(d) {
-			return d instanceof Date && !isNaN(d);
-		},
+		// isValidDate(d) {
+		// 	return d instanceof Date && !isNaN(d);
+		// },
 
 		//////Partie Agence/////////
 		submit() {
@@ -448,6 +412,8 @@ export default {
 				var getInputs = document.querySelectorAll(
 					'input[class=switch]'
 				);
+
+				//Boucles sur le  tableau pour enregistrer chaques cellules en objet agence
 				do {
 					for (var j = 0; j < response.data.length; j++) {
 						if (
@@ -457,7 +423,6 @@ export default {
 						) {
 							this.agence.incident_id =
 								response.data[j].incident_id;
-							// console.log(this.agence.incident_id);
 						}
 					}
 					var getTitle = document.getElementById('title').innerHTML;
@@ -476,61 +441,18 @@ export default {
 
 					var dateDebut = new Date(this.tableData[i][1]);
 					var recupDaysAndMounth = this.tableData[i][1].split('/');
-					// var recupYear = recupDaysAndMounth[2].split(' ');
-					// var recupHoursAndMins = recupYear[1].split(':');
-					// console.log(recupDaysAndMounth);
-					// console.log(recupYear);
-					// console.log(recupDaysAndMounth[0]);
-					// console.log(recupDaysAndMounth[1]);
 					dateDebut.setDate(recupDaysAndMounth[0]);
 					dateDebut.setMonth(recupDaysAndMounth[1]);
-					// dateDebut.setFullYear(recupYear[0]);
-					// if (recupHoursAndMins[0] == '') {
-					// 	recupHoursAndMins[0] = '00';
-					// 	dateDebut.setHours(recupHoursAndMins[0]);
-					// } else {
-					// 	dateDebut.setHours(recupHoursAndMins[0]);
-					// }
-					// dateDebut.setMinutes(recupHoursAndMins[1]);
+					
 					dateDebut.toString(`dd,mm,yyyy`);
-					// console.log(dateDebut.getDate());
-					// console.log(dateDebut.getMonth());
-					// console.log(dateDebut.getFullYear());
-					// console.log(dateDebut.getHours());
-					// console.log(dateDebut.getMinutes());
+					
 
 					this.agence.date_debut = dateDebut;
-					// console.log(this.agence.date_debut);
+					
 
 					var dateFin = new Date(this.tableData[i][2]);
-					// if (dateFin != '' && dateFin != undefined) {
-					// 	recupDaysAndMounth = this.tableData[i][2].split('/');
-						// recupYear = recupDaysAndMounth[2].split(' ');
-						// recupHoursAndMins = recupYear[1].split(':');
-						// console.log(recupDaysAndMounth);
-						// console.log(recupYear);
-						// console.log(recupDaysAndMounth[0]);
-						// console.log(recupDaysAndMounth[1]);
-						// dateFin.setDate(recupDaysAndMounth[0]);
-						// dateFin.setMonth(recupDaysAndMounth[1]);
-						// dateFin.setFullYear(recupYear[0]);
-						// if (recupHoursAndMins[0] == '') {
-						// 	recupHoursAndMins[0] = '00';
-						// 	dateFin.setHours(recupHoursAndMins[0]);
-						// } else {
-						// 	dateFin.setHours(recupHoursAndMins[0]);
-						// }
-
-						// dateFin.setMinutes(recupHoursAndMins[1]);
-					// }
-
+				
 					dateFin.toString(`dd,mm,yyyy`);
-
-					// console.log(dateFin.getDate());
-					// console.log(dateFin.getMonth());
-					// console.log(dateFin.getFullYear());
-					// console.log(dateFin.getHours());
-					// console.log(dateFin.getMinutes());
 
 					this.agence.application_impactee = this.tableData[i][3];
 
@@ -566,7 +488,6 @@ export default {
 					} else if (this.tableData[i][7].includes('Clos')) {
 						this.agence.statut_id = 5;
 						this.agence.date_fin = dateFin;
-						// console.log(this.agence.dateFin);
 					}
 
 					this.agence.cause = this.tableData[i][8].trim();
@@ -579,6 +500,7 @@ export default {
 
 					this.agenceTable.push(this.agence);
 
+					// reset de l'objet agence pour chaque passage dans la boucle
 					this.agence = {
 						incident_id: 0,
 						reference: '', //
@@ -598,16 +520,18 @@ export default {
 					i++;
 				} while (i < this.tableData.length);
 
+				/**
+				 * filtre les références existantes pour garder que les réfs non existantes en BDD pour 
+				 * l'ajouts de celles-ci en BDD
+				 **/
+
 				var difValueBetweenTables = this.agenceTable.filter(
 					this.comparer(response.data)
 				);
 
 				for (let i = 0; i < difValueBetweenTables.length; i++) {
-					// console.log(
-					// 	'valeur non identique',
-					// 	difValueBetweenTables[i]
-					// );
 
+					//Boucle sur les inputs pour vérifier qu'elles ne sont pas checker
 					for (let j = 0; j < getInputs.length; j++) {
 						var getTdTBody = getInputs[j].parentNode,
 							getTrOfTBody = getTdTBody.parentNode;
@@ -616,13 +540,8 @@ export default {
 							getTrOfTBody.childNodes[1].innerHTML ==
 							difValueBetweenTables[i].reference
 						) {
-							console.log('je suis égale');
+							// console.log('je suis égale');
 							if (getInputs[i].checked == false) {
-								// console.log('je suis créé');
-								// console.log(difValueBetweenTables[i].reference);
-								// console.log(
-								// 	difValueBetweenTables[i].date_debut
-								// );
 								if (
 									difValueBetweenTables[i].date_debut != '' &&
 									difValueBetweenTables[i].date_debut !=
@@ -642,21 +561,17 @@ export default {
 									return false;
 								}
 							}
-						} //else {
-						// console.log('je ne suis pas égale');
-						// console.log(getTrOfTBody.childNodes[1].innerHTML);
-						// console.log(difValueBetweenTables[i].reference);
-						// }
+						} 
 					}
 				}
 
+				//filtre qui ressort les éléments identiques pour l'update 
 				this.agenceTable.forEach(element => {
 					this.filterResult = response.data.filter(
 						ref => element.reference === ref.reference
 					);
 
-					console.log('Le filter ', this.filterResult)
-
+					// Update des références existantes 
 					if (this.filterResult.length >= 1) {
 						for (let i = 0; i < this.agenceTable.length; i++) {
 							if (
@@ -665,11 +580,8 @@ export default {
 								)
 							) {
 								this.refUpdate = this.agenceTable[i];
-								// console.log(
-								// 	'valeurs existantes',
-								// 	this.refUpdate
-								// );
 
+								//Boucle sur les inputs pour vérifier qu'elles ne sont pas checker
 								for (let j = 0; j < getInputs.length; j++) {
 									var getTdTBody = getInputs[j].parentNode,
 										getTrOfTBody = getTdTBody.parentNode;
@@ -678,15 +590,7 @@ export default {
 										getTrOfTBody.childNodes[1].innerHTML ==
 										this.refUpdate.reference
 									) {
-										// console.log('je suis égale');
 										if (getInputs[i].checked == false) {
-											// console.log('je suis mis à jour');
-											// console.log(
-											// 	this.refUpdate.reference
-											// );
-											// console.log(
-											// 	this.refUpdate.date_debut
-											// );
 											if (
 												this.refUpdate.date_debut !=
 													'' &&
@@ -699,13 +603,7 @@ export default {
 												);
 											}
 										}
-									} //else {
-									// 	console.log('je ne suis pas égale');
-									// 	console.log(
-									// 		getTrOfTBody.childNodes[1].innerHTML
-									// 	);
-									// 	console.log(this.refUpdate.reference);
-									// }
+									} 
 								}
 							}
 							this.refUpdate = {};
@@ -725,6 +623,7 @@ export default {
 			});
 		},
 
+		//Permet de comparer les références identiques entre deux tableaux
 		comparer(tableau) {
 			return function(current) {
 				return (
@@ -737,6 +636,7 @@ export default {
 	},
 
 	computed: {
+		//Affiche le nom du document selectionné dans le modal d'ajout 
 		description() {
 			switch (this.files.length) {
 				case 0:
@@ -744,9 +644,6 @@ export default {
 				case 1:
 					return `${this.files[0].name}`;
 				default:
-					// Cas où ont pourraient sélectionner plusieurs fichiers
-					// return `${this.files.length} fichiers sélectionnés.`;
-
 					//Blocage du téléchargement de plusieurs fichiers
 					return 'Plusieurs fichiers sélectionnés !  Un seul fichier téléchargeable possible !';
 			}
