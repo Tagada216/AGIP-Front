@@ -48,6 +48,7 @@
 <script>
 // @ is an alias to /src
 import Grid from '@/components/Grid.vue';
+import { AgGridVue } from 'ag-grid-vue';
 import Splitpanes from 'splitpanes';
 import UpdateIncidentForm from '@/components/MyUpdateIncidentForm';
 import 'splitpanes/dist/splitpanes.css';
@@ -55,7 +56,7 @@ import Axios from 'axios';
 import JsonExcel from 'vue-json-excel';
 import { constants } from 'crypto';
 import methods from '@/components/MyUpdateIncidentForm';
-import { AgGridVue } from 'ag-grid-vue';
+
 
 export default {
     data() {

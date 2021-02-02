@@ -14,6 +14,7 @@
 <script>
 import { AgGridVue } from 'ag-grid-vue';
 
+
 function dateComparator(date1, date2) {
     var date1Number = monthToComparableNumber(date1);
     var date2Number = monthToComparableNumber(date2);
@@ -50,6 +51,7 @@ export default {
             rowData: this.rowData,
             columnDefs: this.columnDefs,
             rowSelection: 'single',
+            date_cosip_selec:""
         };
     },
 
@@ -66,6 +68,7 @@ export default {
             .get(this.dataLink)
             .then(response => this.setGridData(response.data));
     },
+
     methods: {
         setGridData(data) {
             this.setColDef(Object.keys(data[0]));
@@ -94,7 +97,9 @@ export default {
                 this.$emit('CosipSelected', event.data.id);
             }
         },
+
     },
+
 };
 </script>
 
