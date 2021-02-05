@@ -1,4 +1,5 @@
 <template>
+	<div>
     <el-form ref="form" :model="form" :rules="rules" label-position="top">
         <el-row :gutter="20">
             <el-col :span="6">
@@ -830,6 +831,7 @@
             >			
         </el-form-item>
     </el-form>
+	</div>
 </template>
 
 <script>
@@ -837,10 +839,11 @@ import Axios from 'axios';
 import Vue from 'vue'
 import CreateIncidentFormVue from './CreateIncidentForm.vue';
 import { readFile, watch } from 'fs';
-import { importSpecifier, thisTypeAnnotation } from 'babel-types';
+import { importSpecifier, thisTypeAnnotation, identifier } from 'babel-types';
 import readXlsxFile from 'read-excel-file'
 import { setTimeout } from 'timers';
 import { constants } from 'crypto';
+import methods from '@/components/CosipWeek';
 export default {
 	mounted(){
 		this.verifURL()  // Lance la focntion au "chargement" de la page
@@ -868,7 +871,6 @@ export default {
 
     data() {
         return {
-
 			url:'',
 			checkedImpactBDDF: false,
 			isCosip: false,
@@ -1455,7 +1457,10 @@ export default {
 						var semaineCosip = Math.round((ms - dateDebut.valueOf()) / (7*864e5))+1
 						//Fin du calcul
 
-						this.form.semaine_cosip=dateDebut.getFullYear()+"/S"+semaineCosip
+						this.form.semaine_cosip="S"+semaineCosip+"_"+dateDebut.getFullYear()
+						
+
+
 						if(response.data[0].statut==5)
 						{
 							this.form.statut_id="Terminé"
@@ -1525,16 +1530,8 @@ export default {
 					this.form.references = [];
 					this.form.application_impactee = [];
 
-					//Calcul du numéro de la semaine en fonction de la date de début
-					var jour = dateDebut.getDay();
-					dateDebut.setDate(dateDebut.getDate() - (jour + 6) % 7 + 3);
-					var ms = dateDebut.valueOf();
-					dateDebut.setMonth(0)
-					dateDebut.setDate(4)
-					var semaineCosip = Math.round((ms - dateDebut.valueOf()) / (7*864e5))+1
-					//Fin du calcul
 
-					this.form.semaine_cosip=dateDebut.getFullYear()+"/S"+semaineCosip
+					this.form.semaine_cosip=response.data[0].semaine_cosip
 
 					// Ajout d'un 0 devant le mois si celui-ci est inférieur strict à 10
 					if(numeroMois<10)
@@ -1750,8 +1747,9 @@ export default {
                         .toLowerCase()
                         .indexOf(queryString.toLowerCase()) != -1
                 );
-            };
+			};
 		},
+
         ////////////////////////////////////////
 
 	},
