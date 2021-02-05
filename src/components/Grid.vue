@@ -51,10 +51,10 @@ export default {
             rowData: this.rowData,
             columnDefs: this.columnDefs,
             rowSelection: 'single',
-            date_cosip_selec:""
+            date_cosip_selec:"",
+            url:''
         };
     },
-
     components: {
         'ag-grid-vue': AgGridVue,
     },
@@ -67,6 +67,7 @@ export default {
         this.$http
             .get(this.dataLink)
             .then(response => this.setGridData(response.data));
+
     },
 
     methods: {
@@ -99,6 +100,11 @@ export default {
         },
 
     },
+    watch:{
+        cosip_url: function cosipUrlUpdate (){
+            this.$forceUpdate()
+        } 
+    }
 
 };
 </script>

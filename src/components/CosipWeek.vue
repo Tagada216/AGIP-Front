@@ -1,8 +1,11 @@
 <template>
     <div style="100vh">
+        <el-button type="primary" class="button-ok" plain @click="getCurrentCosipWeek()" round>
+            Afficher la semaine COSIP Courante </el-button>
         <el-button class="btnModalWeek" type="info" @click="openWeekModal()" round
-            >Sélectionner une ancienne semaine COSIP</el-button
-        >
+            >Sélectionner une ancienne semaine COSIP</el-button>
+        <el-button type="info" class="button-ok" plain @click="all()" round>
+            Afficher tous les incidents au COSIP</el-button>
 		<div>			
             <h4>Semaine COSIP : {{displaySemaineCosip}}</h4>
         </div>
@@ -17,7 +20,6 @@
                     format=" WW/yyyy"
                 />
             </div>
-            <el-button type="info" class="button-ok" plain @click="ok()">Afficher tous les incidents au Cosip</el-button>
             <el-button type="success" class="button-ok" @click="displaySelectWeek(date_cosip_select)">Afficher la semaine sélectionné</el-button>
             <br>
             <el-button type="danger" class="cancelbtn" @click="cancel()">Annuler</el-button>
@@ -30,18 +32,21 @@ import Vue from 'vue';
 import methods from '@/components/CosipForm';
 import VModal from 'vue-js-modal';
 
+
 Vue.use(VModal, { componentName: 'modal' });
 
 export default {
     created(){
-		this.getCurrentCosipWeek();
+        this.displaySemaineCosip = localStorage.getItem('WEEK_COSIP')
     },
+
     data() {
         return {
             date_cosip_select:"",
             selectCosipWeek:'',
             displaySemaineCosip:"",
-            url_api:""
+            url_api:"",
+
         };
     },
 
@@ -55,11 +60,16 @@ export default {
 			dateDebut.setMonth(0)
 			dateDebut.setDate(4)
             var semaineCosip = Math.round((ms - dateDebut.valueOf()) / (7*864e5))+1
+            this.displaySemaineCosip = "S"+(semaineCosip-1)+"_"+dateDebut.getFullYear()
+            this.url_api = "http://localhost:5000/api/cosip/week/" + this.displaySemaineCosip
             
-            this.displaySemaineCosip = "S"+(semaineCosip-1)+"/"+dateDebut.getFullYear()
+            //Sauvegarde dans le stockageLocal
+            localStorage.setItem('URL_COSIP', this.url_api)
+            localStorage.setItem('WEEK_COSIP', this.displaySemaineCosip)
+            window.location.reload()
         },
         getCosipWeek(selectDate){
-            console.log("La semaine sélectionné est: ", selectDate)
+
             const date = new Date(selectDate);
             var jour = date.getDay();
             date.setDate(date.getDate() - (jour+6)% 7 + 3);
@@ -68,8 +78,13 @@ export default {
             date.setDate(4)
             var semaineCosip = Math.round((ms - date.valueOf())/(7*864e5))+1
             this.displaySemaineCosip = "S"+(semaineCosip)+"_"+date.getFullYear()
+            this.url_api = "http://localhost:5000/api/cosip/week/" + this.displaySemaineCosip
 
-           return this.url_api = "http://localhost:5000/api/cosip/week/" + this.displaySemaineCosip
+            ////Sauvegarde dans le stockageLocal
+            localStorage.setItem('URL_COSIP', this.url_api)
+            console.log('Semaine cosip sélectionné', this.displaySemaineCosip)
+            localStorage.setItem('WEEK_COSIP', this.displaySemaineCosip)
+            window.location.reload()
         },
 
 
@@ -90,6 +105,14 @@ export default {
             this.confirmed = true;
             this.getCosipWeek(week)
             
+        },
+        //Affichage de tous les incident au cosip
+        all(){
+            this.$modal.hide('selectWeekModal')
+            this.confirmed = true;
+            localStorage.setItem('URL_COSIP', 'http://localhost:5000/api/cosip')
+            localStorage.setItem('WEEK_COSIP', "Tous les incidents au COSIP")
+            window.location.reload()
         }
     },
 };

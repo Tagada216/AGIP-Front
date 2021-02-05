@@ -19,13 +19,13 @@
 
         <splitpanes watch-slots class="default-theme" horizontal>
             <div splitpanes-size="0" splitpanes-max="2"></div>
-            <grid v-if="date_cosip_selec"
+            <grid
                 splitpanes-size="50"
                 splitpanes-min="15"
                 splitpanes-max="100"
                 style="height: 100%"
                 @CosipSelected="updateRef"
-				:dataLink="date_cosip_selec"
+				:dataLink="cosip_url"
             />
             <CosipForm
                 :idCos="curId"
@@ -39,7 +39,7 @@
 </template>
 <script>
 
-
+import Vue from 'vue';
 import { AgGridVue } from 'ag-grid-vue';
 import CosipWeek from '@/components/CosipWeek.vue'
 import Splitpanes from 'splitpanes';
@@ -51,16 +51,18 @@ import Axios from 'axios';
 import Grid from '@/components/Grid.vue';
 import { constants } from 'crypto';
 
+
+
 export default {
     created(){
-        this.getWeekURL()
+        this.cosip_url = localStorage.getItem('URL_COSIP')
     },
     data(){
         return{
             curId: '',
             exportFileName: "Référentiel Incidents Majeurs",
             displaySemaineCosip:'',
-            date_cosip_selec:"",
+            cosip_url:"",
         }
     },
 
@@ -80,7 +82,7 @@ export default {
         },
         async fetchCosip() {
             const response = await this.$http.get(
-                'http://localhost:5000/api/cosip'
+                this.cosip_url
             )
             return response.data;
         },
@@ -92,14 +94,9 @@ export default {
 			const now = new Date()
 			return `Référentiel Incidents Majeurs ${now.toLocaleDateString().replace(/\//g,'-')} ${now.toLocaleTimeString()}`
         },
-        async getWeekURL(){
-        const rep = await this.$http
-            .get('http://localhost:5000/api/cosip/url/week')
-            
-            this.date_cosip_selec = rep.data[0].url_cosip;
-        },
+    },
 
-    }
+
 };
 </script>
 
@@ -110,4 +107,34 @@ div.splitpanes
 
 div.splitpanes__pane
   overflow: auto
+#pane_1
+  &div
+    height: 100%
+#pane_2
+    background-color: white
+div.default-theme.splitpanes--horizontal
+    >div.splitpanes__splitter
+        background-color: #2a2a2e
+        border: none
+        height: 12px
+        &::before
+            background-color: white
+        &::after
+            background-color: white
+.header-btn
+    line-height: 70px
+    height: 70px
+    width: 70px
+    padding: 0
+    margin: 0
+    float: right
+    border: none
+    color: white
+    font-size: 50px
+    background-color: #2a2a2e
+    &:hover
+        background-color: #b7011d
+        cursor: pointer
+    &:focus
+        border: none
 </style>
