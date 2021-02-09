@@ -334,7 +334,7 @@
 		<!-- Fin Modal de confirmation de suppression d'une application impactée-->
 
 		<el-form-item style="text-align: center">
-			<el-button type="primary" class="button" @click="onSubmit()">Sauvegarder</el-button>
+			<el-button type="primary" class="button" @click="onSubmit() ">Sauvegarder</el-button>
 			<el-button type="primary" class="button" @click="envoyerMail()">Envoyer un mail</el-button>
 			<el-button type="primary" class="button" @click="dupliquer()">Dupliquer</el-button>
 			<el-button type="primary" class="button" @click="cosip()">Cosip</el-button>
@@ -356,6 +356,7 @@ import { importSpecifier, thisTypeAnnotation, identifier } from 'babel-types';
 import readXlsxFile from 'read-excel-file';
 import { setTimeout } from 'timers';
 import { constants } from 'crypto';
+import { Loading } from 'element-ui';
 export default {
 	created() {
 		this.getFieldsOptions();
@@ -520,8 +521,10 @@ export default {
 			this.form.application_impactee[appIndex] = appSelection;
 		},
 		onSubmit() {
-			console.log(this.form);
-
+			
+			let loadingInstance = Loading.service({fullscreen: true,text:"Chargement des donnée ...",
+					background: "rgba(0, 0, 0, 0.7)"})
+							
 			// Vérification Trigramme not udefined 
 			for(let i = 0; i < this.form.application_impactee.length; i++){
 				if((this.form.application_impactee[i].trigramme === undefined) && (this.form.application_impactee[i].code_irt !== undefined)){
@@ -555,6 +558,7 @@ export default {
 								"<h2 style='font-family: arial'>Cet incident est au cosip</h2> <p style='font-family: arial'>==> Modifier le depuis l'onglet <strong>Cosip</strong></p>",
 							type: 'error',
 						});
+						loadingInstance.close();
 						return false;
 					}
 					/*// On vérifie qu'il y a au moins une référence
@@ -575,6 +579,7 @@ export default {
 								"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Au moins une <strong>Référence</strong> doit être renseignée.</p>",
 							type: 'error',
 						});
+						loadingInstance.close();
 						return false;
 					}
 					// On vérifie qu'il y a au moins une application impactée
@@ -585,6 +590,7 @@ export default {
 								"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Au moins une <strong>Application</strong> doit être renseignée.</p>",
 							type: 'error',
 						});
+						loadingInstance.close();
 						return false;
 					}
 
@@ -605,6 +611,7 @@ export default {
 									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Veuillez remplir le(s) champ(s) 'Application(s) impactée(s) ouvert(s).</p>",
 								type: 'error',
 							});
+							loadingInstance.close();
 							return false;
 						}
 					}
@@ -616,7 +623,7 @@ export default {
 							this.form.references[i].reference == '' &&
 							this.form.statut_id != 5
 						) {
-							this.form.references[i].reference = 'A venir';
+			 			  this.form.references[i].reference = 'A venir';
 						} else if (
 							(this.form.references.length == 1 &&
 								this.form.references[i].reference == '') ||
@@ -642,9 +649,10 @@ export default {
 							this.$message({
 								dangerouslyUseHTMLString: true,
 								message:
-									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Si il y à plus de deux références veuillez remplir les champs au format : \"P00IN-0000000\".</p>",
+									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Veuillez remplir les champs au format : \"P00IN-0000000\".</p>",
 								type: 'error',
 							});
+							loadingInstance.close();
 							return false;
 						}
 						if (
@@ -657,6 +665,7 @@ export default {
 									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Le Statut de l'incident est en <strong>Résolu</strong> le champs <strong>Fin de l'incident est obligatoire</strong> .</p>",
 								type: 'error',
 							});
+							loadingInstance.close();
 							return false;
 						}
 					}
@@ -674,7 +683,11 @@ export default {
 									"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
 								type: 'success',
 							});
-							window.location.reload();
+							setTimeout(function(){
+								loadingInstance.close();	
+								window.location.reload();
+							},4000);
+							
 						});
 				} else {
 					this.$message({
@@ -683,9 +696,11 @@ export default {
 							"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Tous les <strong>Champs requis</strong> n'ont pas été remplis.</p>",
 						type: 'error',
 					});
+					loadingInstance.close();
 					return false;
 				}
 			});
+			
 		},
 
 		///////Partie Agence/////////
@@ -1198,4 +1213,5 @@ th:first-child .cell
 	&::before
 		content: "* "
 		color: red
+
 </style>
