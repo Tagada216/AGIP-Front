@@ -7,7 +7,7 @@
         <el-button type="info" class="button-ok" plain @click="all()" round>
             Afficher tous les incidents au COSIP</el-button>
 		<div>			
-            <h4>Semaine COSIP : {{displaySemaineCosip}}</h4>
+            <h4 class="text-red-500">Semaine COSIP : {{displaySemaineCosip}}</h4>
         </div>
         <modal class="modal" name="selectWeekModal">
             <h4> Sélectionner une semaine à afficher : </h4>
