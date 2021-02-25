@@ -9,7 +9,7 @@ export default new Router({
 	base : process.env.BASE_URL,
 	routes: [
 		{
-			path: '/',
+			path: '/home',
 			name: 'home',
 			component: Home,
 		},
@@ -63,6 +63,25 @@ export default new Router({
 			path: '/agences',
 			component: () => import('./views/GestionAgence.vue')
 		},
+		{
+			path:'*',
+			redirect:'home'
+		}
 	
 	],
 });
+
+// router.beforeEach((to, from, next) => {
+// 	store.dispatch('fetchAccessToken');
+// 	if (to.fullPath === '/users') {
+// 	  if (!store.state.accessToken) {
+// 		next('/login');
+// 	  }
+// 	}
+// 	if (to.fullPath === '/home') {
+// 	  if (store.state.accessToken) {
+// 		next('/users');
+// 	  }
+// 	}
+// 	next();
+//   });

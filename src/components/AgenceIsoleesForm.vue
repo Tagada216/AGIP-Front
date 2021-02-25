@@ -176,7 +176,7 @@ export default {
 
 			this.upload(rawFile);
 			setTimeout(this.changeButtonName(), 5000);
-			console.log(rawFile);
+			// console.log(rawFile);
 		},
 
 		//Change la fonctionnalité du bouton
