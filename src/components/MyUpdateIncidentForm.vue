@@ -411,6 +411,7 @@ export default {
 				impact_avereCDN: '',
 				impact_avereBDDF: '',
 				impact_avereBPF: '',
+
 				gravite_idCDN: '',
 				gravite_idBPF: '',
 				gravite_idBDDF: '',
@@ -545,7 +546,7 @@ export default {
 				this.form.origine = '';
 				this.form.action_retablissement = '';
 				this.form.plan_action = '';
-			}
+			}//  Vérifier avant la modification si l'incident est au COSIP si c'est le cas le modifier depuis l'onglet : COSIP car plus d'infos sur celui-ci 
 			this.$refs['form'].validate(valid => {
 				if (valid) {
 					if (
@@ -1011,7 +1012,6 @@ export default {
                 'http://localhost:5000/api/main-courante/' + idIncident
             ).then(response => {
 				this.form.incident_id = this.incident_id;
-				console.log(this.form.incident_id);
                 this.form.description = response.data[0].description;
                 this.form.date_debut = response.data[0].date_debut;
                 this.form.date_fin = response.data[0].date_fin;
@@ -1043,13 +1043,11 @@ export default {
 				this.form.references = [];
                 this.form.application_impactee = [];
                 this.form.cosip_id = response.data[0].cosip_id
-                console.log("La référence récup : ", response.data[0].reference)
                 for (const ens_id of response.data[0].id_enseigne.split('/')) {
 					this.form.enseigne_impactee.push(parseInt(ens_id));
 				}
 
 				// console.log("Nb ref ", response.data[0].reference_id.split('/').length)
-				console.log("Nb ref ", response.data[0].reference_id);
 				//Gestion pour la récupération des référence 
                 for (
                     let index = 0;
@@ -1063,10 +1061,6 @@ export default {
 						reference: ref, 
                     });
 				}
-
-				// for (const app of response.data[0].display_name.split('|||')) {
-				// 	this.form.application_impactee.push({ display_name: app });
-				// }
 
 				//Récupération des applications
 				for (
@@ -1114,7 +1108,7 @@ export default {
 						gravite: graviteNom,
 						id_grav: graviteA,
 						class: criticite,
-					});
+					}); // Switch case pour récupérer les données qui sont indépendantes en fonction de l'enseigne
 					switch (this.tab_enseignes[index].enseigne_id) {
 						case '1':
 							this.form.description_impactBDDF = this.tab_enseignes[

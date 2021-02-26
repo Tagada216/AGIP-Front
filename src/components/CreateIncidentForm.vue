@@ -84,7 +84,7 @@
 						<h4 class="card-header">Agences isolées</h4>
 					</div>
 					<input type="file" id="file" ref="fichierAgence" @change="importer" style="margin-left:10px;" />
-				</el-card> -->
+				</el-card>-->
 				<!-- Fin agences isolées-->
 			</el-col>
 
@@ -281,6 +281,7 @@ export default {
 
 	data() {
 		return {
+			verifRefExistante : false,
 			// Données énumérées venant de l'API
 			remoteEnum: {
 				priorites: [],
@@ -396,6 +397,18 @@ export default {
 		isValid(value) {
 			return /^P\d{2,}[IN|PB|CH|RQ]{2,}[-]{1,}\d{7,}$/.test(value);
 		},
+
+		verifUniqueRef(value) {
+			Axios.get('http://localhost:5000/api/reference').then(response => {
+				for (var j = 0; j < response.data.length; j++) {
+					if (response.data[j].reference.includes(value)) {
+						this.verifRefExistante = false
+					} 
+					this.verifRefExistante = true
+				}
+			});
+			return this.verifRefExistante
+		},
 		// Cette méthode est lancée quand un champ d'appli impacté s'est vu selectionné une appli parmis les propositions
 		// Quand tel est le cas, on insere les données de l'appli (CI et trigramme) pour pouvoir la relier en BDD
 		appSelected(appSelection) {
@@ -413,6 +426,7 @@ export default {
 			this.$refs['form'].validate(valid => {
 				if (valid) {
 					// On vérifie qu'il y a au moins une référence
+					
 					if (this.form.references.length == 0) {
 						this.$message({
 							dangerouslyUseHTMLString: true,
@@ -438,6 +452,8 @@ export default {
 						i < this.form.application_impactee.length;
 						i++
 					) {
+						this.verifUniqueRef(this.form.references[i].reference)
+					
 						// On vérifie qu'il y a au moins une application impactée
 						if (
 							this.form.application_impactee.length >= 1 &&
@@ -456,6 +472,8 @@ export default {
 					// On parcourt tous les champs référence
 					for (let i = 0; i < this.form.references.length; i++) {
 						// Si le premier champs est vide on écrit "A venir"
+						this.verifUniqueRef(this.form.references[i].reference)
+						// console.log(this.verifRefExistante)
 						if (
 							this.form.references.length == 1 &&
 							this.form.references[i].reference == '' &&
@@ -491,11 +509,28 @@ export default {
 							this.$message({
 								dangerouslyUseHTMLString: true,
 								message:
-									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Si il y à plus de deux <strong>Références</strong> </br><strong>ou</strong></br>==> Si le <strong>Statut est Résolu<strong/> veuillez remplir le(s) champs <strong>Référence</strong> au format : \"P00IN-0000000\".</p>",
+									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> La <strong>Références</strong> est déjà existante </br><strong>ou</strong></br>==> Si le <strong>Statut est Résolu<strong/> veuillez remplir le(s) champs <strong>Référence</strong> au format : \"P00IN-0000000\".</p>",
 								type: 'error',
 							});
 							return false;
 						}
+
+						// Vérifications permettant de ne pas avoir de références en double
+						if (
+							!this.verifRefExistante
+							) 
+						{
+							console.log("je rentre dans le if")
+							this.$message({
+								dangerouslyUseHTMLString: true,
+								message:
+									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> La <strong>Références</strong> est déjà existante </p>",
+								type: 'error',
+							});
+							return false;
+						}
+
+
 						if (
 							this.form.statut_id === 5 &&
 							this.form.date_fin === null
