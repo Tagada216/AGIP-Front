@@ -152,10 +152,7 @@ export default {
 
 			this.upload(rawFile);
 			setTimeout(this.changeButtonName(), 5000);
-<<<<<<< HEAD
 			// console.log(rawFile);
-=======
->>>>>>> origin/tailwind
 		},
 
 		//Change la fonctionnalité du bouton
