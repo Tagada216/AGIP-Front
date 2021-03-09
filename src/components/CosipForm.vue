@@ -1228,7 +1228,6 @@ export default {
 						
 		},
 		onUpdate(){
-			console.log(this.form)
 			//Modification des impact avéré en int et non String pour les rendres utilisable.
 			if(this.form.gravite_idBDDF.length > 2){
 				switch(this.form.gravite_idBDDF){
