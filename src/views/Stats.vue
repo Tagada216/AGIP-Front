@@ -12,7 +12,7 @@
 <script>
 import StatsComponent from  '@/components/StatsComponent.vue'
 export default {
-
+name: 'stats',
 
 components: {
     StatsComponent

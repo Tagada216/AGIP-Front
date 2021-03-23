@@ -653,7 +653,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 $redColor: #ed1a3a;
 $blackColor: #2c3e50;
 

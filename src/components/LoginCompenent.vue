@@ -1,5 +1,5 @@
 <template>
-	<modal v-model="modal" class="loginModal" name="loginModal" :width="340"
+	<modal v-model="modal" class="loginModal" name="loginModal" :width="355"
          :height="400" shiftX:0.5 shiftY:0.5>
 		<div class="login">
 			<el-card>
@@ -11,10 +11,10 @@
 					ref="form"
 					@submit.native.prevent="login"
 				>
-					<el-form-item prop="username">
+					<el-form-item prop="matricule">
 						<el-input
-							v-model="model.username"
-							placeholder="Nom d'utilisateur"
+							v-model="model.matricule"
+							placeholder="Matricule"
 							prefix-icon="fas fa-user"
 						></el-input>
 					</el-form-item>
@@ -54,16 +54,16 @@ import VModal from 'vue-js-modal';
 Vue.use(VModal, { componentName: 'modal' });
 
 export default {
-    name: 'login',
+    name: 'home',
 	data() {
 		return {
-            modal: false,
-			validCredentials: {
-				username: 'lightscope',
-				password: 'lightscope',
-			},
+            // modal: false,
+			// validCredentials: {
+			// 	username: 'lightscope',
+			// 	password: 'lightscope',
+			// },
 			model: {
-				username: '',
+				matricule: '',
 				password: '',
 			},
 			loading: false,
@@ -115,7 +115,26 @@ export default {
 				this.model.username === this.validCredentials.username &&
 				this.model.password === this.validCredentials.password
 			) {
-				this.$message.success('Login successfull');
+				this.this.$http.post(
+					'http://localhost:5000/api/login',
+					 this.matricule,
+					 this.password)
+				.then(response =>{
+					localStorage.setItem('user',JSON.stringify(response.data.user))
+					localStorage.setItem("jwt", response.data.token)
+
+					if(localStorage.getItem('jwt') !=null){
+						this.$emit('loggedIn')
+						if(this.$route.params.nextUrl != null){
+							this.$route.push(this.$route.params.nextUrl)
+						}
+					}
+					this.$message.success('Login successfull');
+				})
+				.catch(function(error){
+					console.log(error.response);
+				})
+				
 			} else {
 				this.$message.error('Username or password is invalid');
 			}
@@ -123,6 +142,7 @@ export default {
     },
 };
 </script>
+//A487423
 // @GiPro
 <style lang="scss" scoped>
 .login {

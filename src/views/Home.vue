@@ -1,7 +1,7 @@
 <template>
 	<div class="home">
 		<base-header title="Accueil">
-			<el-button class="button" @click="showModal()">Connexion</el-button>
+			<el-button class="rounded-lg float-right mr-5 mt-3" @click="showModal()">Connexion</el-button>
 		</base-header>
 		<img alt="Vue logo" src="../assets/Logo AGIPRO et subtitle_v2.svg" />
 		<h1 class="welcomeHeader">Bienvenue dans AGIPROS</h1>
