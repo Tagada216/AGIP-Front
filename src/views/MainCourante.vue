@@ -59,6 +59,7 @@ import methods from '@/components/MyUpdateIncidentForm';
 
 
 export default {
+    name: 'mainCourante',
     data() {
         return { 
 			curID: 1,

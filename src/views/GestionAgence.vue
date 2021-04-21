@@ -46,6 +46,7 @@ import { arraySlugToHeader, arraySlugifier, arrayToJSON } from '../etlUtils';
 import AgenceForm from '../components/AgenceForm';
 
 export default {
+	name: 'agences',
 	components: {
 		DndFileInput,
 		AgenceForm,

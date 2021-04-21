@@ -9,6 +9,7 @@
 import CreateIncidentForm from '@/components/CreateIncidentForm';
 
 export default {
+    name: "incident",
     components: {
 		CreateIncidentForm,
     },

@@ -54,6 +54,7 @@ import { constants } from 'crypto';
 
 
 export default {
+    name:'cosip',
     created(){
         this.cosip_url = localStorage.getItem('URL_COSIP')
     },

@@ -40,6 +40,7 @@ import JsonExcel from 'vue-json-excel';
 
 
 export default {
+    name: 'fichierRouge',
     data() {
         return {
 			exportFileName: '',

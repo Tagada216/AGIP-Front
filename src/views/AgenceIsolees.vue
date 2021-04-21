@@ -30,6 +30,7 @@ import Splitpanes from 'splitpanes';
 import 'splitpanes/dist/splitpanes.css';
 
 export default {
+    name: "agenceIsolee",
 	components: {
 		AgenceIsoleesForm,
 		Grid,

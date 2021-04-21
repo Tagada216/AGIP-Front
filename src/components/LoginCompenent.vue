@@ -1,0 +1,231 @@
+<template>
+	<modal v-model="modal" class="loginModal" name="loginModal" :width="355"
+         :height="400" shiftX:0.5 shiftY:0.5>
+		<div class="login">
+			<el-card>
+				<h2>Connextion</h2>
+				<el-form
+					class="login-form"
+					:model="model"
+					:rules="rules"
+					ref="form"
+					@submit.native.prevent="login"
+				>
+					<el-form-item prop="matricule">
+						<el-input
+							v-model="model.matricule"
+							placeholder="Matricule"
+							prefix-icon="fas fa-user"
+						></el-input>
+					</el-form-item>
+					<el-form-item prop="password">
+						<el-input
+							v-model="model.password"
+							placeholder="Mot de passe"
+							type="password"
+							prefix-icon="fas fa-lock"
+						></el-input>
+					</el-form-item>
+					<el-form-item>
+						<el-button
+							:loading="loading"
+							class="login-button"
+							type="primary"
+							native-type="submit"
+							block
+							>Connexion</el-button
+						>
+					</el-form-item>
+					<a
+						class="forgot-password"
+						href=""
+						>Mot de passe oublié ?</a
+					>
+				</el-form>
+			</el-card>
+		</div>
+	</modal>
+</template>
+
+<script>
+import Vue from 'vue';
+import VModal from 'vue-js-modal';
+
+Vue.use(VModal, { componentName: 'modal' });
+
+export default {
+    name: 'home',
+	data() {
+		return {
+            modal: false,
+			// validCredentials: {
+			// 	username: 'lightscope',
+			// 	password: 'lightscope',
+			// },
+			// connect: false,
+			model: {
+				matricule: '',
+				password: '',
+			},
+			loading: false,
+			rules: {
+				username: [
+					{
+						required: true,
+						message: 'Nom utilisateur requis',
+						trigger: 'blur',
+					},
+					{
+						min: 5,
+						message:
+							'Le mot de passe doit avoir au moins 5 caractères',
+						trigger: 'blur',
+					},
+				],
+				password: [
+					{
+						required: true,
+						message: 'Mot de passe requis',
+						trigger: 'blur',
+					},
+					{
+						min: 5,
+						message:
+							'Le mot de passe doit avoir au moins 5 caractères',
+						trigger: 'blur',
+					},
+				],
+			},
+		};
+	},
+	methods: {
+		simulateLogin() {
+			return new Promise(resolve => {
+				setTimeout(resolve, 800);
+			});
+		},
+		async login(e) {
+			e.preventDefault()
+			let valid = await this.$refs.form.validate();
+			if (!valid) {
+				return;
+			}
+			this.loading = true;
+			await this.simulateLogin();
+			this.loading = false;
+			// if (
+			// 	this.model.username === this.validCredentials.username &&
+			// 	this.model.password === this.validCredentials.password
+			// ) {
+				console.log(this.model.matricule)
+				console.log(this.model.password)
+				this.$http.post(
+					'http://localhost:5000/api/login',{
+						matricule:  this.model.matricule,
+						password : this.model.password
+					})
+				.then(response =>{
+					console.log(response.data)
+					localStorage.setItem('user',JSON.stringify(response.data.user))
+					localStorage.setItem("jwt", response.data.token)
+					// console.log(response.data.refreshToken)
+					if(localStorage.getItem('jwt') !=null){
+						this.$emit('loggedIn')
+						if(this.$route.params.nextUrl != null){
+							this.$router.push(this.$route.params.nextUrl);
+						}else{
+							console.log(localStorage.getItem('jwt'))
+							this.$router.push('new-incident').catch(()=>{})
+						}
+					}
+					this.$message.success('Login successfull');
+					this.$modal.hide();
+					this.connect = true
+					console.log(this.connect)
+					
+				})
+				.catch(function(error){
+					console.log(error.response);
+				})
+				
+			// } else {
+			// 	this.$message.error('Username or password is invalid');
+			// }
+		},
+    },
+};
+</script>
+//A487423
+// @GiPro
+<style lang="scss" scoped>
+.login {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.login-button {
+	width: 100%;
+	margin-top: 40px;
+}
+.login-form {
+	width: 290px;
+}
+.forgot-password {
+	margin-top: 10px;
+}
+$red: #ed1a3a;
+.el-button--primary {
+	background:$red;
+	border-color: $red;
+
+	&:hover,
+	&.active,
+	&:focus {
+		background: lighten($red, 7);
+		border-color: lighten($red, 7);
+	}
+}
+.login .el-input__inner:hover {
+	border-color: $red;
+}
+.login .el-input__prefix {
+	background: rgb(238, 237, 234);
+	left: 0;
+	height: calc(100% - 2px);
+	left: 1px;
+	top: 1px;
+	border-radius: 3px;
+	.el-input__icon {
+		width: 30px;
+	}
+}
+.login .el-input input {
+	padding-left: 35px;
+}
+.login .el-card {
+	padding-top: 0;
+	padding-bottom: 30px;
+}
+h2 {
+	font-family: 'Open Sans';
+	letter-spacing: 1px;
+	font-family: Roboto, sans-serif;
+	padding-bottom: 20px;
+}
+a {
+	color: #d1939c;
+	text-decoration: none;
+	&:hover,
+	&:active,
+	&:focus {
+		color: lighten($red, 7);
+	}
+}
+.login .el-card {
+	width: 340px;
+	display: flex;
+	justify-content: center;
+}
+</style>

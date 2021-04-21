@@ -19,7 +19,9 @@ import {
 	faFileExcel,
 	faTasks,
 	faBuilding,
-	faFolderPlus
+	faFolderPlus,
+	faUser,
+	faLock
 } from '@fortawesome/free-solid-svg-icons';
 
 library.add(
@@ -34,6 +36,8 @@ library.add(
 	faFileExcel,
 	faTasks,
 	faBuilding,
-	faFolderPlus
+	faFolderPlus,
+	faUser,
+	faLock
 );
 ///////////////////////////////////////////////////////////////////////////////

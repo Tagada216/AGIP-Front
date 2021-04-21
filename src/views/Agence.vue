@@ -11,6 +11,7 @@ import Splitpanes from 'splitpanes';
 import 'splitpanes/dist/splitpanes.css';
 
 export default {
+    name: 'majAgence',
     components: {
     PartieAgence,
     Grid,

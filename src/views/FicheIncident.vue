@@ -8,6 +8,7 @@
 import Cosip from '@/components/CosipForm';
 
 export default {
+  name: "codipId",
     components: {
 		Cosip,
     },
