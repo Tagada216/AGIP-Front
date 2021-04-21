@@ -516,19 +516,19 @@ export default {
 						}
 
 						// Vérifications permettant de ne pas avoir de références en double
-						if (
-							!this.verifRefExistante
-							) 
-						{
-							console.log("je rentre dans le if")
-							this.$message({
-								dangerouslyUseHTMLString: true,
-								message:
-									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> La <strong>Références</strong> est déjà existante </p>",
-								type: 'error',
-							});
-							return false;
-						}
+						// if (
+						// 	!this.verifRefExistante
+						// 	) 
+						// {
+						// 	console.log("je rentre dans le if")
+						// 	this.$message({
+						// 		dangerouslyUseHTMLString: true,
+						// 		message:
+						// 			"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> La <strong>Références</strong> est déjà existante </p>",
+						// 		type: 'error',
+						// 	});
+						// 	return false;
+						// }
 
 
 						if (

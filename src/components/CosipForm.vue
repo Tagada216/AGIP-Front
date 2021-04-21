@@ -258,14 +258,11 @@
 
 										<el-col :span="6">
 											<el-form-item label="Impact Avéré" prop="gravite_idBDDF">
-												<el-select
-													id="impact_avereBDDF"
-													v-model="form.impact_avereBDDF"
-												>
+												<el-select v-model="form.gravite_idBDDF">
 													<el-option
 														v-for="item in remoteEnum.gravite"
 														:key="item.id"
-														:label="item.Nom"
+														:label="item.nom"
 														:value="item.id"
 													></el-option>
 												</el-select>
@@ -422,14 +419,11 @@
 
 										<el-col :span="6">
 											<el-form-item label="Impact Avéré" prop="gravite_idCDN">
-												<el-select
-													id="gravite_id"
-													v-model="form.impact_avereCDN"
-												>
+												<el-select v-model="form.gravite_idCDN">
 													<el-option
 														v-for="item in remoteEnum.gravite"
 														:key="item.id"
-														:label="item.Nom"
+														:label="item.nom"
 														:value="item.id"
 													></el-option>
 												</el-select>
@@ -581,14 +575,11 @@
 										
 										<el-col :span="6">
 											<el-form-item label="Impact Avéré" prop="gravite_idBPF">
-												<el-select
-													id="impact_avereBPF"
-													v-model="form.impact_avereBPF"
-												>
+												<el-select v-model="form.gravite_idBPF">
 													<el-option
 														v-for="item in remoteEnum.gravite"
 														:key="item.id"
-														:label="item.Nom"
+														:label="item.nom"
 														:value="item.id"
 													></el-option>
 												</el-select>
@@ -871,6 +862,12 @@ export default {
 
     data() {
         return {
+			impactClientBDDF:"",
+			impactClientBPF:"",
+			impactClientCDN:"",
+			impactReseauBDDF:"",
+			impactReseauBPF:"",
+			impactReseauCDN:"",
 			url:'',
 			checkedImpactBDDF: false,
 			isCosip: false,
@@ -935,9 +932,6 @@ export default {
 				valueImpactCDN:'',
 				valueImpactBDDF:'',
 				valueImpactBPF:'',
-				impact_avereCDN:'',
-				impact_avereBDDF:'',
-				impact_avereBPF:'',
 				gravite_idCDN: '',
 				gravite_idBPF: '',
 				gravite_idBDDF: '',
@@ -1234,7 +1228,46 @@ export default {
 						
 		},
 		onUpdate(){
-			console.log(this.form)
+			//Modification des impact avéré en int et non String pour les rendres utilisable.
+			if(this.form.gravite_idBDDF.length > 2){
+				switch(this.form.gravite_idBDDF){
+					case "Faible":
+						this.form.gravite_idBDDF = 1;
+						break;
+					case "Moyen":
+						this.form.gravite_idBDDF = 2;
+						break;
+					case "Eleve":
+						this.form.gravite_idBDDF = 3;
+						break;
+				}
+			}
+			if(this.form.gravite_idCDN.length > 2){
+				switch(this.form.gravite_idCDN){
+					case "Faible":
+						this.form.gravite_idCDN = 1;
+						break;
+					case "Moyen":
+						this.form.gravite_idCDN = 2;
+						break;
+					case "Eleve":
+						this.form.gravite_idCDN = 3;
+						break;
+				}
+			}
+			if(this.form.gravite_idBPF.length > 2){
+				switch(this.form.gravite_idBPF){
+					case "Faible":
+						this.form.gravite_idBPF = 1;
+						break;
+					case "Moyen":
+						this.form.gravite_idBPF = 2;
+						break;
+					case "Eleve":
+						this.form.gravite_idBPF = 3;
+						break;
+				}
+			}
 			// Vérification Trigramme not udefined 
 			for(let i = 0; i < this.form.application_impactee.length; i++){
 				if((this.form.application_impactee[i].trigramme === undefined) && (this.form.application_impactee[i].code_irt !== undefined)){
@@ -1259,7 +1292,7 @@ export default {
 							"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
 						type: 'success',
 					});
-					window.location.href = 'http://localhost:8080/#/cosip'
+					//window.location.reload()
 				});
 			} else {
 					this.$message({
@@ -1440,7 +1473,7 @@ export default {
 						this.form.description_impactCDN=response.data[0].description_impact
 						this.form.description_impactBDDF=response.data[0].description_impact
 						this.form.description_impactBPF=response.data[0].description_impact
-						this.form.priorite_id=response.data[0].priorite
+						
 						
 						// Ajout d'un 0 devant le mois si celui-ci est inférieur strict à 10
 						if(numeroMois<10)
@@ -1575,7 +1608,6 @@ export default {
 						trigramme: tri
 					});
 				}
-
 				//Récupération des enseignes et affichage des cards
 				
 				for(
@@ -1588,33 +1620,30 @@ export default {
 					this.form.enseigne_impactee.push(parseInt(idEns));
 					const desImpact = response.data[0].description_impact.split('/')[index]
 					const graviteA = response.data[0].gravite_id.split('/')[index] 
-					const graviteNom = response.data[0].gravite_nom.split('/')[index]
 					const criticite = response.data[0].classification.split('/')[index]
+					const graviteNom = response.data[0].gravite_nom.split('/')[index]
 					this.tab_enseignes.push({
 						enseigne_id: idEns,
 						desc: desImpact,
-						gravite: graviteNom,
-						id_grav: graviteA,
-						class: criticite
+						id_gravite: graviteA,
+						class: criticite,
+						graviteNom: graviteNom
 					})
 				switch(this.tab_enseignes[index].enseigne_id){
 					case "1" :
 						this.form.description_impactBDDF = this.tab_enseignes[index].desc
-						this.form.impact_avereBDDF = this.tab_enseignes[index].gravite
 						this.classificationBDDF = this.tab_enseignes[index].class
-						this.form.gravite_idBDDF = this.tab_enseignes[index].id_grav
+						this.form.gravite_idBDDF = this.tab_enseignes[index].graviteNom
 						break;
 					case "2" :
 						this.form.description_impactCDN = this.tab_enseignes[index].desc
-						this.form.impact_avereCDN = this.tab_enseignes[index].gravite
 						this.classificationCDN = this.tab_enseignes[index].class
-						this.form.gravite_idCDN = this.tab_enseignes[index].id_grav
+						this.form.gravite_idCDN = this.tab_enseignes[index].graviteNom
 						break;
 					case "3":
-						this.form.impact_avereBPF = this.tab_enseignes[index].gravite
 						this.form.description_impactBPF = this.tab_enseignes[index].desc
 						this.classificationBPF = this.tab_enseignes[index].class
-						this.form.gravite_idBPF = this.tab_enseignes[index].id_grav
+						this.form.gravite_idBPF = this.tab_enseignes[index].graviteNom
 						break;
 					}
 				}
