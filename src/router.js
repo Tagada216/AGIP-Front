@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
+import LoginCompenent from '@/components/LoginCompenent.vue';
 
 Vue.use(Router);
 
@@ -67,7 +68,7 @@ let router = new Router({
 		},
 		{
 			path: '/new-incident/id=:id',
-			name: "incident",
+			name: "incident_id",
 			component: () => import('./views/NewIncident.vue'),
 			meta: {
                 requiresAuth: true
@@ -123,22 +124,11 @@ router.beforeEach((to,from,next) => {
 			if(localStorage.getItem("jwt") == null){
 				next({
 					path :"/home",
-					params: {nextUrl: to.fullPath}
+					params: { nextUrl: to.fullPath }
 				})
 			} else {
-				next({name: 'incident'})
+				next()
 			}
-		}else if(to.matched.some(record => record.meta.guest)){
-			if(localStorage.getItem("jwt") == null){
-				next({
-					path :"/home",
-					params: {nextUrl: to.fullPath}
-				})
-			}else{
-				next({name:'incident'})
-			}
-		}else{
-			next()
 		}
 	}else{
 		next()
@@ -147,3 +137,15 @@ router.beforeEach((to,from,next) => {
 })
 
 export default router
+// else if(to.matched.some(record => record.meta.guest)){
+// 	if(localStorage.getItem("jwt") == null){
+// 		next({
+// 			path :"/home",
+// 			params: { nextUrl: to.fullPath }
+// 		})
+// 	}else{
+// 		next({name:'agences'})
+// 	}
+// }else{
+// 	next()
+// }

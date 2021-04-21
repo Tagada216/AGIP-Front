@@ -33,7 +33,7 @@
 							type="primary"
 							native-type="submit"
 							block
-							>Connextion</el-button
+							>Connexion</el-button
 						>
 					</el-form-item>
 					<a
@@ -57,11 +57,12 @@ export default {
     name: 'home',
 	data() {
 		return {
-            // modal: false,
+            modal: false,
 			// validCredentials: {
 			// 	username: 'lightscope',
 			// 	password: 'lightscope',
 			// },
+			// connect: false,
 			model: {
 				matricule: '',
 				password: '',
@@ -103,7 +104,8 @@ export default {
 				setTimeout(resolve, 800);
 			});
 		},
-		async login() {
+		async login(e) {
+			e.preventDefault()
 			let valid = await this.$refs.form.validate();
 			if (!valid) {
 				return;
@@ -111,33 +113,44 @@ export default {
 			this.loading = true;
 			await this.simulateLogin();
 			this.loading = false;
-			if (
-				this.model.username === this.validCredentials.username &&
-				this.model.password === this.validCredentials.password
-			) {
-				this.this.$http.post(
-					'http://localhost:5000/api/login',
-					 this.matricule,
-					 this.password)
+			// if (
+			// 	this.model.username === this.validCredentials.username &&
+			// 	this.model.password === this.validCredentials.password
+			// ) {
+				console.log(this.model.matricule)
+				console.log(this.model.password)
+				this.$http.post(
+					'http://localhost:5000/api/login',{
+						matricule:  this.model.matricule,
+						password : this.model.password
+					})
 				.then(response =>{
+					console.log(response.data)
 					localStorage.setItem('user',JSON.stringify(response.data.user))
 					localStorage.setItem("jwt", response.data.token)
-
+					// console.log(response.data.refreshToken)
 					if(localStorage.getItem('jwt') !=null){
 						this.$emit('loggedIn')
 						if(this.$route.params.nextUrl != null){
-							this.$route.push(this.$route.params.nextUrl)
+							this.$router.push(this.$route.params.nextUrl);
+						}else{
+							console.log(localStorage.getItem('jwt'))
+							this.$router.push('new-incident').catch(()=>{})
 						}
 					}
 					this.$message.success('Login successfull');
+					this.$modal.hide();
+					this.connect = true
+					console.log(this.connect)
+					
 				})
 				.catch(function(error){
 					console.log(error.response);
 				})
 				
-			} else {
-				this.$message.error('Username or password is invalid');
-			}
+			// } else {
+			// 	this.$message.error('Username or password is invalid');
+			// }
 		},
     },
 };

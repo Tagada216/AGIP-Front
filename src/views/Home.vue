@@ -1,7 +1,10 @@
 <template>
 	<div class="home">
 		<base-header title="Accueil">
-			<el-button class="rounded-lg float-right mr-5 mt-3" @click="showModal()">Connexion</el-button>
+			<el-button v-if="connect == true" id="coButton" class="rounded-lg float-right mr-5 mt-3"
+			 @click="login_out();" >Déconnexion</el-button>
+			 <el-button v-else id="coButton" class="rounded-lg float-right mr-5 mt-3"
+			  @click="login_out()">Connexion</el-button> 
 		</base-header>
 		<img alt="Vue logo" src="../assets/Logo AGIPRO et subtitle_v2.svg" />
 		<h1 class="welcomeHeader">Bienvenue dans AGIPROS</h1>
@@ -34,16 +37,42 @@ import LoginComponent from '../components/LoginCompenent'
 export default {
 	name: 'home',
 	components: {
-		LoginComponent
+		LoginComponent,
 	},
-	date(){
+	data(){
 		return{
-			// modal : false
+			connect : false,
+			nameButton: "Connexion"
 		}
 	},
 	methods:{
 		showModal(){
 			this.$modal.show('loginModal');
+		},
+
+		logout(){
+			if(localStorage.getItem('jwt') !== null){
+				localStorage.removeItem('user');
+				localStorage.removeItem('jwt');
+				window.location.reload();
+				this.nameButton = "Connexion";
+				this.connect = false
+			}
+		},
+
+
+		login_out(){
+			const getButton = document.getElementById("coButton");
+
+			if(localStorage.getItem('jwt') !== null){
+				getButton.onclick = this.logout();
+				
+			}else{
+				//this.nameButton = "Connexion"
+				getButton.onclick = this.showModal();
+				
+			}
+			
 		}
 	},
 };
