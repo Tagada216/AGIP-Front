@@ -17,9 +17,14 @@
 					<i class="fas fa-file"></i>
 				</button>
 			</el-tooltip>
-			<el-tooltip class="item" effect="light" content="COSIP" placement="bottom-end">
+			<el-tooltip class="item" effect="light" content="Cosip" placement="bottom-end">
                 <button class="header-btn" @click="cosip()">
 					C
+                </button>
+            </el-tooltip>
+            <el-tooltip class="item" effect="light" content="Importer Main courante" placement="bottom-end">
+                <button class="header-btn" @click="mainCouranteImport()" >
+					+
                 </button>
             </el-tooltip>
         </base-header>
@@ -42,11 +47,35 @@
                 splitpanes-max="100"
             />
         </splitpanes>
+        <!-- Modal d'upload MainCourante -->
+        <modal class="modal" name="importModal">
+				<div class="fileupload" :class="{ 'fileupload--slim': slim }">
+					<div>
+						<slot :files="files">
+							<span class="flex justify-center text-center mt-8 font-bold text-xl">Importer le fichier Main Courante</span>
+						</slot>
+					</div>
+					<input 
+						multiple
+						:slim="true"
+						accept=".xlsx, .xls, .xlsm, .csv"
+						type="file"
+						:loading="loading"
+						ref="excel-upload-input"
+						class="mt-12"
+						@change="fileSelected"
+					/>
+				</div>
+                <download-excel :data="json_data"> test </download-excel>
+				<el-button type="primary" class="rounded mt-8" @click="ok()">Importer</el-button>
+			</modal>
     </div>
 </template>
 
 <script>
 // @ is an alias to /src
+import Vue from 'vue';
+import VModal from 'vue-js-modal';
 import Grid from '@/components/Grid.vue';
 import { AgGridVue } from 'ag-grid-vue';
 import Splitpanes from 'splitpanes';
@@ -57,13 +86,14 @@ import JsonExcel from 'vue-json-excel';
 import { constants } from 'crypto';
 import methods from '@/components/MyUpdateIncidentForm';
 
-
+Vue.use(VModal, { componentName: 'modal' });
 export default {
     name: 'mainCourante',
     data() {
         return { 
 			curID: 1,
-			exportFileName: "Main Courante"
+            exportFileName: "Main Courante",
+            json_data:""
 		}
 	},
     components: {
@@ -73,6 +103,10 @@ export default {
         'download-excel': JsonExcel,
     },
     methods: {
+        mainCouranteImport() {
+			this.$modal.show('importModal');
+			var confirmed = false;
+		},
         updateID(id) {
             this.curID = id;
             console.log("L'id est " + this.curID)
@@ -114,6 +148,8 @@ export default {
 </script>
 
 <style lang="sass">
+
+
 div.splitpanes
   height: calc(100vh - 71px)
 div.splitpanes__pane
