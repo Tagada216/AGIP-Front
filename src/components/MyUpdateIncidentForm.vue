@@ -820,6 +820,7 @@ export default {
 		},
 		// Méthode qui permet d'envoyer l'incident séléctionné vers un formulaire COSIP
 		cosip() {
+			
 			window.location.href = '/cosip/id=' + this.incident_id;
 			if (this.incident_id == undefined) {
 				console.log('ID non existant');

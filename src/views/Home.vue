@@ -16,7 +16,10 @@
 				>Connexion</el-button
 			>
 		</base-header>
-		<img alt="Vue logo" src="../assets/Logo AGIPRO et subtitle_v2.svg" />
+		<div class="flex flex-col items-center mb-6">
+			<img alt="Vue logo" src="../assets/Logo AGIPRO et subtitle_v2.svg" />
+		</div>
+		
 		<h1 class="welcomeHeader">Bienvenue dans AGIPROS</h1>
 		<p>
 			AGIPROS pour ATP, Gestion des Incidents, des PROblèmes et
@@ -29,13 +32,15 @@
 		<br />
 		<br />
 		<br />
-		<h1>Notre outil de supervision</h1>
-		<a
-			href="https://moncockpit.safe.socgen/#/"
-			onclick="window.open(this.href); return false;"
-			><img alt="Vue logo" src="../assets/cockpit-icon-cropped.png"
-		/></a>
-		<Login-Component />
+		<h1 class=" text-xl font-semibold">Notre outil de supervision : </h1>
+		<div class="flex flex-col items-center ">
+			<a
+				href="https://moncockpit.safe.socgen/#/"
+				onclick="window.open(this.href); return false;"
+				><img alt="Vue logo" src="../assets/cockpit-icon-cropped.png"
+			/></a>
+		</div>
+		<Login-Component/>
 		<!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
 	</div>
 </template>
