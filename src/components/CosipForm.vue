@@ -831,10 +831,11 @@ import Vue from 'vue'
 import CreateIncidentFormVue from './CreateIncidentForm.vue';
 import { readFile, watch } from 'fs';
 import { importSpecifier, thisTypeAnnotation, identifier } from 'babel-types';
-import readXlsxFile from 'read-excel-file'
+import readXlsxFile from 'read-excel-file';
 import { setTimeout } from 'timers';
 import { constants } from 'crypto';
 import methods from '@/components/CosipWeek';
+
 export default {
 	mounted(){
 		this.verifURL()  // Lance la focntion au "chargement" de la page
