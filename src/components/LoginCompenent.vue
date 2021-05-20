@@ -1,6 +1,13 @@
 <template>
-	<modal v-model="modal" class="loginModal" name="loginModal" :width="355"
-         :height="400" shiftX:0.5 shiftY:0.5>
+	<modal
+		v-model="modal"
+		class="loginModal"
+		name="loginModal"
+		:width="355"
+		:height="400"
+		shiftX:0.5
+		shiftY:0.5
+	>
 		<div class="login">
 			<el-card>
 				<h2>Connextion</h2>
@@ -36,11 +43,7 @@
 							>Connexion</el-button
 						>
 					</el-form-item>
-					<a
-						class="forgot-password"
-						href=""
-						>Mot de passe oublié ?</a
-					>
+					<a class="forgot-password" href="">Mot de passe oublié ?</a>
 				</el-form>
 			</el-card>
 		</div>
@@ -54,15 +57,14 @@ import VModal from 'vue-js-modal';
 Vue.use(VModal, { componentName: 'modal' });
 
 export default {
-    name: 'home',
+	name: 'home',
 	data() {
 		return {
-            modal: false,
+			modal: false,
 			// validCredentials: {
 			// 	username: 'lightscope',
 			// 	password: 'lightscope',
 			// },
-			// connect: false,
 			model: {
 				matricule: '',
 				password: '',
@@ -105,7 +107,7 @@ export default {
 			});
 		},
 		async login(e) {
-			e.preventDefault()
+			e.preventDefault();
 			let valid = await this.$refs.form.validate();
 			if (!valid) {
 				return;
@@ -117,46 +119,55 @@ export default {
 			// 	this.model.username === this.validCredentials.username &&
 			// 	this.model.password === this.validCredentials.password
 			// ) {
-				console.log(this.model.matricule)
-				console.log(this.model.password)
-				this.$http.post(
-					'http://localhost:5000/api/login',{
-						matricule:  this.model.matricule,
-						password : this.model.password
-					})
-				.then(response =>{
-					console.log(response.data)
-					localStorage.setItem('user',JSON.stringify(response.data.user))
-					localStorage.setItem("jwt", response.data.token)
-					// console.log(response.data.refreshToken)
-					if(localStorage.getItem('jwt') !=null){
-						this.$emit('loggedIn')
-						if(this.$route.params.nextUrl != null){
-							this.$router.push(this.$route.params.nextUrl);
-						}else{
-							console.log(localStorage.getItem('jwt'))
-							this.$router.push('new-incident').catch(()=>{})
+			console.log(this.model.matricule);
+			console.log(this.model.password);
+			this.$http
+				.post('http://localhost:5000/api/login', {
+					matricule: this.model.matricule,
+					password: this.model.password,
+				})
+				.then(response => {
+					console.log(response.data);
+					if (response.status === 200) {
+						console.log("je rentre dan sle if")
+						sessionStorage.setItem(
+							'user',
+							JSON.stringify(response)
+						);
+						sessionStorage.setItem(
+							'role',
+							JSON.stringify(response.data.role)
+						);
+						// sessionStorage.setItem('autorisation',response.data.cookie)
+						sessionStorage.setItem('jwt', response.data.token);
+						if (sessionStorage.getItem('jwt') != null) {
+							this.$emit(response.data.status);
+							if (this.$route.params.nextUrl != null) {
+								this.$route.push(this.$root.params.nextUrl);
+							} else {
+								this.$router
+									.push('new-incident')
+									.catch(() => {});
+							}
 						}
 					}
 					this.$message.success('Login successfull');
 					this.$modal.hide();
 					this.connect = true
-					console.log(this.connect)
-					
+					localStorage.connect = this.connect
 				})
-				.catch(function(error){
+				.catch(function(error) {
 					console.log(error.response);
-				})
-				
+				});
+
 			// } else {
 			// 	this.$message.error('Username or password is invalid');
 			// }
 		},
-    },
+	},
 };
 </script>
-//A487423
-// @GiPro
+//A487423 // @GiPro
 <style lang="scss" scoped>
 .login {
 	flex: 1;
@@ -177,7 +188,7 @@ export default {
 }
 $red: #ed1a3a;
 .el-button--primary {
-	background:$red;
+	background: $red;
 	border-color: $red;
 
 	&:hover,
