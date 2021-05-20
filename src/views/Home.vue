@@ -50,7 +50,6 @@
 // import HelloWorld from '@/components/HelloWorld.vue';
 import LoginComponent from '../components/LoginCompenent';
 export default {
-	props: ['connect'],
 	name: 'home',
 	components: {
 		LoginComponent,
@@ -58,7 +57,6 @@ export default {
 	data() {
 		return {
 			connect: false
-		
 		};
 	},
 	mounted(){

@@ -129,7 +129,7 @@ export default {
 				.then(response => {
 					console.log(response.data);
 					if (response.status === 200) {
-						console.log("je rentre dan sle if")
+						console.log('je rentre dan sle if');
 						sessionStorage.setItem(
 							'user',
 							JSON.stringify(response)
@@ -153,8 +153,8 @@ export default {
 					}
 					this.$message.success('Login successfull');
 					this.$modal.hide();
-					this.connect = true
-					localStorage.connect = this.connect
+					this.connect = true;
+					localStorage.connect = this.connect;
 				})
 				.catch(function(error) {
 					console.log(error.response);
