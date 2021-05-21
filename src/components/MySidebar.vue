@@ -1,5 +1,5 @@
 <template>
-	<sidebar-menu widthCollapsed="70px" :menu="menu" />
+	<sidebar-menu widthCollapsed="70px" collapsed :menu="menu" />
 </template>
 
 <style lang="sass">
@@ -13,12 +13,12 @@ $iconWidth: 50px
 
 .v-sidebar-menu .vsm-item.first-item.active-item > .vsm-link > .vsm-icon
     background-color: $primaryColor !important
-		
+
 
 .active-item
     background-color: $primaryColor
-  
-		
+
+
 
 @import "vue-sidebar-menu/src/scss/vue-sidebar-menu.scss"
 .vsm-title
@@ -122,16 +122,6 @@ export default {
 					icon: 'fas fa-chart-bar',
 				},
 			],
-			props: {
-				widthCollapsed: {
-					type: String,
-					default: '50px',
-				},
-				collapsed: {
-					type: Boolean,
-					default: true,
-				},
-			},
 		};
 	},
 	components: {
