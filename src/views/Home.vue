@@ -60,7 +60,11 @@ export default {
 		};
 	},
 	mounted(){
-		this.setConnectButtonName()
+		this.setConnectButtonName();
+		if(sessionStorage.getItem('jwt') == null){
+			this.connect = false;
+			localStorage.connect = this.connect;
+		}
 	},
 	methods: {
 

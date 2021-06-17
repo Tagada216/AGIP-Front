@@ -26,7 +26,7 @@
 				<el-button id="myButton" type="primary" class="button" @click="changeButton()">{{ buttonName }}</el-button>
 				<el-button id="cancelButton" type="danger" class="button" @click="onCancel()">Annuler</el-button>
 			</div>
-			<modal class="modal" name="importModal">
+			<modal class="modal" name="importModal" style="width: 50rem !important;height:50rem !important;">
 				<div class="fileupload" :class="{ 'fileupload--slim': slim }">
 					<base-button v-if="slim">
 						<slot :files="files">{{ title }}</slot>
@@ -619,7 +619,7 @@ export default {
 						"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
 					type: 'success',
 				});
-				setTimeout(window.location.reload(), 30000);
+				setTimeout(window.location.reload(), 60000);
 			});
 		},
 
@@ -652,7 +652,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 $redColor: #ed1a3a;
 $blackColor: #2c3e50;
 
@@ -737,8 +737,10 @@ $blackColor: #2c3e50;
 		position: absolute;
 		top: 0;
 		left: 0;
-		width: 100%;
-		height: 100%;
+		// width: 100%;
+		// height: 100%;
+		width: 50rem;
+		height: 50rem;
 		cursor: inherit;
 	}
 

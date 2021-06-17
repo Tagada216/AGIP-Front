@@ -397,7 +397,7 @@ export default {
 		isValid(value) {
 			return /^P\d{2,}[IN|PB|CH|RQ]{2,}[-]{1,}\d{7,}$/.test(value);
 		},
-
+// P21IN-123456789
 		verifUniqueRef(value) {
 			Axios.get('http://localhost:5000/api/reference').then(response => {
 				for (var j = 0; j < response.data.length; j++) {

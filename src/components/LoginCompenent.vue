@@ -1,16 +1,8 @@
 <template>
-	<modal
-		v-model="modal"
-		class="loginModal"
-		name="loginModal"
-		:width="355"
-		:height="400"
-		shiftX:0.5
-		shiftY:0.5
-	>
+	<modal v-model="modal" class="loginModal" name="loginModal">
 		<div class="login">
 			<el-card>
-				<h2>Connextion</h2>
+				<h2>Connexion</h2>
 				<el-form
 					class="login-form"
 					:model="model"
@@ -37,7 +29,7 @@
 						<el-button
 							:loading="loading"
 							class="login-button"
-							type="primary"
+							type="danger"
 							native-type="submit"
 							block
 							>Connexion</el-button
@@ -168,7 +160,10 @@ export default {
 };
 </script>
 //A487423 // @GiPro
-<style lang="scss" scoped>
+<style lang="scss">
+$redColor: #ed1a3a;
+$blackColor: #2c3e50;
+
 .login {
 	flex: 1;
 	display: flex;
@@ -182,12 +177,19 @@ export default {
 }
 .login-form {
 	width: 290px;
+	.el-form-item {
+		margin-bottom: 35px !important;
+	}
+}
+
+.el-input__icon{
+	color: $blackColor !important;
 }
 .forgot-password {
 	margin-top: 10px;
 }
 $red: #ed1a3a;
-.el-button--primary {
+.el-button--danger {
 	background: $red;
 	border-color: $red;
 
@@ -215,6 +217,17 @@ $red: #ed1a3a;
 .login .el-input input {
 	padding-left: 35px;
 }
+
+.vm--modal {
+	width: 370px !important;
+	height: 350px !important;
+	border: 10px solid;
+	border-image-slice: 1;
+	border-width: 5px;
+	left: 750px !important;
+	border-image-source: linear-gradient(to left, $blackColor, $redColor);
+}
+
 .login .el-card {
 	padding-top: 0;
 	padding-bottom: 30px;
@@ -235,7 +248,8 @@ a {
 	}
 }
 .login .el-card {
-	width: 340px;
+	width: 370px;
+	height: 350px;
 	display: flex;
 	justify-content: center;
 }
