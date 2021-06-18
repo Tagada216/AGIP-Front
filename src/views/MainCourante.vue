@@ -117,14 +117,61 @@ export default {
 			curID: 1,
             exportFileName: "Main Courante",
             files:null,
+            dataFile:null,
             error:false,
             errorMessage:null,
             loader:null,
             fullPage:false,
             disabledAction:false,
+            refs:null,
+            tempTab:[],
+            finalTab:[],
+            form:{
+				references: [], //
+				is_faux_incident: false, //
+				date_debut: '', //
+				date_fin: null, //
+				description: '', //
+				cause: '',
+				cosip_id: '',
+				origine: '',
+				gravite_id: '',
+				action_retablissement: '',
+				plan_action: '',
+				description_impact: '', //
+				description_contournement: 'Aucun contournement', //
+				is_contournement: false, //
+				priorite_id: '', //
+				statut_id: '', //
+				enseigne_impactee: [],
+				application_impactee: [],
+				date_detection: '',
+				date_communication_TDC: '',
+				date_qualification_p01: '',
+				date_premiere_com: '',
+				valueImpactCDN: '',
+				valueImpactBDDF: '',
+				valueImpactBPF: '',
+				impact_avereCDN: '',
+				impact_avereBDDF: '',
+				impact_avereBPF: '',
+
+				gravite_idCDN: '',
+				gravite_idBPF: '',
+				gravite_idBDDF: '',
+				enseigne_impactee: [],
+				desc_impact_enseigne: [],
+				description_impact: '', //
+				description_impactCDN: '',
+				description_impactBDDF: '',
+				description_impactBPF: ''
+            }
 		}
     },
     mounted(){
+        this.getRef();
+        const event = this.ExcelDateToJSDate(44320,7847222222 );
+        console.log("La date : ", event)
     },
     components: {
         Grid,
@@ -133,7 +180,26 @@ export default {
         'download-excel': JsonExcel,
     },
     methods: {
+        ExcelDateToJSDate(serial) {
+   var utc_days  = Math.floor(serial - 25569);
+   var utc_value = utc_days * 86400;                                        
+   var date_info = new Date(utc_value * 1000);
+
+   var fractional_day = serial - Math.floor(serial) + 0.0000001;
+
+   var total_seconds = Math.floor(86400 * fractional_day);
+
+   var seconds = total_seconds % 60;
+
+   total_seconds -= seconds;
+
+   var hours = Math.floor(total_seconds / (60 * 60));
+   var minutes = Math.floor(total_seconds / 60) % 60;
+
+   return new Date(date_info.getFullYear(), date_info.getMonth(), date_info.getDate(), hours, minutes, seconds);
+},
         mainCouranteImport() {
+            this.getRef();
 			this.$modal.show('importModal');
 			var confirmed = false;
 		},
@@ -176,15 +242,6 @@ export default {
         fileSelected(e){
             const files = e.target.files;
             this.files = [...files];
-            readXlsxFile(this.files[0]).then((row)=>{
-                console.log("Row: ",row);
-                this.importFile(row);
-            }).catch((err)=>{
-                this.errorMessage = err;
-            })
-        },
-        importFile(file){
-            console.log("Methods import: ", file)
         },
         startImport(){
             this.disabledAction = !this.disabledAction
@@ -196,12 +253,152 @@ export default {
                 onCancel: this.onCancel(),
                 color: "#E60028",
                 opacity: 0.5,
-            })
+            });
+            //Lecture du fichier 
+            readXlsxFile(this.files[0]).then((row)=>{
+                this.cleanData(row);
+                this.$modal.hide('importModal');
+                // this.loader.hide();
+            }).catch((err)=>{
+                this.errorMessage = err;
+            });
+        },
+        isValid(value) {
+			return /^P\d{2,}[IN|PB|CH|RQ]{2,}[-]{1,}\d{7,}$/.test(value);
+        },
+        cleanData(data, temp){
+            this.tempTab = data;
+            
+            //Test de validité 
+            for(let i=0; i<this.tempTab.length; i++){
+                if((this.isValid(this.tempTab[i][0]) != true)&&(this.tempTab[i][0]!=='A venir')){
+                    this.tempTab.splice(i, 1 );
+                }
+            }
+            //Test d'inexistance 
+            for(let i=0; i<this.tempTab.length; i++){
+                for(let y=0; y<this.refs.length; y++){
+                    if(this.tempTab[i][0] === this.refs[y].reference){
+                        console.log("Delete this:", this.tempTab[i][0])
+                        this.tempTab.splice(i,1);
+                        
+                    }
+                }
+            }
+            this.finalTab = this.tempTab
+            console.log('Le tableau final avec incident existant delete ', this.finalTab)
+            this.postMainCourante(this.finalTab)
+        },
+        async postMainCourante(cData){
+            // Attibution des données formulaire puis post en back 
+            
+            console.log(cData[1][1])
+            console.log(cData[20][1])
 
+            // for(let i =0; i<cData.length; i++){
+            //     // Références
+            //     this.form.references.push({
+            //         reference: cData[i][0]
+            //     });
+            //     this.form.date_debut = cData[i][1];
+
+            //     //Enseignes impactés
+            //     if(cData[i][2] === null ){
+            //         cData.splice(i, 1)
+            //     }else{
+            //         const enseigne = cData[i][2].split("-");
+            //         for(let y=0; y<enseigne.length; y++){
+            //             switch(enseigne[y])
+            //             {
+            //                 case 'BDDF':
+            //                     this.form.enseigne_impactee.push({
+            //                         enseigne_id: 1
+            //                     });
+            //                 break;
+            //                 case 'CDN':
+            //                     this.form.enseigne_impactee.push({
+            //                         enseigne_id: 2
+            //                     });
+            //                 break;
+            //                 case 'BPF':
+            //                     this.form.enseigne_impactee.push({
+            //                         enseigne_id: 3
+            //                     });
+            //                 break;
+            //             }
+            //         }
+            //     }
+            //     //Application impactés :
+
+            //     //Description : 
+            //     this.form.description = cData[i][5];
+            //     //Priorité :
+            //         switch(cData[i][6])
+            //         {
+            //             case 'P0':
+            //                 this.form.priorite_id = 0;
+            //             break;
+            //             case 'P1':
+            //                 this.form.priorite_id = 1;
+            //             break;
+            //             case 'P2':
+            //                 this.form.priorite_id = 2
+            //             break;
+            //             case 'P3':
+            //                 this.form.priorite_id = 3
+            //             break;
+            //             case 'P4':
+            //                 this.form.priorite_id = 4
+            //             break;
+            //         }
+            //     //Statut :
+            //         switch(cData[i][7])
+            //         {
+            //             case 'Ouvert':
+            //                 this.form.priorite_id = 0;
+            //             break;
+            //             case 'En cours de traitement':
+            //                 this.form.priorite_id = 1;
+            //             break;
+            //             case 'Correctif identifié':
+            //                 this.form.priorite_id = 2
+            //             break;
+            //             case 'Observation':
+            //                 this.form.priorite_id = 3
+            //             break;
+            //             case 'Résolu':
+            //                 this.form.priorite_id = 4
+            //             break;
+            //             case 'Faux Incident':
+            //                 this.form.priorite_id = 5
+            //             break;
+            //         }
+            //     //description impact enseigne 
+            //     this.form.description_impact = cData[i][9];
+            //     //Cause racine 
+            //     // cData[i][17];
+
+            //     //Cause et origine 
+            //     const causeOrigine = cData[i][18].split('_x000D_');
+            //     this.form.cause = causeOrigine[0];
+            //     this.form.origine = causeOrigine[2];
+
+            //     //cData[i][18];
+                
+            //     //Dates 
+
+            // }
 
         },
         onCancel(){
             console.log('User cancelled the loader')
+        },
+        getRef(){
+            this.$http 
+				.get('http://localhost:5000/api/reference')
+				.then(response => {
+                    this.refs = response.data
+				});
         }
 	},
 }
@@ -211,11 +408,11 @@ export default {
 
 
 div.splitpanes
-  height: calc(100vh - 71px)
+    height: calc(100vh - 71px)
 div.splitpanes__pane
-  overflow: auto
+    overflow: auto
 #pane_1
-  &div
+    &div
     height: 100%
 #pane_2
     background-color: white
