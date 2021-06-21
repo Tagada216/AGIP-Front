@@ -831,10 +831,11 @@ import Vue from 'vue'
 import CreateIncidentFormVue from './CreateIncidentForm.vue';
 import { readFile, watch } from 'fs';
 import { importSpecifier, thisTypeAnnotation, identifier } from 'babel-types';
-import readXlsxFile from 'read-excel-file'
+import readXlsxFile from 'read-excel-file';
 import { setTimeout } from 'timers';
 import { constants } from 'crypto';
 import methods from '@/components/CosipWeek';
+
 export default {
 	mounted(){
 		this.verifURL()  // Lance la focntion au "chargement" de la page
@@ -1200,6 +1201,7 @@ export default {
 							this.form
 						)
 						.then(result => {
+							console.log(result)
 							/* 
 								Ajout du then pour attendre que l'API réponde 
 								Car il se peut que ça se passe mal et qu'on envoi quand même un message de succés.
@@ -1212,7 +1214,7 @@ export default {
 									"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
 								type: 'success',
 							});
-							window.location.href = 'http://localhost:8080/#/cosip'
+							window.location.href = 'http://localhost:8080/cosip'
 						});
 				} else {
 					this.$message({
@@ -1292,7 +1294,7 @@ export default {
 							"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
 						type: 'success',
 					});
-					//window.location.reload()
+					window.location.reload()
 				});
 			} else {
 					this.$message({
@@ -1308,7 +1310,7 @@ export default {
 		//Méthode de récupération de l'url courante afin de modifier le bouton de validation du formulaire en "crétation" ou "Modification"
 		verifURL(){
 			this.url = window.location.href
-			if(this.url == "http://localhost:8080/#/cosip"){
+			if(this.url == "http://localhost:8080/cosip"){
 				this.isCosip = true
 			}
 		},

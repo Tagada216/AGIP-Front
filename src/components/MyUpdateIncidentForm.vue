@@ -624,7 +624,7 @@ export default {
 							this.form.references[i].reference == '' &&
 							this.form.statut_id != 5
 						) {
-			 			  this.form.references[i].reference = 'A venir';
+							this.form.references[i].reference = 'A venir';
 						} else if (
 							(this.form.references.length == 1 &&
 								this.form.references[i].reference == '') ||
@@ -1013,11 +1013,11 @@ export default {
                 'http://localhost:5000/api/main-courante/' + idIncident
             ).then(response => {
 				this.form.incident_id = this.incident_id;
-                this.form.description = response.data[0].description;
+	
+				this.form.description = response.data[0].description;
                 this.form.date_debut = response.data[0].date_debut;
                 this.form.date_fin = response.data[0].date_fin;
-                this.form.description_impact =
-                    response.data[0].description_impact;
+                this.form.description_impact = response.data[0].description_impact;
                 this.form.statut_id = response.data[0].statut;
                 this.form.priorite_id = response.data[0].priorite;
                 this.form.date_detection = response.data[0].date_detection;
