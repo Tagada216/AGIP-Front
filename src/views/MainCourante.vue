@@ -101,7 +101,7 @@ import JsonExcel from 'vue-json-excel';
 import { constants } from 'crypto';
 import methods from '@/components/MyUpdateIncidentForm';
 import Loading from 'vue-loading-overlay';
-
+const { getJsDateFromExcel } = require("excel-date-to-js");
 Vue.use(Loading);
 Vue.use(VModal, { componentName: 'modal' });
 
@@ -126,52 +126,38 @@ export default {
             refs:null,
             tempTab:[],
             finalTab:[],
-            form:{
-				references: [], //
+            form:[{
+				references: null, //
 				is_faux_incident: false, //
-				date_debut: '', //
+				date_debut: null, //
 				date_fin: null, //
-				description: '', //
-				cause: '',
-				cosip_id: '',
-				origine: '',
-				gravite_id: '',
-				action_retablissement: '',
-				plan_action: '',
-				description_impact: '', //
+				description: null, //
+				cause: null,
+				origine: null,
+				gravite_id: null,
+				action_retablissement: null,
+				plan_action: null,
+				description_impact: null, //
 				description_contournement: 'Aucun contournement', //
 				is_contournement: false, //
-				priorite_id: '', //
-				statut_id: '', //
-				enseigne_impactee: [],
+				priorite_id: null, //
+				statut_id: null, //
+				enseigne_impactee: null,
 				application_impactee: [],
-				date_detection: '',
-				date_communication_TDC: '',
-				date_qualification_p01: '',
-				date_premiere_com: '',
-				valueImpactCDN: '',
-				valueImpactBDDF: '',
-				valueImpactBPF: '',
-				impact_avereCDN: '',
-				impact_avereBDDF: '',
-				impact_avereBPF: '',
-
-				gravite_idCDN: '',
-				gravite_idBPF: '',
-				gravite_idBDDF: '',
-				enseigne_impactee: [],
-				desc_impact_enseigne: [],
-				description_impact: '', //
-				description_impactCDN: '',
-				description_impactBDDF: '',
-				description_impactBPF: ''
-            }
+				date_detection: null,
+				date_communication_TDC: null,
+				date_qualification_p01: null,
+				date_premiere_com: null,
+				impact_avereCDN: null,
+				impact_avereBDDF: null,
+				impact_avereBPF: null,
+				enseigne_impactee: null,
+				description_impact: null, //
+            }]
 		}
     },
     mounted(){
         this.getRef();
-        const event = this.ExcelDateToJSDate(44320,7847222222 );
-        console.log("La date : ", event)
     },
     components: {
         Grid,
@@ -181,27 +167,34 @@ export default {
     },
     methods: {
         ExcelDateToJSDate(serial) {
-   var utc_days  = Math.floor(serial - 25569);
-   var utc_value = utc_days * 86400;                                        
-   var date_info = new Date(utc_value * 1000);
+            const utc_days  = Math.floor(serial - 25569);
+            const utc_value = utc_days * 86400;                                        
+            const date_info = new Date(utc_value * 1000);
 
-   var fractional_day = serial - Math.floor(serial) + 0.0000001;
+            const fractional_day = serial - Math.floor(serial) + 0.0000001;
+            
+            let total_seconds = Math.floor(86400 * fractional_day);
+            
+            const seconds = total_seconds % 60;
 
-   var total_seconds = Math.floor(86400 * fractional_day);
+            total_seconds -= seconds;
 
-   var seconds = total_seconds % 60;
+            const hours = Math.floor(total_seconds / (60 * 60));
+            const minutes = Math.floor(total_seconds / 60) % 60;
+            const dd = String(date_info.getDate()).padStart(2, '0');
+            const mm = String(date_info.getMonth() + 1).padStart(2, '0');
+            const yyyy = date_info.getFullYear();
 
-   total_seconds -= seconds;
+            const date = dd + '/' + mm + "/" + yyyy + " "+ hours+ ":"+ minutes
+    
+            return date;
+        },
 
-   var hours = Math.floor(total_seconds / (60 * 60));
-   var minutes = Math.floor(total_seconds / 60) % 60;
-
-   return new Date(date_info.getFullYear(), date_info.getMonth(), date_info.getDate(), hours, minutes, seconds);
-},
+    
         mainCouranteImport() {
             this.getRef();
 			this.$modal.show('importModal');
-			var confirmed = false;
+			const confirmed = false;
 		},
         updateID(id) {
             this.curID = id;
@@ -250,7 +243,7 @@ export default {
             this.loader = this.$loading.show({
                 container: this.fullPage ? null : this.$refs.formContainer,
                 canCancel: true,
-                onCancel: this.onCancel(),
+                //onCancel: this.onCancel(),
                 color: "#E60028",
                 opacity: 0.5,
             });
@@ -279,119 +272,116 @@ export default {
             for(let i=0; i<this.tempTab.length; i++){
                 for(let y=0; y<this.refs.length; y++){
                     if(this.tempTab[i][0] === this.refs[y].reference){
-                        console.log("Delete this:", this.tempTab[i][0])
                         this.tempTab.splice(i,1);
                         
                     }
                 }
             }
             this.finalTab = this.tempTab
-            console.log('Le tableau final avec incident existant delete ', this.finalTab)
+            console.log('Tableau final: ', this.finalTab)
             this.postMainCourante(this.finalTab)
         },
         async postMainCourante(cData){
             // Attibution des données formulaire puis post en back 
-            
-            console.log(cData[1][1])
-            console.log(cData[20][1])
+        
+            for(let i = 1; i<cData.length; i++){
 
-            // for(let i =0; i<cData.length; i++){
-            //     // Références
-            //     this.form.references.push({
-            //         reference: cData[i][0]
-            //     });
-            //     this.form.date_debut = cData[i][1];
+                // Références
+                console.log('Les references avant: ', cData[i][0]);
+                this.form[i].references = [{reference: cData[i][0]}];
+                console.log('Les references', cData[i][0]);
 
-            //     //Enseignes impactés
-            //     if(cData[i][2] === null ){
-            //         cData.splice(i, 1)
-            //     }else{
-            //         const enseigne = cData[i][2].split("-");
-            //         for(let y=0; y<enseigne.length; y++){
-            //             switch(enseigne[y])
-            //             {
-            //                 case 'BDDF':
-            //                     this.form.enseigne_impactee.push({
-            //                         enseigne_id: 1
-            //                     });
-            //                 break;
-            //                 case 'CDN':
-            //                     this.form.enseigne_impactee.push({
-            //                         enseigne_id: 2
-            //                     });
-            //                 break;
-            //                 case 'BPF':
-            //                     this.form.enseigne_impactee.push({
-            //                         enseigne_id: 3
-            //                     });
-            //                 break;
-            //             }
-            //         }
-            //     }
-            //     //Application impactés :
+                //Enseignes impactés
+                if(cData[i][2] === null ){
+                    cData.splice(i, 1)
+                }else{
+                    const enseigne = cData[i][2].split("-");
+                    for(let y=0; y<enseigne.length; y++){
+                        switch(enseigne[y])
+                        {
+                            case 'BDDF':
+                                this.form[i].enseigne_impactee = [{enseigne: 1}] ;
+                            break;
+                            case 'CDN':
+                                this.form[i].enseigne_impactee = [{enseigne: 2}];
+                            break;
+                            case 'BPF':
+                                this.form[i].enseigne_impactee = [{enseigne: 3}];
+                            break;
+                        }
+                    }
+                }
+                //Application impactés :
 
-            //     //Description : 
-            //     this.form.description = cData[i][5];
-            //     //Priorité :
-            //         switch(cData[i][6])
-            //         {
-            //             case 'P0':
-            //                 this.form.priorite_id = 0;
-            //             break;
-            //             case 'P1':
-            //                 this.form.priorite_id = 1;
-            //             break;
-            //             case 'P2':
-            //                 this.form.priorite_id = 2
-            //             break;
-            //             case 'P3':
-            //                 this.form.priorite_id = 3
-            //             break;
-            //             case 'P4':
-            //                 this.form.priorite_id = 4
-            //             break;
-            //         }
+                //Description : 
+                this.form[i].description = cData[i][5];
+                //Priorité :
+                    switch(cData[i][6])
+                    {
+                        case 'P0':
+                            this.form[i].priorite_id = 0;
+                        break;
+                        case 'P1':
+                            this.form[i].priorite_id = 1;
+                            break;
+                        case 'P2':
+                            this.form[i].priorite_id = 2;
+                        break;
+                        case 'P3':
+                            this.form[i].priorite_id = 3;
+                        break;
+                        case 'P4':
+                            this.form[i].priorite_id = 4;
+                        break;
+                    }
             //     //Statut :
-            //         switch(cData[i][7])
-            //         {
-            //             case 'Ouvert':
-            //                 this.form.priorite_id = 0;
-            //             break;
-            //             case 'En cours de traitement':
-            //                 this.form.priorite_id = 1;
-            //             break;
-            //             case 'Correctif identifié':
-            //                 this.form.priorite_id = 2
-            //             break;
-            //             case 'Observation':
-            //                 this.form.priorite_id = 3
-            //             break;
-            //             case 'Résolu':
-            //                 this.form.priorite_id = 4
-            //             break;
-            //             case 'Faux Incident':
-            //                 this.form.priorite_id = 5
-            //             break;
-            //         }
+                    switch(cData[i][7])
+                    {
+                        case 'Ouvert':
+                            this.form[i].statut_id = 0;
+                        break;
+                        case 'En cours de traitement':
+                            this.form[i].statut_id = 1;
+                        break;
+                        case 'Correctif identifié':
+                            this.form[i].statut_id = 2;
+                        break;
+                        case 'Observation':
+                            this.form[i].statut_id = 3;
+                        break;
+                        case 'Résolu':
+                            this.form[i].statut_id = 4;
+                        break;
+                        case 'Faux Incident':
+                            this.form[i].statut_id = 5;
+                        break;
+                    }
             //     //description impact enseigne 
-            //     this.form.description_impact = cData[i][9];
+                this.form[i].description_impact = cData[i][9];
+                
             //     //Cause racine 
-            //     // cData[i][17];
+                //cData[i][17];
 
             //     //Cause et origine 
-            //     const causeOrigine = cData[i][18].split('_x000D_');
-            //     this.form.cause = causeOrigine[0];
-            //     this.form.origine = causeOrigine[2];
+                const causeOrigine = cData[i][18].split('_x000D_');
 
-            //     //cData[i][18];
+                this.form[i].cause = causeOrigine[0];
                 
-            //     //Dates 
+                this.form[i].origine = causeOrigine[2];
+                
+            //     //Date Début 
+                    this.form[i].date_debut = this.ExcelDateToJSDate(cData[i][1]);
+                   
+                   //Date de fin 
+                    if(cData[i][8]){
 
-            // }
+                        this.form[i] = this.ExcelDateToJSDate(cData[i][8]);
+                    }
 
-        },
-        onCancel(){
-            console.log('User cancelled the loader')
+                console.log("Le form : ", this.form[i])
+
+            }
+
         },
         getRef(){
             this.$http 

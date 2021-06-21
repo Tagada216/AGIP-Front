@@ -624,7 +624,7 @@ export default {
 							this.form.references[i].reference == '' &&
 							this.form.statut_id != 5
 						) {
-			 			  this.form.references[i].reference = 'A venir';
+							this.form.references[i].reference = 'A venir';
 						} else if (
 							(this.form.references.length == 1 &&
 								this.form.references[i].reference == '') ||
