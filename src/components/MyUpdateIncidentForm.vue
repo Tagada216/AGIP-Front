@@ -389,6 +389,7 @@ export default {
 				date_fin: null, //
 				description: '', //
 				cause: '',
+				is_imported:false,
 				cosip_id: '',
 				origine: '',
 				gravite_id: '',
@@ -1013,7 +1014,10 @@ export default {
                 'http://localhost:5000/api/main-courante/' + idIncident
             ).then(response => {
 				this.form.incident_id = this.incident_id;
-	
+				if(response.data[0].is_imported){
+					this.form.is_imported = true;
+					console.log("Cest un incident importé")
+				}
 				this.form.description = response.data[0].description;
                 this.form.date_debut = response.data[0].date_debut;
                 this.form.date_fin = response.data[0].date_fin;

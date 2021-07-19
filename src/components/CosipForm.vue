@@ -910,6 +910,7 @@ export default {
 				references: [], //
 				reference:'',
 				probleme:'',
+				is_imported:false,
 				incident_id: 0,
 				cosip_id: 0,
                 is_faux_incident: false, //
@@ -1445,6 +1446,7 @@ export default {
 				Axios.get('http://localhost:5000/api/main-courante/' + idIncident).then(
 					response => {
 						this.form.incident_id=idIncident
+						this.form.is_imported = response.data[0].is_imported
 						this.form.incident_id=response.data[0].id
 						this.form.cosip_id = response.data[0].cosip_id
 						this.form.cosip_resume=response.data[0].cosip_resume
@@ -1539,6 +1541,10 @@ export default {
 				//Données récupéré et injecté dans le formulaire d'update
 					this.form.incident_id=response.data[0].id
 					this.form.cosip_id = response.data[0].cosip_id
+					if(response.data[0].is_imported){
+						this.form.is_imported = true;
+					console.log("Cest un incident importé")
+					}
 					this.form.cosip_resume=response.data[0].cosip_resume;
 					this.form.statut_id=response.data[0].statut_id;
 					this.form.priorite_id=response.data[0].priorite_id

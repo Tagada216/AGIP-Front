@@ -48,7 +48,7 @@
         </splitpanes>
         <!-- Modal d'upload MainCourante -->
 
-        <modal class="modal" name="importModal"  >
+        <modal class="modal" name="importModal" :width="500" :height="300" :adaptive="true" >
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert" v-if="error">
                 <strong class="font-bold">Import erreur </strong>
                 <span class="block sm:inline">{{errorMessage}}</span>
@@ -77,7 +77,11 @@
                         </div>                    
 				</div>
 				<el-button  :disabled="disabledAction" type="primary" class="rounded mt-8" @click="startImport()">Importer</el-button>
-		</modal>
+                <p v-if="waiting && !repeatMax">Veuillez patienter l'import peut durer quelques minutes.</p>
+                <p v-if="waiting && !repeatMax">Récupération des données du fichier....</p>
+                <p v-if="waiting && repeatMax" >Import des incidents en base de données....</p>
+                <p v-if="waiting && repeatMax" >{{tabIndex}} / <span class="text-bold"> {{repeatMax}}</span></p>
+        </modal>
         <modal class=modal name="loaderModal">
             <div class="flex justify-center">
                 <div ref="formContainer"></div>
@@ -114,6 +118,9 @@ export default {
     name: 'mainCourante',
     data() {
         return { 
+            waiting: false,
+            tabIndex: 1,
+            repeatMax: 0,
 			curID: 1,
             exportFileName: "Main Courante",
             files:null,
@@ -126,7 +133,8 @@ export default {
             refs:null,
             tempTab:[],
             finalTab:[],
-            form:[{
+            oneIncident:{
+                is_imported:true,
 				references: null, //
 				is_faux_incident: false, //
 				date_debut: null, //
@@ -142,8 +150,7 @@ export default {
 				is_contournement: false, //
 				priorite_id: null, //
 				statut_id: null, //
-				enseigne_impactee: null,
-				application_impactee: [],
+				application_impactee: "",
 				date_detection: null,
 				date_communication_TDC: null,
 				date_qualification_p01: null,
@@ -151,9 +158,9 @@ export default {
 				impact_avereCDN: null,
 				impact_avereBDDF: null,
 				impact_avereBPF: null,
-				enseigne_impactee: null,
+				enseigne_impactee: [],
 				description_impact: null, //
-            }]
+            }
 		}
     },
     mounted(){
@@ -185,9 +192,9 @@ export default {
             const mm = String(date_info.getMonth() + 1).padStart(2, '0');
             const yyyy = date_info.getFullYear();
 
-            const date = dd + '/' + mm + "/" + yyyy + " "+ hours+ ":"+ minutes
+            const date = yyyy + '-' + mm + "-" + dd +" "+ hours+ ":"+ minutes+":"+ seconds
     
-            return date;
+            return new Date(date);
         },
 
     
@@ -238,7 +245,7 @@ export default {
         },
         startImport(){
             this.disabledAction = !this.disabledAction
-
+            this.waiting = !this.waiting
             //Vue loader et la consfiguration 
             this.loader = this.$loading.show({
                 container: this.fullPage ? null : this.$refs.formContainer,
@@ -250,7 +257,7 @@ export default {
             //Lecture du fichier 
             readXlsxFile(this.files[0]).then((row)=>{
                 this.cleanData(row);
-                this.$modal.hide('importModal');
+                
                 // this.loader.hide();
             }).catch((err)=>{
                 this.errorMessage = err;
@@ -259,7 +266,7 @@ export default {
         isValid(value) {
 			return /^P\d{2,}[IN|PB|CH|RQ]{2,}[-]{1,}\d{7,}$/.test(value);
         },
-        cleanData(data, temp){
+        cleanData(data){
             this.tempTab = data;
             
             //Test de validité 
@@ -277,111 +284,150 @@ export default {
                     }
                 }
             }
+
+
             this.finalTab = this.tempTab
             console.log('Tableau final: ', this.finalTab)
             this.postMainCourante(this.finalTab)
         },
         async postMainCourante(cData){
             // Attibution des données formulaire puis post en back 
-        
-            for(let i = 1; i<cData.length; i++){
-
-                // Références
-                console.log('Les references avant: ', cData[i][0]);
-                this.form[i].references = [{reference: cData[i][0]}];
-                console.log('Les references', cData[i][0]);
+            this.repeatMax = cData.length - 1;
+            console.log(`L'insertion en cours ${this.repeatMax} incidents vont être insérés `)
+            let i = 1;
+            do{
+                console.log("l'index est : ", this.tabIndex)
+                
+                //Références :
+                this.oneIncident.references = [{reference: cData[this.tabIndex][0]}];
+                
+                //Description (cleanString afin de supprimer les guillemets impossible d'insérer en BDD):
+                console.log(typeof(cData[this.tabIndex][5]))
+                if(typeof(cData[this.tabIndex][5]) === 'object'){
+                    this.oneIncident.description = " ";
+                }else{
+                    this.oneIncident.description = this.cleanString(cData[this.tabIndex][5]);
+                }
+                
+                
+                //description impact (cleanString afin de supprimer les guillemets impossible d'insérer en BDD) :
+                this.oneIncident.description_impact = this.cleanString(cData[this.tabIndex][9]);
 
                 //Enseignes impactés
-                if(cData[i][2] === null ){
-                    cData.splice(i, 1)
+                if(cData[this.tabIndex][2] === null ){
+                    cData.splice(this.tabIndex, 1)
                 }else{
-                    const enseigne = cData[i][2].split("-");
+                    this.oneIncident.enseigne_impactee= [];
+                    const enseigne = cData[this.tabIndex][2].split("-");
+                    
                     for(let y=0; y<enseigne.length; y++){
-                        switch(enseigne[y])
+                        switch(enseigne[y].replace(/\s+/g,""))
                         {
                             case 'BDDF':
-                                this.form[i].enseigne_impactee = [{enseigne: 1}] ;
+                                this.oneIncident.enseigne_impactee.push(1) ;
                             break;
                             case 'CDN':
-                                this.form[i].enseigne_impactee = [{enseigne: 2}];
+                                this.oneIncident.enseigne_impactee.push(2);
                             break;
                             case 'BPF':
-                                this.form[i].enseigne_impactee = [{enseigne: 3}];
+                                this.oneIncident.enseigne_impactee.push(3);
                             break;
                         }
                     }
                 }
-                //Application impactés :
 
-                //Description : 
-                this.form[i].description = cData[i][5];
                 //Priorité :
-                    switch(cData[i][6])
+                switch(cData[this.tabIndex][6])
                     {
                         case 'P0':
-                            this.form[i].priorite_id = 0;
+                            this.oneIncident.priorite_id = 1;
                         break;
                         case 'P1':
-                            this.form[i].priorite_id = 1;
+                            this.oneIncident.priorite_id = 2;
                             break;
                         case 'P2':
-                            this.form[i].priorite_id = 2;
+                            this.oneIncident.priorite_id = 3;
                         break;
                         case 'P3':
-                            this.form[i].priorite_id = 3;
+                            this.oneIncident.priorite_id = 4;
                         break;
                         case 'P4':
-                            this.form[i].priorite_id = 4;
+                            this.oneIncident.priorite_id = 5;
                         break;
                     }
-            //     //Statut :
-                    switch(cData[i][7])
+
+                //Statut :
+                switch(cData[this.tabIndex][7])
                     {
                         case 'Ouvert':
-                            this.form[i].statut_id = 0;
+                            this.oneIncident.statut_id = 0;
                         break;
                         case 'En cours de traitement':
-                            this.form[i].statut_id = 1;
+                            this.oneIncident.statut_id = 1;
                         break;
                         case 'Correctif identifié':
-                            this.form[i].statut_id = 2;
+                            this.oneIncident.statut_id = 2;
                         break;
                         case 'Observation':
-                            this.form[i].statut_id = 3;
+                            this.oneIncident.statut_id = 3;
                         break;
                         case 'Résolu':
-                            this.form[i].statut_id = 4;
+                            this.oneIncident.statut_id = 4;
                         break;
                         case 'Faux Incident':
-                            this.form[i].statut_id = 5;
+                            this.oneIncident.statut_id = 5;
                         break;
                     }
-            //     //description impact enseigne 
-                this.form[i].description_impact = cData[i][9];
-                
-            //     //Cause racine 
-                //cData[i][17];
+                //Cause et origine 
+                const causeOrigine = cData[this.tabIndex][18].split('_x000D_');
 
-            //     //Cause et origine 
-                const causeOrigine = cData[i][18].split('_x000D_');
-
-                this.form[i].cause = causeOrigine[0];
+                this.oneIncident.cause = causeOrigine[0];
                 
-                this.form[i].origine = causeOrigine[2];
-                
-            //     //Date Début 
-                    this.form[i].date_debut = this.ExcelDateToJSDate(cData[i][1]);
-                   
-                   //Date de fin 
-                    if(cData[i][8]){
+                this.oneIncident.origine = causeOrigine[2];
 
-                        this.form[i] = this.ExcelDateToJSDate(cData[i][8]);
+                //Date Début 
+                this.oneIncident.date_debut = this.ExcelDateToJSDate(cData[this.tabIndex][1]);
+                
+                //Date de fin 
+                if(cData[this.tabIndex][8]){
+                    this.oneIncident.date_fin = this.ExcelDateToJSDate(cData[this.tabIndex][8]);
+                }
+                //Application impactés :
+                this.oneIncident.application_impactee = cData[this.tabIndex][4];
+
+                //this.oneIncident.splice(0, 1);
+                console.log("Form: ", this.oneIncident);
+                const post = await  this.$http.post('http://localhost:5000/api/main-courante', this.oneIncident);
+                if(post.status === 200 ){
+                    this.tabIndex++
+                    if(this.tabIndex === this.repeatMax){
+                        this.$modal.hide('importModal');
+                        this.$message({
+							dangerouslyUseHTMLString: true,
+							message:
+								"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+							type: 'success',
+						});
+						window.location.reload();			
                     }
+                }else{
+                    console.log(post);
+                }
+            }while(i <= this.repeatMax);
 
-                console.log("Le form : ", this.form[i])
+//-------------------------------------------------------------------------------------
 
+
+           // //Cause racine 
+                //cData[tabIndex][17];
+
+            //     console.log("Le form : ", this.oneIncident)
+
+        },
+        cleanString(str){
+            if(str != null){
+                return str.replace(/["]+/g, '')
             }
-
         },
         getRef(){
             this.$http 

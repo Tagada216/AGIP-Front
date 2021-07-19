@@ -293,6 +293,7 @@ export default {
 			// Données du formulaire
 			form: {
 				references: [], //
+				is_imported:false,
 				is_faux_incident: false, //
 				date_debut: '', //
 				date_fin: null, //
