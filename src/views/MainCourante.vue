@@ -46,6 +46,7 @@
                 splitpanes-max="100"
             />
         </splitpanes>
+
         <!-- Modal d'upload MainCourante -->
 
         <modal class="modal" name="importModal" :width="500" :height="300" :adaptive="true" >

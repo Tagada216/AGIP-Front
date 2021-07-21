@@ -3,6 +3,8 @@
         <ag-grid-vue
             style="width: 100%; height: 100%; min-height: 85%"
             class="ag-theme-balham"
+            pagination=true
+            paginationPageSize=200
             :rowData="rowData"
             :columnDefs="columnDefs"
             :rowSelection="rowSelection"
