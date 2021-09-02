@@ -107,12 +107,8 @@ export default {
 			this.loading = true;
 			await this.simulateLogin();
 			this.loading = false;
-			// if (
-			// 	this.model.username === this.validCredentials.username &&
-			// 	this.model.password === this.validCredentials.password
-			// ) {
-			console.log(this.model.matricule);
-			console.log(this.model.password);
+		
+			
 			this.$http
 				.post('http://localhost:5000/api/login', {
 					matricule: this.model.matricule,
@@ -121,7 +117,6 @@ export default {
 				.then(response => {
 					console.log(response.data);
 					if (response.status === 200) {
-						console.log('je rentre dan sle if');
 						sessionStorage.setItem(
 							'user',
 							JSON.stringify(response)
@@ -130,7 +125,6 @@ export default {
 							'role',
 							JSON.stringify(response.data.role)
 						);
-						// sessionStorage.setItem('autorisation',response.data.cookie)
 						sessionStorage.setItem('jwt', response.data.token);
 						if (sessionStorage.getItem('jwt') != null) {
 							this.$emit(response.data.status);

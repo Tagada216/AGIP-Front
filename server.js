@@ -1,4 +1,5 @@
-void function mail() {
+void
+function mail() {
     const nodeMailer = require('nodemailer/lib/nodemailer');
 
     var transporter = nodeMailer.createTransport({
@@ -10,19 +11,15 @@ void function mail() {
     });
 
     var mailOptions = {
-        from: 'luciouh@gmail.com',
-        to: 'lucie-varlet@hotmail.fr',
-        subject: 'Test',
-        text: 'Message',
-        html: '<b>corps du mail</b>',
+        from: '"Fred Foo 👻" <foo@example.com>', // sender address
+        to: "bar@example.com, baz@example.com", // list of receivers
+        subject: "Hello ✔", // Subject line
+        text: "Hello world?", // plain text body
+        html: "<b>Hello world?</b>", // html body
     };
 
-    transporter.sendMail(mailOptions, function(error, info) {
-        if (error) {
-            return console.log(error);
-        }
-        console.log('Message sent: ' + info.response);
-    });
+    transporter.sendMail(mailOptions);
+       
 
     transporter.close();
 };

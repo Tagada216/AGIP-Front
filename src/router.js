@@ -134,23 +134,6 @@ let router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-	// if (to.path !== '/home') {
-	// 	if (to.matched.some(record => record.meta.requiresAuth)) {
-	// 		if (localStorage.getItem("jwt") == null) {
-	// 			next({
-	// 				path: "/home",
-	// 				params: {
-	// 					nextUrl: to.fullPath
-	// 				}
-	// 			});
-	// 		} else {
-	// 			next()
-	// 		}
-	// 	}
-	// } else {
-	// 	next()
-	// }
-
 	if (to.path !== '/home') {
 		if (to.matched.some(record => record.meta.requiresAuth)) {
 			if (sessionStorage.getItem("jwt") == null) {
