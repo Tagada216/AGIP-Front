@@ -141,6 +141,7 @@
 							:autosize="{ minRows: 2, maxRows: 8 }"
 							placeholder="Description"
 							v-model="form.description"
+							spellCheck="true"
 						></el-input>
 					</el-form-item>
 
@@ -282,6 +283,7 @@ export default {
 	data() {
 		return {
 			verifRefExistante : false,
+			
 			// Données énumérées venant de l'API
 			remoteEnum: {
 				priorites: [],
@@ -421,7 +423,7 @@ export default {
 		// Méthode exécuté par le bouton "Sauvegarder".
 		// Elle gère la validation du formulaire ainsi que l'envoie des données vers l'API
 		submit() {
-			//console.log(this.form.application_impactee);
+		
 
 			this.$refs['form'].validate(valid => {
 				if (valid) {
@@ -501,10 +503,7 @@ export default {
 							].reference = this.form.references[
 								i
 							].reference.toUpperCase();
-							//console.log(this.form.references[i].reference);
-							//console.log(this.form.references[i].reference.toUpperCase());
-							//console.log(this.form.references[i].reference.length);
-							//console.log("OK ");
+							
 						} else {
 							this.$message({
 								dangerouslyUseHTMLString: true,
@@ -550,7 +549,7 @@ export default {
 					// On enregistre en base de données
 					this.$http
 						.post(
-							'http://localhost:5000/api/main-courante',
+							// 'http://localhost:5000/api/main-courante',
 							this.form
 						)
 						.then(result => {
@@ -566,7 +565,7 @@ export default {
 									"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
 								type: 'success',
 							});
-							setTimeout(window.location.reload(), 2500);
+							// setTimeout(window.location.reload(), 2500);
 						});
 				} else {
 					this.$message({
@@ -640,6 +639,7 @@ export default {
 								});
 							}
 							this.agence.cause = row[8];
+
 							////////////// Statut ///////////////
 							// if (row[7].includes('En cours') == true) {
 							// 	this.agence.statut_id = 2;
@@ -647,6 +647,8 @@ export default {
 							// if (row[7].includes('Clos') == true) {
 							// 	this.agence.statut_id = 5;
 							// }
+
+
 							////////////////////////////////////
 							////////// Priorité /////////////
 							if (row[6].includes('P0') == true) {
