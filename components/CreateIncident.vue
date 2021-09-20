@@ -290,7 +290,10 @@ import Rule from "../models/Rule";
 
 export default {
   created() {
-    this.getFieldsOptions();
+    GeneralMethod.getFieldsOptions().then(res => {
+      this.datas = res
+    })
+    
   },
 
   data() {
@@ -335,12 +338,6 @@ export default {
     },
 
     // Méthode à Généraliser
-    async getFieldsOptions() {
-      this.datas.priorites = await GetData.getPriorite();
-      this.datas.statut = await GetData.getStatut();
-      this.datas.enseignes = await GetData.getEnseigne();
-      this.datas.application_impactee = await GetData.getAllApp();
-    },
 
     setContournementRule() {
       this.rules.description_contournement[0].required = !this.rules
