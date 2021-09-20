@@ -166,7 +166,7 @@
                 inactive-color="#ff4949"
                 active-text="Oui"
                 inactive-text="Non"
-                @change="setContournementRule()"
+                @change=" rules.description_contournement[0].required = !rules.description_contournement[0].required &&   (this.incident.description_contournement = !this.rules.description_contournement[0].required? 'Aucun contournement': '')"
               ></el-switch>
             </el-col>
           </el-form-item>
@@ -286,6 +286,7 @@ import IncidentClass from "../Class/IncidentClass";
 import DataClass from "../Class/DataClass";
 import GetData from "../models/GetData";
 import GeneralMethod from "../models/GeneralMethod";
+import {setContournementRule} from "../models/GeneralMethod"
 import Rule from "../models/Rule";
 
 export default {
@@ -339,14 +340,6 @@ export default {
 
     // Méthode à Généraliser
 
-    setContournementRule() {
-      this.rules.description_contournement[0].required = !this.rules
-        .description_contournement[0].required;
-      this.incident.description_contournement = !this.rules
-        .description_contournement[0].required
-        ? "Aucun contournement"
-        : "";
-    },
 
     confirmDelete() {
       this.incident.references.splice(this.indexToDelete, 1);
