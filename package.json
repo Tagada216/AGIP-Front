@@ -1,13 +1,15 @@
 {
-  "name": "tdctoolbox",
-  "version": "0.1.0",
+  "name": "TDC-Toolbox2",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@fortawesome/fontawesome-svg-core": "^1.2.19",
     "@fortawesome/free-solid-svg-icons": "^5.9.0",
     "@fortawesome/vue-fontawesome": "^0.1.6",
@@ -44,22 +46,26 @@
     "vue-spinner": "^1.0.4",
     "xlsx": "^0.16.8",
     "yarn": "^1.22.10"
+=======
+    "@fortawesome/fontawesome-free": "^5.15.4",
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/vue-fontawesome": "^2.0.2",
+    "axios": "^0.21.4",
+    "core-js": "^3.15.1",
+    "element-ui": "^2.15.6",
+    "nuxt": "^2.15.7",
+    "vue-sidebar-menu": "^4.8.1"
+>>>>>>> toolboox-v2
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.7.0",
-    "@vue/cli-plugin-eslint": "^3.7.0",
-    "@vue/cli-service": "^3.7.0",
-    "@vue/eslint-config-prettier": "^4.0.1",
-    "babel-eslint": "^10.0.1",
-    "eslint": "^5.16.0",
-    "eslint-plugin-vue": "^5.0.0",
-    "sass": "^1.18.0",
-    "sass-loader": "^7.1.0",
-    "tailwindcss": "^2.0.3",
-    "vue-template-compiler": "^2.6.10"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions"
-  ]
+    "@fortawesome/free-brands-svg-icons": "^5.15.4",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@nuxtjs/fontawesome": "^1.1.2",
+    "@nuxtjs/tailwindcss": "^4.2.0",
+    "@nuxtjs/vuetify": "^1.12.1",
+    "fibers": "^5.0.0",
+    "postcss": "^8.3.5",
+    "sass": "^1.39.2",
+    "sass-loader": "10"
+  }
 }
