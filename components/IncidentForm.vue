@@ -278,6 +278,7 @@
         >Sauvegarder</el-button
       >
     </el-form-item>
+    <CosipForm v-if="pageName=='Cosip'"/>
   </el-form>
 </template>
 
@@ -290,6 +291,9 @@ import {setContournementRule} from "../models/GeneralMethod"
 import Rule from "../models/Rule";
 
 export default {
+  props:{
+    pageName :String
+  },
   created() {
     GeneralMethod.getFieldsOptions().then(res => {
       this.datas = res
@@ -317,6 +321,7 @@ export default {
       rules: Rule.rules
     };
   },
+
 
   methods: {
     async submit() {
