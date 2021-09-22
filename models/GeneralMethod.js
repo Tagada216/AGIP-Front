@@ -1,5 +1,6 @@
 import DataClass from "../Class/DataClass";
-import GetData from "./GetData";
+import GetData from "../models/GetData";
+import Rule from "../models/Rule";
 
 export default {
 
@@ -16,7 +17,7 @@ export default {
     
 
 
-    // Avec la fonction lambda
+    // Avec la fonction lambda / Récupération des Options diposnible ( Priorite, status, enseignes etc ) pour les afficher sur le formulaire 
     async getFieldsOptions(){	
         let datas = new DataClass();
 
@@ -27,6 +28,8 @@ export default {
         
         return datas;
     },
+
+
 
     
 }

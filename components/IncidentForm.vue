@@ -166,7 +166,7 @@
                 inactive-color="#ff4949"
                 active-text="Oui"
                 inactive-text="Non"
-                @change="setContournementRule()"
+                @change=" rules.description_contournement[0].required = !rules.description_contournement[0].required &&   (this.incident.description_contournement = !this.rules.description_contournement[0].required? 'Aucun contournement': '')"
               ></el-switch>
             </el-col>
           </el-form-item>
@@ -278,6 +278,7 @@
         >Sauvegarder</el-button
       >
     </el-form-item>
+    <CosipForm v-if="pageName=='Cosip'"/>
   </el-form>
 </template>
 
@@ -286,11 +287,18 @@ import IncidentClass from "../Class/IncidentClass";
 import DataClass from "../Class/DataClass";
 import GetData from "../models/GetData";
 import GeneralMethod from "../models/GeneralMethod";
+import {setContournementRule} from "../models/GeneralMethod"
 import Rule from "../models/Rule";
 
 export default {
+  props:{
+    pageName :String
+  },
   created() {
-    this.getFieldsOptions();
+    GeneralMethod.getFieldsOptions().then(res => {
+      this.datas = res
+    })
+    
   },
 
   data() {
@@ -314,6 +322,7 @@ export default {
     };
   },
 
+
   methods: {
     async submit() {
       //  Exemple d'implémentation de class
@@ -335,21 +344,7 @@ export default {
     },
 
     // Méthode à Généraliser
-    async getFieldsOptions() {
-      this.datas.priorites = await GetData.getPriorite();
-      this.datas.statut = await GetData.getStatut();
-      this.datas.enseignes = await GetData.getEnseigne();
-      this.datas.application_impactee = await GetData.getAllApp();
-    },
 
-    setContournementRule() {
-      this.rules.description_contournement[0].required = !this.rules
-        .description_contournement[0].required;
-      this.incident.description_contournement = !this.rules
-        .description_contournement[0].required
-        ? "Aucun contournement"
-        : "";
-    },
 
     confirmDelete() {
       this.incident.references.splice(this.indexToDelete, 1);
