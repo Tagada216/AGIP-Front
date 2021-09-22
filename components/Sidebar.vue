@@ -96,7 +96,7 @@ export default {
           icon: "fas fa-folder-plus fa-lg",
         },
         {
-          href: "/main-courante",
+          href: "/MainCourante",
           title: "Main courante",
           icon: "fas fa-book-open fa-lg",
         },

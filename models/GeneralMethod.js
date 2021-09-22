@@ -1,5 +1,5 @@
 import DataClass from "../Class/DataClass";
-import GetData from "../models/GetData";
+import GetData from "./GetData";
 
 export default {
 
