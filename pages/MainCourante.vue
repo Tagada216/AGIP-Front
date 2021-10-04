@@ -53,16 +53,17 @@
 				splitpanes-min="15"
 				splitpanes-max="100"
 				dataLink="http://localhost:5000/api/incident"
+				@incidentSelected="updateID"
 			/>
 				
-			<!-- @incidentSelected="updateID" -->
+			
 
-			<!-- <update-incident-form
+			<IncidentForm pageName='MainCourante'
 				:incident_id="curID"
 				splitpanes-size="50"
 				splitpanes-min="20"
 				splitpanes-max="100"
-			/> -->
+			/>
 		</splitpanes>
 	</div>
 </template>

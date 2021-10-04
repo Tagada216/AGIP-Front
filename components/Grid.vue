@@ -1,111 +1,119 @@
 <template>
-    <div style="height: 100%;">
-        <ag-grid-vue
-            style="width: 100%; height: 100%; min-height: 85%"
-            class="ag-theme-balham"
-            :rowData="rowData"
-            :columnDefs="columnDefs"
-            :rowSelection="rowSelection"
-            @row-selected="onRowSelected"
-        ></ag-grid-vue>
-    </div>
+  <div style="height: 100%;">
+    <ag-grid-vue
+      style="width: 100%; height: 100%; min-height: 85%"
+      class="ag-theme-alpine"
+      :rowData="rowData"
+      :columnDefs="columnDefs"
+      :rowSelection="rowSelection"
+      @row-selected="onRowSelected"
+    ></ag-grid-vue>
+  </div>
 </template>
 
-// <script>
-import { AgGridVue } from 'ag-grid-vue';
-
+<script>
+import { AgGridVue } from "ag-grid-vue";
+import IncidentClass from "../Class/IncidentClass";
 
 function dateComparator(date1, date2) {
-    var date1Number = monthToComparableNumber(date1);
-    var date2Number = monthToComparableNumber(date2);
-    if (date1Number === null && date2Number === null) {
-        return 0;
-    }
-    if (date1Number === null) {
-        return -1;
-    }
-    if (date2Number === null) {
-        return 1;
-    }
-    return date1Number - date2Number;
+  var date1Number = monthToComparableNumber(date1);
+  var date2Number = monthToComparableNumber(date2);
+  if (date1Number === null && date2Number === null) {
+    return 0;
+  }
+  if (date1Number === null) {
+    return -1;
+  }
+  if (date2Number === null) {
+    return 1;
+  }
+  return date1Number - date2Number;
 }
 
 function monthToComparableNumber(date) {
-    if (date === undefined || date === null || date.length !== 19) {
-        return null;
-    }
-    var yearNumber = date.substring(6, 10)
-    var monthNumber = date.substring(3, 5)
-	var dayNumber = date.substring(0, 2)
-	var hoursNumber = date.substring(11,13)
-	var minNumber = date.substring(14,16)
-	var secNumber = date.substring(17,19)
-    var result = yearNumber * 100000000 + monthNumber * 10000 + dayNumber * 100 + hoursNumber;
-    return result;
+  if (date === undefined || date === null || date.length !== 19) {
+    return null;
+  }
+  var yearNumber = date.substring(6, 10);
+  var monthNumber = date.substring(3, 5);
+  var dayNumber = date.substring(0, 2);
+  var hoursNumber = date.substring(11, 13);
+  var minNumber = date.substring(14, 16);
+  var secNumber = date.substring(17, 19);
+  var result =
+    yearNumber * 100000000 +
+    monthNumber * 10000 +
+    dayNumber * 100 +
+    hoursNumber;
+  return result;
 }
 
 export default {
-    name: 'LargeDataSetExample',
-    data() {
-        return {
-            rowData: this.rowData,
-            columnDefs: this.columnDefs,
-            rowSelection: 'single',
-            date_cosip_selec:"",
-            url:''
-        };
+  name: "LargeDataSetExample",
+  data() {
+    return {
+      rowData: this.rowData,
+      columnDefs: this.columnDefs,
+      rowSelection: "single",
+      date_cosip_selec: "",
+      url: ""
+    };
+  },
+  components: {
+    "ag-grid-vue": AgGridVue
+  },
+
+  props: {
+    dataLink: String
+  },
+
+  mounted() {
+    let incidents = [];
+    this.$http.get(this.dataLink).then(response =>
+      this.setGridData(
+        response.data.map(inc => {
+          let incident = new IncidentClass(inc);
+        //   incident = inc
+          return incident;
+        })
+      )
+    );
+  },
+  //
+  methods: {
+    setGridData(data) {
+      this.setColDef(Object.keys(data[0]));
+      this.rowData = data;
     },
-    components: {
-        'ag-grid-vue': AgGridVue,
+    setColDef(colNames) {
+      this.columnDefs = [];
+      console.log(colNames);
+
+      for (const colName of colNames) {
+        this.columnDefs.push({
+          field: "" + colName,
+          hide: colName == "id",
+          width: (1 / (colNames.length / 2)) * 3000,
+          sortable: true,
+          filter: true,
+          comparator: colName.includes("Date") ? dateComparator : false,
+          sort: colName.includes("Date de début") ? "desc" : false
+        });
+      }
     },
-
-    props: {
-        dataLink: String,
-    },
-
-    mounted() {
-        this.$http
-            .get(this.dataLink)
-            .then(response => this.setGridData(response.data));
-
-    },
-
-    methods: {
-        setGridData(data) {
-            this.setColDef(Object.keys(data[0]));
-            this.rowData = data;
-        },
-        setColDef(colNames) {
-            this.columnDefs = [];
-            // console.log(colNames);
-
-            for (const colName of colNames) {
-                this.columnDefs.push({
-                    field: '' + colName,
-                    hide: colName == 'id',
-                    width: (1 / (colNames.length / 2)) * 3000,
-                    sortable: true,
-                    filter: true,
-					comparator: colName.includes("Date") ? dateComparator : false,
-					sort: colName.includes("Date de début") ? "desc" : false
-                });
-            }
-        },
-        //Trigger qui permet de récupérer L'id ou la référence depuis le tableau main courante ou Cosip 
-        onRowSelected(event) {
-            if (event.node.selected) {
-                this.$emit('incidentSelected', event.data.id);
-                this.$emit('CosipSelected', event.data.id);
-            }
-        },
-
-    },
-    watch:{
-        cosip_url: function cosipUrlUpdate (){
-            this.$forceUpdate()
-        } 
+    //Trigger qui permet de récupérer L'id ou la référence depuis le tableau main courante ou Cosip
+    onRowSelected(event) {
+      if (event.node.selected) {
+        this.$emit("incidentSelected", event.data.id);
+        this.$emit("CosipSelected", event.data.id);
+      }
     }
-
+  },
+  watch: {
+    cosip_url: function cosipUrlUpdate() {
+      this.$forceUpdate();
+    }
+  }
 };
 </script>
 
@@ -129,4 +137,5 @@ input
 	border: none
 	font-size : 2em
 	background-color: transparent
+    
 </style>
