@@ -74,6 +74,7 @@ export default {
         setGridData(data) {
             this.setColDef(Object.keys(data[0]));
             this.rowData = data;
+
         },
         setColDef(colNames) {
             this.columnDefs = [];

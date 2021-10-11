@@ -25,6 +25,9 @@ export default {
 		datas.statut = await GetData.getDatas('incident/statut');
 		datas.enseignes = await GetData.getDatas('enseigne');
         datas.application_impactee = await GetData.getDatas('applications');
+        datas.gravite = await GetData.getDatas('gravite');
+        datas.cause_racines = await GetData.getDatas('cause-racine');
+        datas.entite_responsable = await GetData.getDatas('entite-responsable');
         
         return datas;
     },

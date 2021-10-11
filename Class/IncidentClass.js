@@ -9,10 +9,13 @@ export default class IncidentClass {
     description = "";
     application_impactee = [];
     cause = "";
+    action_retablissement = "";
+    plan_action="";
     description_impact = "";
     description_contournement = "Aucun contournement";
     is_contournement = false;
     is_agence = false;
+    departement_responsable='';
 
     constructor() {};
 

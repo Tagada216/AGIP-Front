@@ -1,8 +1,10 @@
+const { Checkbox } = require("element-ui");
+
 module.exports = {
     theme: {
       backgroundColor: theme => ({
        ...theme('colors'),
-       'primary': ' #DC4941',
+       'primary': ' #E60028',
        'secondary': '#303333',
        'danger': '#1e1e21',
       })

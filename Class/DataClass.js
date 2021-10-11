@@ -3,7 +3,9 @@ export default class GetDataModel {
   statut = [];
   enseignes = [];
   application_impactee = [];
-
+  gravite = []; 
+  cause_racines =[];
+  entite_responsable=[];
 
   constructor() {};
 }

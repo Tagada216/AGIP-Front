@@ -19,7 +19,7 @@
         box-shadow: 3px 0px 0px 0px #303333 inset
 
 .v-sidebar-menu
-    background-color: #DC4941 !important
+    background-color: #E60028 !important
     
     .vsm--item
         margin-top: 1em
@@ -62,7 +62,7 @@
         background-color: #303333
 
     .vsm--mobile-item
-      background-color:  #DC4941 !important
+      background-color:  #E60028 !important
 
     .vsm--mobile-bg
       background-color: #303333 !important

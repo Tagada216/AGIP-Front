@@ -1,20 +1,310 @@
 <template>
-        <el-form-item >
-            <el-input
-              type="textarea"
-              :autosize="{ minRows: 2, maxRows: 8 }"
-              placeholder="Description"
-              spellCheck="true"
-            ></el-input>
-          </el-form-item>
+    <div>
+        <div v-if="part=='horodatage'">
+            <el-form-item label="Mois" >
+                <el-input
+                    id="mois_cosip"
+                    placeholder="Mois"
+                    
+                ></el-input>
+                </el-form-item>
+
+                <el-form-item label="Semaine COSIP" >
+                    <el-input
+                        id="semaine_cosip"
+                        placeholder="Semaine COSIP"
+                        
+                    ></el-input>
+            </el-form-item>
+
+            <el-form-item label="Date de fin" >
+                    <el-date-picker
+                        id="date_fin"
+                        type="datetime"
+                        placeholder="Selectionnez l'horodatage"
+                        format="dd/MM/yyyy HH:mm:ss"
+                        value-format="yyyy-MM-dd HH:mm:ss"
+                    ></el-date-picker>
+            </el-form-item>
+        </div>
+        <div v-if="part=='info-generale'">
+            <el-form-item label="Résumé" >
+                <el-input
+                    id="cosip_resume"
+                    type="textarea"
+                    :autosize="{ minRows: 4, maxRows: 8 }"
+                    placeholder="Résumé"
+                    v-model="incident.description"
+                ></el-input>
+            </el-form-item>
+
+            <el-form-item label="Cause"
+            >
+                <el-input
+                    id="cause"
+                    type="textarea"
+                    :autosize="{ minRows: 4, maxRows: 8 }"
+                    placeholder="Cause"
+                    v-model="incident.cause"
+                ></el-input>
+            </el-form-item>
+            <el-row :span="3" >
+                    <el-form-item label="Cause Racine" >
+                        <el-select
+                            id="cause_racine_id"
+                            v-model="cosip.cause_racine_id"
+                            >
+                            <el-option
+                            v-for="item in datas.cause_racines"
+                            :key="item.id"
+                            :label="item.nom"
+                            :value="item.id"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
+            </el-row>
+
+
+            <el-form-item label="Origine"
+                
+            >
+                <el-input 
+                    id="numChangement"
+                    placeholder="Numéro de changement"
+                ></el-input>
+                <el-input
+                    id="origine"
+                    type="textarea"
+                    :autosize="{ minRows: 4, maxRows: 8 }"
+                    placeholder="Origine"
+                    v-model="incident.origine"
+                ></el-input>
+            </el-form-item>
+            <el-card>
+                <div slot="header">
+                    <h4 class="card-header">Rétablissement</h4>
+                </div>
+                <el-row :gutter="20">
+                    <el-col :span="6">
+                        <el-form-item>
+                            <el-checkbox>Crise</el-checkbox>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-form-item 
+                            label="Problème ?"
+                            prop="probleme"
+                        >
+                            <el-input id="probleme" placeholder="Problème" ></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                    <el-col :span="6">
+                        <el-form-item label="Détection"
+                            prop="date_detection"
+                        >
+                            <el-date-picker
+                                id="date_detection"
+                                v-model="iEnseigne.date_detection"
+                                type="datetime"
+                                placeholder="Sélectionnez l'horodatage"
+                                format="dd/MM/yyyy HH:mm:ss"
+                                value-format="yyyy-MM-dd HH:mm:ss"
+                            />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-form-item label="Première communication à l'enseigne"
+                            prop="date_premiere_com"
+                        >
+                            <el-date-picker
+                                id="date_premiere_com"
+                                v-model="iEnseigne.date_premier_com"
+                                type="datetime"
+                                placeholder="Sélectionnez l'horodatage"
+                                format="dd/MM/yyyy HH:mm:ss"
+                                value-format="yyyy-MM-dd HH:mm:ss"
+                            />
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-form-item
+                    label="Action de rétablissement"
+                    prop="action_retablissement"
+                >
+                    <el-input
+                        id="action_retablissement"
+                        type="textarea"
+                        :autosize="{ minRows: 4, maxRows: 8 }"
+                        placeholder="Action de rétablissement"
+                        v-model="incident.action_retablissement"
+                    ></el-input>
+                </el-form-item>
+                
+                <el-form-item label="Plan d'action" prop="plan_action">
+                    <el-input
+                        id="plan_action"
+                        type="textarea"
+                        :autosize="{ minRows: 4, maxRows: 8 }"
+                        placeholder="Plan d'action"
+                        v-model="incident.plan_action"
+                    ></el-input>
+                </el-form-item>
+            </el-card>
+            <el-card>	
+                <div slot="header">
+                    <h4 class="card-header">Enseignes impactées</h4>
+                </div>
+                <el-form-item label="Enseigne(s) impactée(s)" prop="enseigne_impactee">
+                    <el-checkbox-group @change="verifCheckEnseignesImpactees()" v-model="iEnseigne.enseigne" style="text-align:left; margin-left:5px;">
+                        <el-checkbox
+                            v-for="enseigne in datas.enseignes"
+                            :label="enseigne.id"
+                            :key="enseigne.id"
+                            v-if="!enseigne.is_deprecated"
+                        >{{ enseigne.nom }}</el-checkbox>
+                    </el-checkbox-group>
+                    <el-tabs v-model="activeEnseigne" >
+                        <el-tab-pane label="BDDF" class="flex flex-nowrap" >
+                            <ImpactEnseigneForm v-if="BDDFForm"></ImpactEnseigneForm>
+                        </el-tab-pane>
+                        <el-tab-pane label="CDN" class="flex flex-nowrap" >
+                            <ImpactEnseigneForm v-show="CDNForm" ></ImpactEnseigneForm>
+                        </el-tab-pane>
+                        <el-tab-pane label="BPF" class="flex flex-nowrap" >
+                            <ImpactEnseigneForm v-show="BPFForm" ></ImpactEnseigneForm>
+                        </el-tab-pane>
+                    </el-tabs>
+                </el-form-item>
+                <el-row :gutter="20">
+						<el-col :span="12">
+							<el-form-item label="Responsabilité" prop="entite_responsable_id">
+								<el-select v-model="incident.departement_responsable">
+									<div style="margin-bottom: 10px;">
+										<el-option
+											v-for="item in datas.entite_responsable"
+											:key="item.id"
+											:label="item.nom"
+											:value="item.id" >
+										</el-option>
+									</div>
+								</el-select >
+							</el-form-item>
+						</el-col>
+						<el-col :span="12">
+							<el-form-item label="/">
+								<el-input v-model="cosip.other_entite_responsable"></el-input>
+							</el-form-item>
+						</el-col>
+					</el-row>
+                    <el-form-item label="Commentaire" prop="commentaire">
+						<el-input
+						    id="commentaire"
+                            type="textarea"
+                            :autosize="{ minRows: 4, maxRows: 8 }"
+                            placeholder="Commentaire"
+							v-model="cosip.comment"
+						></el-input>
+					</el-form-item>
+            </el-card>
+        </div>
+    </div>
+    
 </template>
 
 <script>
+import IncidentClass from "../Class/IncidentClass";
+import Cosip from "../Class/CosipClass";
+import GeneralMethod from '../models/GeneralMethod'
+import DataClass from "../Class/DataClass";
+import GetData from "../models/GetData";
+import Rule from "../models/Rule";
+import ImpactEnseigne from "../Class/ImpactEnseigneClass";
 export default {
+    beforeCreate() {
+        GeneralMethod.getFieldsOptions().then(res => {
+        this.datas = res
+        console.log("Les datas du COSIP", this.datas)
+        })
+        
+    },
+    mounted(){
+        this.verifCheckEnseignesImpactees()
+    },
+    props:{
+        part: String,
+        enseignes : [],
+        nom:""
+    },
 
+
+        data() {
+    return {
+
+        
+        cosip: new Cosip(),
+        iEnseigne : new ImpactEnseigne(),
+        incident: new IncidentClass(),
+        datas: new DataClass(),
+        test: [],
+
+
+        //Gestion des diférent formulaire impact enseigne 
+        BDDFForm:false,
+        CDNForm: false,
+        BPFForm:false,
+        activeEnseigne:'',
+
+        // Variables à Généraliser
+        // Les lignes suivantes sont des variables nécessaires au modal de suppression
+        delConfirmationModalVisible: false,
+        delConfirmationModalVisibleApp: false,
+        messageConfirmation: true,
+        indexRefToDelete: 0,
+        indexRefToDeleteApp: 0,
+        refToDelete: "",
+        refToDeleteApp: "",
+        ajoutIncidentsAgencesVisible: false,
+
+        // Règles de validation pour le formulaire
+        rules: Rule.rules
+        };
+        
+    },
+
+    methods:{
+        verifCheckEnseignesImpactees(){
+            console.log(this.iEnseigne.enseigne)
+
+            if(this.iEnseigne.enseigne[0] === 1 || this.iEnseigne.enseigne[1]==1 || this.iEnseigne.enseigne[2] ==1) {
+                this.activeEnseigne = 'BDDF'
+                this.BDDFForm = true
+            }else{
+                this.BDDFForm = false
+            }
+
+            if(this.iEnseigne.enseigne[0] === 2 || this.iEnseigne.enseigne[1] === 2 || this.iEnseigne.enseigne[2] === 2  ) {
+                this.activeEnseigne = 'CDN'
+                this.CDNForm = true
+            }else{
+                this.CDNForm = false
+            }
+
+            if(this.iEnseigne.enseigne[0] === 3 || this.iEnseigne.enseigne[1] === 3 || this.iEnseigne.enseigne[2] === 3 ) {
+                this.activeEnseigne = 'BPF'
+                this.BPFForm = true
+            }else{
+                this.BPFForm = false
+            }
+        }
+    }
 }
 </script>
 
 <style>
-
+.el-checkbox__orig-checkbox:checked + .el-checkbox__inner {
+  background-color: rgb(222, 233, 243);
+  border-color: black;
+}
 </style>

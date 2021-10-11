@@ -62,7 +62,11 @@
             ></el-date-picker>
           </el-form-item>
 
-          <el-form-item label="Faux incident ?">
+          <!-- Utilisation du Composant COSIP_Form et selection de la partie à afficher Horodatage   -->
+          <CosipForm v-if="pageName=='Cosip'" part="horodatage"/>
+          <!--------------------------------------------------------------------------------------->
+          
+          <el-form-item v-if="pageName=='NewIncident'" label="Faux incident ?">
             <el-col :span="3.5">
               <el-switch
                 style="display: block"
@@ -75,7 +79,7 @@
             </el-col>
           </el-form-item>
 
-          <el-form-item label="Fin de l'incident">
+          <el-form-item v-if="pageName=='NewIncident'" label="Fin de l'incident">
             <el-date-picker
               v-model="incident.date_fin"
               type="datetime"
@@ -123,7 +127,12 @@
             </el-col>
           </el-row>
 
-          <el-form-item
+          <!-- La partie COSIP information générale -->
+          <CosipForm v-if="pageName=='Cosip'" part="info-generale"/>
+          <!----------------------------------------->
+          
+
+          <el-form-item v-if="pageName=='NewIncident'"
             label="Enseigne(s) impactée(s)"
             prop="enseigne_impactee"
           >
@@ -137,7 +146,7 @@
             </el-checkbox-group>
           </el-form-item>
 
-          <el-form-item label="Description" prop="description">
+          <el-form-item v-if="pageName=='NewIncident'" label="Description" prop="description">
             <el-input
               type="textarea"
               :autosize="{ minRows: 2, maxRows: 8 }"
@@ -147,7 +156,7 @@
             ></el-input>
           </el-form-item>
 
-          <el-form-item label="Impact" prop="description_impact">
+          <el-form-item v-if="pageName=='NewIncident'" label="Impact" prop="description_impact">
             <el-input
               type="textarea"
               :autosize="{ minRows: 4, maxRows: 8 }"
@@ -157,7 +166,7 @@
             ></el-input>
           </el-form-item>
 
-          <el-form-item label="Un contournement existe ?">
+          <el-form-item v-if="pageName=='NewIncident'" label="Un contournement existe ?">
             <el-col :span="3.5">
               <el-switch
                 style="display: block"
@@ -172,6 +181,7 @@
           </el-form-item>
 
           <el-form-item
+            v-if="pageName=='NewIncident'"
             label="Description du contournement"
             prop="description_contournement"
           >
@@ -185,7 +195,7 @@
             ></el-input>
           </el-form-item>
 
-          <el-table :data="incident.application_impactee" border>
+          <el-table v-if="pageName=='NewIncident'" :data="incident.application_impactee" border>
             <el-table-column
               label="Application(s) impactée(s)"
               prop="application_impactee"
@@ -277,8 +287,7 @@
         @click="submit()"
         >Sauvegarder</el-button
       >
-    </el-form-item>
-    <CosipForm v-if="pageName=='Cosip'"/>
+    </el-form-item> 
   </el-form>
 </template>
 
@@ -290,20 +299,21 @@ import GeneralMethod from "../models/GeneralMethod";
 import {setContournementRule} from "../models/GeneralMethod"
 import Rule from "../models/Rule";
 
+
 export default {
   props:{
-    pageName :String
+    pageName :String // PageName Props permetant de moduler le formulaire en fonction de sa page de présence 
   },
   created() {
-    GeneralMethod.getFieldsOptions().then(res => {
+    GeneralMethod.getFieldsOptions().then(res => { // Class permettant de récupérer les données des menu déroulant + applications 
       this.datas = res
     })
-    
+
   },
 
   data() {
     return {
-      incident: new IncidentClass(),
+      incident : new IncidentClass(),
       datas: new DataClass(),
 
       // Variables à Généraliser
@@ -325,22 +335,7 @@ export default {
 
   methods: {
     async submit() {
-      //  Exemple d'implémentation de class
-      //  let incident = new IncidentClass("P21IN-123456789","23/04/2021 14:53:30",1,2,["BDDF"],"Desc",["SDF-AN880 : SDF Psystem (Packaging des Beta Test et Mise A jour Psystem)"],"cause","impact");
-      // Exemple de récupération de l'objet incident créer et récupérer du formulaire directement via l'objet incident créer dans data
-      // console.log(this.incident.references)
-      // Exmple  de récupérations des datas avec fonction lambda
-      // let refs;
-      // let id = 43;
-      // refs = await GetData.getDatas(`cosip/${id}`)
-      // console.log(refs)
-      // this.$loading = true
-      // Exemple de récupération des datas avec une fonction par appel
-      //   let refs;
-      //   let id = 43;
-      //   refs = await GetData.getOneIncidentCosip(id);
-      //   console.log(refs);
-      //   this.$loading = true;
+      console.log(this.incident)
     },
 
     // Méthode à Généraliser
