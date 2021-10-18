@@ -89,6 +89,9 @@
               :disabled="incident.is_faux_incident"
             />
           </el-form-item>
+          <UpdateIncidentForm v-if="pageName==='UpdateIncident'" part="horodatage" 
+></UpdateIncidentForm>
+
         </el-card>
         <!-- Fin Horodatage -->
       </el-col>
@@ -132,7 +135,7 @@
           <!----------------------------------------->
           
 
-          <el-form-item v-if="pageName=='NewIncident'"
+          <el-form-item v-if="pageName=='NewIncident'|| pageName=='UpdateIncident'"
             label="Enseigne(s) impactée(s)"
             prop="enseigne_impactee"
           >
@@ -146,7 +149,7 @@
             </el-checkbox-group>
           </el-form-item>
 
-          <el-form-item v-if="pageName=='NewIncident'" label="Description" prop="description">
+          <el-form-item v-if="pageName=='NewIncident' || pageName=='UpdateIncident'" label="Description" prop="description">
             <el-input
               type="textarea"
               :autosize="{ minRows: 2, maxRows: 8 }"
@@ -156,7 +159,7 @@
             ></el-input>
           </el-form-item>
 
-          <el-form-item v-if="pageName=='NewIncident'" label="Impact" prop="description_impact">
+          <el-form-item v-if="pageName=='NewIncident' || pageName=='UpdateIncident'" label="Impact" prop="description_impact">
             <el-input
               type="textarea"
               :autosize="{ minRows: 4, maxRows: 8 }"
@@ -166,7 +169,7 @@
             ></el-input>
           </el-form-item>
 
-          <el-form-item v-if="pageName=='NewIncident'" label="Un contournement existe ?">
+          <el-form-item v-if="pageName=='NewIncident' || pageName=='UpdateIncident'" label="Un contournement existe ?">
             <el-col :span="3.5">
               <el-switch
                 style="display: block"
@@ -181,7 +184,7 @@
           </el-form-item>
 
           <el-form-item
-            v-if="pageName=='NewIncident'"
+            v-if="pageName=='NewIncident' || pageName=='UpdateIncident'"
             label="Description du contournement"
             prop="description_contournement"
           >
@@ -195,7 +198,7 @@
             ></el-input>
           </el-form-item>
 
-          <el-table v-if="pageName=='NewIncident'" :data="incident.application_impactee" border>
+          <el-table v-if="pageName=='NewIncident' || pageName=='UpdateIncident'" :data="incident.application_impactee" border>
             <el-table-column
               label="Application(s) impactée(s)"
               prop="application_impactee"
@@ -235,6 +238,9 @@
               <span class="arrayFormEmpty">Aucune donnée</span>
             </template>
           </el-table>
+          <UpdateIncidentForm v-if="pageName==='UpdateIncident'" part="info-generale"
+          @emit-cause="setUpdateIncident"
+          ></UpdateIncidentForm>
         </el-card>
         <!-- Fin Infos générales incident -->
       </el-col>
@@ -285,8 +291,7 @@
         class="px-4 py-2 rounded-md text-sm font-medium border-b-2 focus:outline-none focus:ring transition text-white bg-blue-500 border-blue-800 hover:bg-blue-600 active:bg-blue-700 focus:ring-blue-300"
         type="submit"
         @click="submit()"
-        >Sauvegarder</el-button
-      >
+        >Sauvegarder</el-button>
     </el-form-item> 
   </el-form>
 </template>
@@ -294,11 +299,10 @@
 <script>
 import IncidentClass from "../Class/IncidentClass";
 import DataClass from "../Class/DataClass";
-import GetData from "../models/GetData";
 import GeneralMethod from "../models/GeneralMethod";
 import {setContournementRule} from "../models/GeneralMethod"
 import Rule from "../models/Rule";
-
+import ImpactEnseigneClass from '../Class/ImpactEnseigneClass';
 
 export default {
   props:{
@@ -315,7 +319,7 @@ export default {
     return {
       incident : new IncidentClass(),
       datas: new DataClass(),
-
+      iEnseigne: new ImpactEnseigneClass(),
       // Variables à Généraliser
       // Les lignes suivantes sont des variables nécessaires au modal de suppression
       delConfirmationModalVisible: false,
@@ -335,9 +339,13 @@ export default {
 
   methods: {
     async submit() {
-      console.log(this.incident)
-    },
+      console.log( "Cause: ",this.incident)
 
+    },
+    setUpdateIncident(payload){
+      console.log("Payload: ", payload)
+      this.incident = payload.inc
+    },
     // Méthode à Généraliser
 
 
@@ -429,4 +437,6 @@ th:first-child .cell
 	&::before
 		content: "* "
 		color: red
+
+    
 </style>

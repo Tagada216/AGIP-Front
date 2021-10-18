@@ -2,7 +2,7 @@ import axios from "axios";
 
 const baseURL = 'http://localhost:5000/api/';
 
-export default {
+export  default {
 
   // Fonction lambda pour récupérer les datas
 

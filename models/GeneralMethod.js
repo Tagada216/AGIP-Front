@@ -1,5 +1,5 @@
 import DataClass from "../Class/DataClass";
-import GetData from "../models/GetData";
+import serviceApi from "../services/serviceApi";
 import Rule from "../models/Rule";
 
 export default {
@@ -21,13 +21,13 @@ export default {
     async getFieldsOptions(){	
         let datas = new DataClass();
 
-		datas.priorites = await GetData.getDatas('incident/priorite');
-		datas.statut = await GetData.getDatas('incident/statut');
-		datas.enseignes = await GetData.getDatas('enseigne');
-        datas.application_impactee = await GetData.getDatas('applications');
-        datas.gravite = await GetData.getDatas('gravite');
-        datas.cause_racines = await GetData.getDatas('cause-racine');
-        datas.entite_responsable = await GetData.getDatas('entite-responsable');
+		datas.priorites = await serviceApi.getDatas('incident/priorite');
+		datas.statut = await serviceApi.getDatas('incident/statut');
+		datas.enseignes = await serviceApi.getDatas('enseigne');
+        datas.application_impactee = await serviceApi.getDatas('applications');
+        datas.gravite = await serviceApi.getDatas('gravite');
+        datas.cause_racines = await serviceApi.getDatas('cause-racine');
+        datas.entite_responsable = await serviceApi.getDatas('entite-responsable');
         
         return datas;
     },

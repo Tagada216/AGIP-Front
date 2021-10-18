@@ -5,7 +5,7 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'TDC-Toolbox2',
+    title: 'AGIRPO',
     htmlAttrs: {
       lang: 'en'
     },

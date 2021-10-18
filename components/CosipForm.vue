@@ -27,6 +27,7 @@
                     ></el-date-picker>
             </el-form-item>
         </div>
+
         <div v-if="part=='info-generale'">
             <el-form-item label="Résumé" >
                 <el-input
@@ -218,7 +219,7 @@ import IncidentClass from "../Class/IncidentClass";
 import Cosip from "../Class/CosipClass";
 import GeneralMethod from '../models/GeneralMethod'
 import DataClass from "../Class/DataClass";
-import GetData from "../models/GetData";
+import serviceApi from "../services/serviceApi";
 import Rule from "../models/Rule";
 import ImpactEnseigne from "../Class/ImpactEnseigneClass";
 export default {

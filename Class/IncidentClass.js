@@ -9,6 +9,7 @@ export default class IncidentClass {
     description = "";
     application_impactee = [];
     cause = "";
+    origine="";
     action_retablissement = "";
     plan_action="";
     description_impact = "";

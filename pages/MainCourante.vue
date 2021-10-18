@@ -64,6 +64,7 @@
 				splitpanes-max="100"
 			/> -->
 		</splitpanes>
+		<IncidentForm pageName='UpdateIncident' />
 	</div>
 </template>
 
@@ -72,7 +73,7 @@
 import Grid from '../components/Grid';
 import Splitpanes from "splitpanes";
 import "splitpanes/dist/splitpanes.css";
-import GetData from "../models/GetData";
+import serviceApi from "../services/serviceApi";
 import '@fortawesome/fontawesome-free/css/all.css'
 
 
@@ -96,7 +97,7 @@ export default {
 			console.log("L'id est " + this.curID);
 		},
 		async fetchMainCourrante() {
-			const response = await GetData.getDatas('incident');
+			const response = await serviceApi.serviceApis('incident');
 			return response.data;
 		},
 		duplicate() {
