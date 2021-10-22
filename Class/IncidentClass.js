@@ -17,7 +17,8 @@ export default class IncidentClass {
     is_contournement = false;
     is_agence = false;
     departement_responsable='';
-
+    changements_id='';
+    crise_ITIM='';
     constructor() {};
 
     //ref,debut,priorite,statut,enseigneImpactee,desc,appImpactee,cause,descImpact

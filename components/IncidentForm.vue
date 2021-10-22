@@ -131,7 +131,7 @@
           </el-row>
 
           <!-- La partie COSIP information générale -->
-          <CosipForm v-if="pageName=='Cosip'" part="info-generale"/>
+          <CosipForm v-if="pageName=='Cosip'" part="info-generale" @emitCosip="setCosipForm"/>
           <!----------------------------------------->
           
 
@@ -144,6 +144,7 @@
                 v-for="enseigne in datas.enseignes"
                 :label="enseigne.id"
                 :key="enseigne.id"
+                v-if="!enseigne.is_deprecated"
                 >{{ enseigne.nom }}</el-checkbox
               >
             </el-checkbox-group>
@@ -198,52 +199,17 @@
             ></el-input>
           </el-form-item>
 
-          <el-table v-if="pageName=='NewIncident' || pageName=='UpdateIncident'" :data="incident.application_impactee" border>
-            <el-table-column
-              label="Application(s) impactée(s)"
-              prop="application_impactee"
-            >
-              <template slot-scope="scope">
-                <el-autocomplete
-                  placeholder="Application impactée"
-                  v-model="
-                    incident.application_impactee[scope.$index].display_name
-                  "
-                  :fetch-suggestions="getMatchingApplications"
-                  value-key="display_name"
-                  @select="appSelected"
-                ></el-autocomplete>
-              </template>
-            </el-table-column>
-            <el-table-column width="60">
-              <template slot="header">
-                <el-button
-                  type="primary"
-                  icon="el-icon-plus"
-                  circle
-                  @click="handleCreateApp()"
-                />
-              </template>
 
-              <template>
-                <el-button
-                  type="danger"
-                  icon="el-icon-delete"
-                  circle
-                  @click="handleDeleteApp(scope.$index)"
-                />
-              </template>
-            </el-table-column>
-            <template slot="empty">
-              <span class="arrayFormEmpty">Aucune donnée</span>
-            </template>
-          </el-table>
           <UpdateIncidentForm v-if="pageName==='UpdateIncident'" part="info-generale"
-          @emit-cause="setUpdateIncident"
+          @emit-updateIncident="setUpdateIncident"
           ></UpdateIncidentForm>
+
+          <ApplicationImpactee @emit-appImpactee="setAppImpactee" v-if="pageName=='NewIncident' || pageName=='UpdateIncident'"></ApplicationImpactee>
         </el-card>
         <!-- Fin Infos générales incident -->
+
       </el-col>
+        
     </el-row>
 
     <!-- Modal de confirmation de suppression d'une reférence problème -->
@@ -266,26 +232,7 @@
     </el-dialog>
     <!-- Fin Modal de confirmation de suppression d'une reférence problème -->
 
-    <!-- Modal de confirmation de suppression d'une application impactée -->
-    <el-dialog
-      title="Demande de confirmation"
-      :visible.sync="delConfirmationModalVisibleApp"
-      width="40%"
-      center
-    >
-      <span>
-        Etes vous sur de vouloir supprimer l'application :
-        {{ refToDeleteApp }}
-      </span>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="delConfirmationModalVisibleApp = false"
-          >Annuler</el-button
-        >
-        <el-button type="danger" @click="confirmDeleteApp()"
-          >Confirmer</el-button
-        >
-      </span>
-    </el-dialog>
+    
     <el-form-item style="text-align: center">
       <el-button
         class="px-4 py-2 rounded-md text-sm font-medium border-b-2 focus:outline-none focus:ring transition text-white bg-blue-500 border-blue-800 hover:bg-blue-600 active:bg-blue-700 focus:ring-blue-300"
@@ -299,6 +246,7 @@
 <script>
 import IncidentClass from "../Class/IncidentClass";
 import DataClass from "../Class/DataClass";
+import Cosip from "../Class/CosipClass";
 import GeneralMethod from "../models/GeneralMethod";
 import {setContournementRule} from "../models/GeneralMethod"
 import Rule from "../models/Rule";
@@ -320,10 +268,10 @@ export default {
       incident : new IncidentClass(),
       datas: new DataClass(),
       iEnseigne: new ImpactEnseigneClass(),
+      cosip: new Cosip(),
       // Variables à Généraliser
       // Les lignes suivantes sont des variables nécessaires au modal de suppression
-      delConfirmationModalVisible: false,
-      delConfirmationModalVisibleApp: false,
+      delConfirmationModalVisible:false,
       messageConfirmation: true,
       indexRefToDelete: 0,
       indexRefToDeleteApp: 0,
@@ -339,12 +287,23 @@ export default {
 
   methods: {
     async submit() {
-      console.log( "Cause: ",this.incident)
-
+      console.log( "Incident: ",this.incident)
+      console.log( "Impact Enseigne: ",this.iEnseigne)
+      console.log( "Cosip: ",this.cosip)
     },
     setUpdateIncident(payload){
       console.log("Payload: ", payload)
       this.incident = payload.inc
+    },
+    setCosipForm(payload){
+      console.log("Payload: ", payload)
+      this.incident = payload.inc
+      this.iEnseigne = payload.ienseigne 
+      this.cosip = payload.cosip
+    },
+    setAppImpactee(payload){
+      console.log("App: ", payload)
+      this.incident.application_impactee = payload.app
     },
     // Méthode à Généraliser
 
@@ -361,58 +320,7 @@ export default {
     handleCreate() {
       this.incident.references.push({ reference: "" });
     },
-    // Les handler pour la table et le modal des applis impactees
-    confirmDeleteApp() {
-      this.incident.application_impactee.splice(this.indexRefToDeleteApp, 1);
-      this.delConfirmationModalVisibleApp = false;
-    },
-    handleDeleteApp(index) {
-      this.indexRefToDeleteApp = index;
-      this.refToDeleteApp = this.incident.application_impactee[
-        index
-      ].application_impactee;
-      this.delConfirmationModalVisibleApp = true;
-    },
-    handleCreateApp() {
-      this.incident.application_impactee.push({ display_name: "" });
-    },
-
-    getMatchingApplications(requete, retour) {
-      if (requete.length > 1) {
-        var apps = this.datas.applications;
-        var results = requete
-          ? apps.filter(this.createAppFilter(requete))
-          : apps;
-        retour(results);
-        //console.log(retour);
-      } else {
-        retour([{ nom: "" }]);
-      }
-    },
-
-    // Crée le filtre nécessaire à matcher les applis
-    createAppFilter(queryString) {
-      return apps => {
-        return (
-          apps.code_irt.toLowerCase().indexOf(queryString.toLowerCase()) !=
-            -1 ||
-          apps.trigramme.toLowerCase().indexOf(queryString.toLowerCase()) !=
-            -1 ||
-          apps.nom.toLowerCase().indexOf(queryString.toLowerCase()) != -1 ||
-          apps.libelle_court.toLowerCase().indexOf(queryString.toLowerCase()) !=
-            -1
-        );
-      };
-    },
-
-    // Cette méthode est lancée quand un champ d'appli impacté s'est vu selectionné une appli parmis les propositions
-    // Quand tel est le cas, on insere les données de l'appli (CI et trigramme) pour pouvoir la relier en BDD
-    appSelected(appSelection) {
-      const appIndex = this.form.application_impactee
-        .map(el => el.display_name)
-        .indexOf(appSelection.display_name);
-      this.incident.application_impactee[appIndex] = appSelection;
-    }
+    
   }
 };
 </script>

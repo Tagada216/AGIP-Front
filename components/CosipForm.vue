@@ -5,7 +5,8 @@
                 <el-input
                     id="mois_cosip"
                     placeholder="Mois"
-                    
+                    v-model="cosipMonth"
+                    @change="emitToParent"
                 ></el-input>
                 </el-form-item>
 
@@ -13,12 +14,15 @@
                     <el-input
                         id="semaine_cosip"
                         placeholder="Semaine COSIP"
-                        
+                        v-model="cosipWeek"
+                        @change="emitToParent"
                     ></el-input>
             </el-form-item>
 
             <el-form-item label="Date de fin" >
                     <el-date-picker
+                        v-model="iEnseigne.date_fin"
+                        @change="emitToParent"
                         id="date_fin"
                         type="datetime"
                         placeholder="Selectionnez l'horodatage"
@@ -36,6 +40,7 @@
                     :autosize="{ minRows: 4, maxRows: 8 }"
                     placeholder="Résumé"
                     v-model="incident.description"
+                    @change="emitToParent"
                 ></el-input>
             </el-form-item>
 
@@ -47,6 +52,7 @@
                     :autosize="{ minRows: 4, maxRows: 8 }"
                     placeholder="Cause"
                     v-model="incident.cause"
+                    @change="emitToParent"
                 ></el-input>
             </el-form-item>
             <el-row :span="3" >
@@ -54,6 +60,7 @@
                         <el-select
                             id="cause_racine_id"
                             v-model="cosip.cause_racine_id"
+                            @change="emitToParent"
                             >
                             <el-option
                             v-for="item in datas.cause_racines"
@@ -72,6 +79,8 @@
                 <el-input 
                     id="numChangement"
                     placeholder="Numéro de changement"
+                    v-model="incident.changements_id"
+                    @change="emitToParent"
                 ></el-input>
                 <el-input
                     id="origine"
@@ -79,6 +88,7 @@
                     :autosize="{ minRows: 4, maxRows: 8 }"
                     placeholder="Origine"
                     v-model="incident.origine"
+                    @change="emitToParent"
                 ></el-input>
             </el-form-item>
             <el-card>
@@ -88,17 +98,21 @@
                 <el-row :gutter="20">
                     <el-col :span="6">
                         <el-form-item>
-                            <el-checkbox>Crise</el-checkbox>
+                            <el-checkbox
+                            v-model="incident.crise_ITIM"
+                            @change="emitToParent"
+                            >Crise
+                            </el-checkbox>
                         </el-form-item>
                     </el-col>
-                    <el-col :span="6">
+                    <!-- <el-col :span="6">
                         <el-form-item 
                             label="Problème ?"
                             prop="probleme"
                         >
                             <el-input id="probleme" placeholder="Problème" ></el-input>
                         </el-form-item>
-                    </el-col>
+                    </el-col> -->
                 </el-row>
                 <el-row :gutter="20">
                     <el-col :span="6">
@@ -108,6 +122,7 @@
                             <el-date-picker
                                 id="date_detection"
                                 v-model="iEnseigne.date_detection"
+                                @change="emitToParent"
                                 type="datetime"
                                 placeholder="Sélectionnez l'horodatage"
                                 format="dd/MM/yyyy HH:mm:ss"
@@ -115,13 +130,14 @@
                             />
                         </el-form-item>
                     </el-col>
-                    <el-col :span="6">
+                    <el-col :span="8">
                         <el-form-item label="Première communication à l'enseigne"
                             prop="date_premiere_com"
                         >
                             <el-date-picker
                                 id="date_premiere_com"
                                 v-model="iEnseigne.date_premier_com"
+                                @change="emitToParent"
                                 type="datetime"
                                 placeholder="Sélectionnez l'horodatage"
                                 format="dd/MM/yyyy HH:mm:ss"
@@ -140,6 +156,7 @@
                         :autosize="{ minRows: 4, maxRows: 8 }"
                         placeholder="Action de rétablissement"
                         v-model="incident.action_retablissement"
+                        @change="emitToParent"
                     ></el-input>
                 </el-form-item>
                 
@@ -150,6 +167,7 @@
                         :autosize="{ minRows: 4, maxRows: 8 }"
                         placeholder="Plan d'action"
                         v-model="incident.plan_action"
+                        @change="emitToParent"
                     ></el-input>
                 </el-form-item>
             </el-card>
@@ -157,8 +175,8 @@
                 <div slot="header">
                     <h4 class="card-header">Enseignes impactées</h4>
                 </div>
-                <el-form-item label="Enseigne(s) impactée(s)" prop="enseigne_impactee">
-                    <el-checkbox-group @change="verifCheckEnseignesImpactees()" v-model="iEnseigne.enseigne" style="text-align:left; margin-left:5px;">
+                <el-form-item label="Enseigne(s) impactée(s)" prop="enseigne_impactee" >
+                    <el-checkbox-group  @change="verifCheckEnseignesImpactees()" v-model="iEnseigne.enseigne" style="text-align:left; margin-left:5px;">
                         <el-checkbox
                             v-for="enseigne in datas.enseignes"
                             :label="enseigne.id"
@@ -168,20 +186,25 @@
                     </el-checkbox-group>
                     <el-tabs v-model="activeEnseigne" >
                         <el-tab-pane label="BDDF" class="flex flex-nowrap" >
-                            <ImpactEnseigneForm v-if="BDDFForm"></ImpactEnseigneForm>
+                            <ImpactEnseigneForm v-if="BDDFForm" enseigne="BDDF" @emit-impactE="setImpactE"></ImpactEnseigneForm>
                         </el-tab-pane>
                         <el-tab-pane label="CDN" class="flex flex-nowrap" >
-                            <ImpactEnseigneForm v-show="CDNForm" ></ImpactEnseigneForm>
+                            <ImpactEnseigneForm v-show="CDNForm" enseigne="CDN" @emit-impactE="setImpactE"></ImpactEnseigneForm>
                         </el-tab-pane>
                         <el-tab-pane label="BPF" class="flex flex-nowrap" >
-                            <ImpactEnseigneForm v-show="BPFForm" ></ImpactEnseigneForm>
+                            <ImpactEnseigneForm v-show="BPFForm" enseigne="BPF" @emit-impactE="setImpactE"></ImpactEnseigneForm>
                         </el-tab-pane>
                     </el-tabs>
                 </el-form-item>
+
+
                 <el-row :gutter="20">
 						<el-col :span="12">
 							<el-form-item label="Responsabilité" prop="entite_responsable_id">
-								<el-select v-model="incident.departement_responsable">
+								<el-select 
+                                    v-model="incident.departement_responsable"
+                                    @change="emitToParent
+                                ">
 									<div style="margin-bottom: 10px;">
 										<el-option
 											v-for="item in datas.entite_responsable"
@@ -195,7 +218,10 @@
 						</el-col>
 						<el-col :span="12">
 							<el-form-item label="/">
-								<el-input v-model="cosip.other_entite_responsable"></el-input>
+								<el-input 
+                                v-model="cosip.other_entite_responsable"
+                                @change="emitToParent"
+                                ></el-input>
 							</el-form-item>
 						</el-col>
 					</el-row>
@@ -206,6 +232,7 @@
                             :autosize="{ minRows: 4, maxRows: 8 }"
                             placeholder="Commentaire"
 							v-model="cosip.comment"
+                            @change="emitToParent"
 						></el-input>
 					</el-form-item>
             </el-card>
@@ -226,12 +253,8 @@ export default {
     beforeCreate() {
         GeneralMethod.getFieldsOptions().then(res => {
         this.datas = res
-        console.log("Les datas du COSIP", this.datas)
         })
         
-    },
-    mounted(){
-        this.verifCheckEnseignesImpactees()
     },
     props:{
         part: String,
@@ -243,12 +266,12 @@ export default {
         data() {
     return {
 
-        
+        cosipMonth: "",
+        cosipWeek:"",
         cosip: new Cosip(),
         iEnseigne : new ImpactEnseigne(),
         incident: new IncidentClass(),
         datas: new DataClass(),
-        test: [],
 
 
         //Gestion des diférent formulaire impact enseigne 
@@ -276,11 +299,13 @@ export default {
 
     methods:{
         verifCheckEnseignesImpactees(){
-            console.log(this.iEnseigne.enseigne)
 
+            
+            
             if(this.iEnseigne.enseigne[0] === 1 || this.iEnseigne.enseigne[1]==1 || this.iEnseigne.enseigne[2] ==1) {
                 this.activeEnseigne = 'BDDF'
                 this.BDDFForm = true
+                console.log("BDDF")
             }else{
                 this.BDDFForm = false
             }
@@ -288,6 +313,7 @@ export default {
             if(this.iEnseigne.enseigne[0] === 2 || this.iEnseigne.enseigne[1] === 2 || this.iEnseigne.enseigne[2] === 2  ) {
                 this.activeEnseigne = 'CDN'
                 this.CDNForm = true
+                console.log("CDN")
             }else{
                 this.CDNForm = false
             }
@@ -295,17 +321,25 @@ export default {
             if(this.iEnseigne.enseigne[0] === 3 || this.iEnseigne.enseigne[1] === 3 || this.iEnseigne.enseigne[2] === 3 ) {
                 this.activeEnseigne = 'BPF'
                 this.BPFForm = true
+                console.log("BPF")
             }else{
                 this.BPFForm = false
             }
+        },
+
+        emitToParent(){
+            this.$emit('emitCosip', {inc: this.incident, ienseigne: this.iEnseigne, cosip: this.cosip})
+        },
+
+        setImpactE(payload){
+            this.iEnseigne = payload.ienseigne
+            console.log("payload", payload)
         }
     }
 }
 </script>
 
-<style>
-.el-checkbox__orig-checkbox:checked + .el-checkbox__inner {
-  background-color: rgb(222, 233, 243);
-  border-color: black;
-}
+<style lang="scss" scoped>
+
+
 </style>

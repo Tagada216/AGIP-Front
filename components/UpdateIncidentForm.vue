@@ -121,9 +121,9 @@ export default {
 	},
 methods:{
 	emitToParent(){
-		this.$emit('emit-cause', { inc: this.incident})
+		this.$emit('emit-updateIncident', { inc: this.incident})
 	}
-
+	
 },
 }
 </script>

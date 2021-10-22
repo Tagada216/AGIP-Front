@@ -2,6 +2,7 @@ import IncidentClass from './IncidentClass';
 
 export default class ImpactEnseigne extends IncidentClass{
     enseigne=[];
+    enseigne_id="";
     gravite_id="";
     description_impact="";
     date_debut="";
