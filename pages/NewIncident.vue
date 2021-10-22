@@ -1,7 +1,7 @@
 <template>
   <div>
     <Header title="Nouvel Incident" />
-    <createIncident />
+    <IncidentForm pageName="NewIncident" />
   </div>
 </template>
 

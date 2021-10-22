@@ -5,7 +5,7 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'TDC-Toolbox2',
+    title: 'AGIRPO',
     htmlAttrs: {
       lang: 'en'
     },
@@ -34,7 +34,11 @@ export default {
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
-  css: [],
+  css: [
+    '@/node_modules/ag-grid-community/dist/styles/ag-grid.css',
+    '@/node_modules/ag-grid-community/dist/styles/ag-theme-dark.css',
+    // '../node-modules/splitpanes/dist/splitpanes.css',
+  ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [

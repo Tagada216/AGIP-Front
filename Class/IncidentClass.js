@@ -9,11 +9,16 @@ export default class IncidentClass {
     description = "";
     application_impactee = [];
     cause = "";
+    origine="";
+    action_retablissement = "";
+    plan_action="";
     description_impact = "";
     description_contournement = "Aucun contournement";
     is_contournement = false;
     is_agence = false;
-
+    departement_responsable='';
+    changements_id='';
+    crise_ITIM='';
     constructor() {};
 
     //ref,debut,priorite,statut,enseigneImpactee,desc,appImpactee,cause,descImpact
