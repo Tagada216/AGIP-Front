@@ -36,7 +36,7 @@ export default {
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
     '@/node_modules/ag-grid-community/dist/styles/ag-grid.css',
-    '@/node_modules/ag-grid-community/dist/styles/ag-theme-dark.css',
+    '@/node_modules/ag-grid-community/dist/styles/ag-theme-alpine.css',
     // '../node-modules/splitpanes/dist/splitpanes.css',
   ],
 
@@ -56,7 +56,8 @@ export default {
   ],
 
   fontawesome: {
-    // component: 'fa',
+    component: 'FaIcon',
+    suffix: false,
     icons: {
       solid: true,
       brands: true
