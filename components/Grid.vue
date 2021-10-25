@@ -91,44 +91,12 @@ export default {
       this.rowData = getFormatedDatas;
     },
 
-<<<<<<< HEAD
-    methods: {
-        setGridData(data) {
-            this.setColDef(Object.keys(data[0]));
-            this.rowData = data;
-
-        },
-        setColDef(colNames) {
-            this.columnDefs = [];
-            // console.log(colNames);
-
-            for (const colName of colNames) {
-                this.columnDefs.push({
-                    field: '' + colName,
-                    hide: colName == 'id',
-                    width: (1 / (colNames.length / 2)) * 3000,
-                    sortable: true,
-                    filter: true,
-					comparator: colName.includes("Date") ? dateComparator : false,
-					sort: colName.includes("Date de début") ? "desc" : false
-                });
-            }
-        },
-        //Trigger qui permet de récupérer L'id ou la référence depuis le tableau main courante ou Cosip 
-        onRowSelected(event) {
-            if (event.node.selected) {
-                this.$emit('incidentSelected', event.data.id);
-                this.$emit('CosipSelected', event.data.id);
-            }
-        },
-=======
     setColDef(colNames) {
       this.columnDefs = [];
 
       var i = 0;
       var keysHeader = Object.values(this.setHeader);
       var hidden = [];
->>>>>>> formatedDatas
 
       for (const colName of colNames) {
         if (colName == keysHeader[i]) {
