@@ -2,7 +2,7 @@
   <div style="height: 100%;">
     <ag-grid-vue
       style="width: 100%; height: 100%; min-height: 85%"
-      class="ag-theme-alpine"
+      class="ag-theme-bootstrap"
       :columnDefs="columnDefs"
       :rowData="rowData"
       :rowSelection="rowSelection"
