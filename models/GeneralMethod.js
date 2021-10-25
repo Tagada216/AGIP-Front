@@ -1,12 +1,7 @@
 import DataClass from "../Class/DataClass";
-<<<<<<< HEAD
 import serviceApi from "../services/serviceApi";
-import Rule from "../models/Rule";
-=======
-import GetData from "../models/GetData";
 import IncidentModel from "../models/IncidentModel";
 
->>>>>>> formatedDatas
 
 export default {
 
@@ -292,27 +287,28 @@ export default {
 
       var oldKeys = getKeys[i].split(':')
 
-<<<<<<< HEAD
-		datas.priorites = await serviceApi.getDatas('incident/priorite');
-		datas.statut = await serviceApi.getDatas('incident/statut');
-		datas.enseignes = await serviceApi.getDatas('enseigne');
-        datas.application_impactee = await serviceApi.getDatas('applications');
-        datas.gravite = await serviceApi.getDatas('gravite');
-        datas.cause_racines = await serviceApi.getDatas('cause-racine');
-        datas.entite_responsable = await serviceApi.getDatas('entite-responsable');
-        
-        return datas;
-    },
-=======
       if (Object.keys(getKeys)[i] == Object.keys(header)[i]) {
         str = str.replace(oldKeys[0], newKeys[0])
       }
->>>>>>> formatedDatas
 
     }
 
     incident = JSON.parse(str)
 
     return incident
-  }
+  },
+
+
+  async getFieldsOptions() {
+
+    let datas = new DataClass();
+ 
+
+    datas.priorites = await GetData.getDatas('incident/priorite');
+    datas.statut = await GetData.getDatas('incident/statut');
+    datas.enseignes = await GetData.getDatas('enseigne');
+    datas.application_impactee = await GetData.getDatas('applications');
+
+    return datas;
+  },
 }
