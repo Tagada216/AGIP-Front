@@ -47,13 +47,13 @@
 		<splitpanes watch-slots class="default-theme" horizontal>
 			<div splitpanes-size="0" splitpanes-max="0"></div>
 
-			<grid
+			<Grid usedIn = mainCourante
 				style="height: 100%"
 				splitpanes-size="50"
 				splitpanes-min="15"
 				splitpanes-max="100"
-				dataLink="http://localhost:5000/api/incident"
 				@incidentSelected="updateID"
+				dataLink="http://localhost:5000/api/incident"
 			/>
 				
 			

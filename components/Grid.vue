@@ -3,8 +3,8 @@
     <ag-grid-vue
       style="width: 100%; height: 100%; min-height: 85%"
       class="ag-theme-alpine"
-      :rowData="rowData"
       :columnDefs="columnDefs"
+      :rowData="rowData"
       :rowSelection="rowSelection"
       @row-selected="onRowSelected"
     ></ag-grid-vue>
@@ -14,6 +14,8 @@
 <script>
 import { AgGridVue } from "ag-grid-vue";
 import IncidentClass from "../Class/IncidentClass";
+import Headers from "../models/Headers";
+import GeneralMethod from "../models/GeneralMethod";
 
 function dateComparator(date1, date2) {
   var date1Number = monthToComparableNumber(date1);
@@ -56,7 +58,8 @@ export default {
       columnDefs: this.columnDefs,
       rowSelection: "single",
       date_cosip_selec: "",
-      url: ""
+      url: "",
+      setHeader: ""
     };
   },
   components: {
@@ -64,41 +67,51 @@ export default {
   },
 
   props: {
-    dataLink: String
+    dataLink: String,
+    usedIn: String
   },
 
   mounted() {
-    let incidents = [];
-    this.$http.get(this.dataLink).then(response =>
-      this.setGridData(
-        response.data.map(inc => {
-          let incident = new IncidentClass(inc);
-        //   incident = inc
-          return incident;
-        })
-      )
-    );
+    this.$http
+      .get(this.dataLink)
+      .then(response => this.setGridData(response.data));
   },
-  //
+
+  
   methods: {
     setGridData(data) {
-      this.setColDef(Object.keys(data[0]));
-      this.rowData = data;
+      let getFormatedDatas;
+
+      if (this.usedIn == "mainCourante") {
+        this.setHeader = Headers.HeaderMainCourante.head;
+      }
+
+      getFormatedDatas = GeneralMethod.transformDatas(data, this.setHeader);
+      this.setColDef(Object.keys(getFormatedDatas[0]));
+      this.rowData = getFormatedDatas;
     },
+
     setColDef(colNames) {
       this.columnDefs = [];
-      console.log(colNames);
+
+      var i = 0;
+      var keysHeader = Object.values(this.setHeader);
+      var hidden = [];
 
       for (const colName of colNames) {
-        this.columnDefs.push({
-          field: "" + colName,
-          hide: colName == "id",
-          width: (1 / (colNames.length / 2)) * 3000,
-          sortable: true,
-          filter: true,
-          comparator: colName.includes("Date") ? dateComparator : false,
-          sort: colName.includes("Date de début") ? "desc" : false
-        });
+        if (colName == keysHeader[i]) {
+          this.columnDefs.push({
+            field: "" + colName,
+            // hide: colName == "id",
+            width: (1 / (colNames.length / 2)) * 3000,
+            sortable: true,
+            filter: true,
+            comparator: colName.includes("Date") ? dateComparator : false,
+            sort: colName.includes("Date de début") ? "desc" : false
+          });
+        }
+
+        i++;
       }
     },
     //Trigger qui permet de récupérer L'id ou la référence depuis le tableau main courante ou Cosip
@@ -137,5 +150,4 @@ input
 	border: none
 	font-size : 2em
 	background-color: transparent
-    
 </style>
