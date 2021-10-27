@@ -63,10 +63,13 @@
           </el-form-item>
 
           <!-- Utilisation du Composant COSIP_Form et selection de la partie à afficher Horodatage   -->
-          <CosipForm v-if="pageName=='Cosip'" part="horodatage"/>
+          <CosipForm v-if="pageName == 'Cosip'" part="horodatage" />
           <!--------------------------------------------------------------------------------------->
-          
-          <el-form-item v-if="pageName=='NewIncident'" label="Faux incident ?">
+
+          <el-form-item
+            v-if="pageName == 'NewIncident'"
+            label="Faux incident ?"
+          >
             <el-col :span="3.5">
               <el-switch
                 style="display: block"
@@ -79,7 +82,10 @@
             </el-col>
           </el-form-item>
 
-          <el-form-item v-if="pageName=='NewIncident'" label="Fin de l'incident">
+          <el-form-item
+            v-if="pageName == 'NewIncident'"
+            label="Fin de l'incident"
+          >
             <el-date-picker
               v-model="incident.date_fin"
               type="datetime"
@@ -89,9 +95,10 @@
               :disabled="incident.is_faux_incident"
             />
           </el-form-item>
-          <UpdateIncidentForm v-if="pageName==='UpdateIncident'" part="horodatage" 
-></UpdateIncidentForm>
-
+          <UpdateIncidentForm
+            v-if="pageName === 'UpdateIncident'"
+            part="horodatage"
+          ></UpdateIncidentForm>
         </el-card>
         <!-- Fin Horodatage -->
       </el-col>
@@ -131,11 +138,15 @@
           </el-row>
 
           <!-- La partie COSIP information générale -->
-          <CosipForm v-if="pageName=='Cosip'" part="info-generale" @emitCosip="setCosipForm"/>
+          <CosipForm
+            v-if="pageName == 'Cosip'"
+            part="info-generale"
+            @emitCosip="setCosipForm"
+          />
           <!----------------------------------------->
-          
 
-          <el-form-item v-if="pageName=='NewIncident'|| pageName=='UpdateIncident'"
+          <el-form-item
+            v-if="pageName == 'NewIncident' || pageName == 'UpdateIncident'"
             label="Enseigne(s) impactée(s)"
             prop="enseigne_impactee"
           >
@@ -150,7 +161,11 @@
             </el-checkbox-group>
           </el-form-item>
 
-          <el-form-item v-if="pageName=='NewIncident' || pageName=='UpdateIncident'" label="Description" prop="description">
+          <el-form-item
+            v-if="pageName == 'NewIncident' || pageName == 'UpdateIncident'"
+            label="Description"
+            prop="description"
+          >
             <el-input
               type="textarea"
               :autosize="{ minRows: 2, maxRows: 8 }"
@@ -160,7 +175,11 @@
             ></el-input>
           </el-form-item>
 
-          <el-form-item v-if="pageName=='NewIncident' || pageName=='UpdateIncident'" label="Impact" prop="description_impact">
+          <el-form-item
+            v-if="pageName == 'NewIncident' || pageName == 'UpdateIncident'"
+            label="Impact"
+            prop="description_impact"
+          >
             <el-input
               type="textarea"
               :autosize="{ minRows: 4, maxRows: 8 }"
@@ -170,7 +189,10 @@
             ></el-input>
           </el-form-item>
 
-          <el-form-item v-if="pageName=='NewIncident' || pageName=='UpdateIncident'" label="Un contournement existe ?">
+          <el-form-item
+            v-if="pageName == 'NewIncident' || pageName == 'UpdateIncident'"
+            label="Un contournement existe ?"
+          >
             <el-col :span="3.5">
               <el-switch
                 style="display: block"
@@ -179,13 +201,20 @@
                 inactive-color="#ff4949"
                 active-text="Oui"
                 inactive-text="Non"
-                @change=" rules.description_contournement[0].required = !rules.description_contournement[0].required &&   (this.incident.description_contournement = !this.rules.description_contournement[0].required? 'Aucun contournement': '')"
+                @change="
+                  rules.description_contournement[0].required =
+                    !rules.description_contournement[0].required &&
+                    (this.incident.description_contournement = !this.rules
+                      .description_contournement[0].required
+                      ? 'Aucun contournement'
+                      : '')
+                "
               ></el-switch>
             </el-col>
           </el-form-item>
 
           <el-form-item
-            v-if="pageName=='NewIncident' || pageName=='UpdateIncident'"
+            v-if="pageName == 'NewIncident' || pageName == 'UpdateIncident'"
             label="Description du contournement"
             prop="description_contournement"
           >
@@ -199,17 +228,19 @@
             ></el-input>
           </el-form-item>
 
-
-          <UpdateIncidentForm v-if="pageName==='UpdateIncident'" part="info-generale"
-          @emit-updateIncident="setUpdateIncident"
+          <UpdateIncidentForm
+            v-if="pageName === 'UpdateIncident'"
+            part="info-generale"
+            @emit-updateIncident="setUpdateIncident"
           ></UpdateIncidentForm>
 
-          <ApplicationImpactee @emit-appImpactee="setAppImpactee" v-if="pageName=='NewIncident' || pageName=='UpdateIncident'"></ApplicationImpactee>
+          <ApplicationImpactee
+            @emit-appImpactee="setAppImpactee"
+            v-if="pageName == 'NewIncident' || pageName == 'UpdateIncident'"
+          ></ApplicationImpactee>
         </el-card>
         <!-- Fin Infos générales incident -->
-
       </el-col>
-        
     </el-row>
 
     <!-- Modal de confirmation de suppression d'une reférence problème -->
@@ -232,14 +263,14 @@
     </el-dialog>
     <!-- Fin Modal de confirmation de suppression d'une reférence problème -->
 
-    
     <el-form-item style="text-align: center">
       <el-button
         class="px-4 py-2 rounded-md text-sm font-medium border-b-2 focus:outline-none focus:ring transition text-white bg-blue-500 border-blue-800 hover:bg-blue-600 active:bg-blue-700 focus:ring-blue-300"
         type="submit"
         @click="submit()"
-        >Sauvegarder</el-button>
-    </el-form-item> 
+        >Sauvegarder</el-button
+      >
+    </el-form-item>
   </el-form>
 </template>
 
@@ -248,30 +279,35 @@ import IncidentClass from "../Class/IncidentClass";
 import DataClass from "../Class/DataClass";
 import Cosip from "../Class/CosipClass";
 import GeneralMethod from "../models/GeneralMethod";
-import {setContournementRule} from "../models/GeneralMethod"
+import { setContournementRule } from "../models/GeneralMethod";
 import Rule from "../models/Rule";
-import ImpactEnseigneClass from '../Class/ImpactEnseigneClass';
+import ImpactEnseigneClass from "../Class/ImpactEnseigneClass";
+import serviceApi from "../services/serviceApi";
 
 export default {
-  props:{
-    pageName :String // PageName Props permetant de moduler le formulaire en fonction de sa page de présence 
+  props: {
+    pageName: String, // PageName Props permetant de moduler le formulaire en fonction de sa page de présence
+    incident_id: {
+      type: Number
+    }
   },
   created() {
-    GeneralMethod.getFieldsOptions().then(res => { // Class permettant de récupérer les données des menu déroulant + applications 
-      this.datas = res
-    })
-
+    GeneralMethod.getFieldsOptions().then(res => {
+      // Class permettant de récupérer les données des menu déroulant + applications
+      this.datas = res;
+    });
+     this.getIncident(this.incident_id);
   },
 
   data() {
     return {
-      incident : new IncidentClass(),
+      incident: new IncidentClass(),
       datas: new DataClass(),
       iEnseigne: new ImpactEnseigneClass(),
       cosip: new Cosip(),
       // Variables à Généraliser
       // Les lignes suivantes sont des variables nécessaires au modal de suppression
-      delConfirmationModalVisible:false,
+      delConfirmationModalVisible: false,
       messageConfirmation: true,
       indexRefToDelete: 0,
       indexRefToDeleteApp: 0,
@@ -284,29 +320,27 @@ export default {
     };
   },
 
-
   methods: {
     async submit() {
-      console.log( "Incident: ",this.incident)
-      console.log( "Impact Enseigne: ",this.iEnseigne)
-      console.log( "Cosip: ",this.cosip)
+      console.log("Incident: ", this.incident);
+      console.log("Impact Enseigne: ", this.iEnseigne);
+      console.log("Cosip: ", this.cosip);
     },
-    setUpdateIncident(payload){
-      console.log("Payload: ", payload)
-      this.incident = payload.inc
+    setUpdateIncident(payload) {
+      console.log("Payload: ", payload);
+      this.incident = payload.inc;
     },
-    setCosipForm(payload){
-      console.log("Payload: ", payload)
-      this.incident = payload.inc
-      this.iEnseigne = payload.ienseigne 
-      this.cosip = payload.cosip
+    setCosipForm(payload) {
+      console.log("Payload: ", payload);
+      this.incident = payload.inc;
+      this.iEnseigne = payload.ienseigne;
+      this.cosip = payload.cosip;
     },
-    setAppImpactee(payload){
-      console.log("App: ", payload)
-      this.incident.application_impactee = payload.app
+    setAppImpactee(payload) {
+      console.log("App: ", payload);
+      this.incident.application_impactee = payload.app;
     },
     // Méthode à Généraliser
-
 
     confirmDelete() {
       this.incident.references.splice(this.indexToDelete, 1);
@@ -320,7 +354,17 @@ export default {
     handleCreate() {
       this.incident.references.push({ reference: "" });
     },
-    
+
+    async getIncident(idIncident) {
+      const recupData = await serviceApi.getDatas("incident/" + idIncident);
+      console.log(idIncident);
+    }
+  },
+
+  watch: {
+    incident_id: function() {
+      this.getIncident(this.incident_id);
+    }
   }
 };
 </script>
@@ -345,6 +389,4 @@ th:first-child .cell
 	&::before
 		content: "* "
 		color: red
-
-    
 </style>
