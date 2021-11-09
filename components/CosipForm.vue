@@ -292,7 +292,8 @@ export default {
         ajoutIncidentsAgencesVisible: false,
 
         // Règles de validation pour le formulaire
-        rules: Rule.rules
+        rules: Rule.rules,
+        tabEnseignesFinal:[]
         };
         
     },
@@ -307,6 +308,13 @@ export default {
                 this.BDDFForm = true
                 console.log("BDDF")
             }else{
+                if(this.tabEnseignesFinal.length > 0){
+                    for(let i =0; i < this.tabEnseignesFinal.length; i++){
+                        if(this.tabEnseignesFinal[i].enseigne_id === 1){
+                            this.tabEnseignesFinal.splice(i,1);
+                        }
+                    }
+                }
                 this.BDDFForm = false
             }
 
@@ -315,6 +323,13 @@ export default {
                 this.CDNForm = true
                 console.log("CDN")
             }else{
+                if(this.tabEnseignesFinal.length > 0){
+                    for(let i =0; i < this.tabEnseignesFinal.length; i++){
+                        if(this.tabEnseignesFinal[i].enseigne_id === 2){
+                            this.tabEnseignesFinal.splice(i,1);
+                        }
+                    }
+                }
                 this.CDNForm = false
             }
 
@@ -323,6 +338,13 @@ export default {
                 this.BPFForm = true
                 console.log("BPF")
             }else{
+                if(this.tabEnseignesFinal.length > 0){
+                    for(let i =0; i < this.tabEnseignesFinal.length; i++){
+                        if(this.tabEnseignesFinal[i].enseigne_id === 3){
+                            this.tabEnseignesFinal.splice(i,1);
+                        }
+                    }
+                }
                 this.BPFForm = false
             }
         },
@@ -331,9 +353,85 @@ export default {
             this.$emit('emitCosip', {inc: this.incident, ienseigne: this.iEnseigne, cosip: this.cosip})
         },
 
+        //Récupération des enseigne impacté et prise en compte des modification sans incrémenté a l'infini
         setImpactE(payload){
-            this.iEnseigne = payload.ienseigne
-            console.log("payload", payload)
+            
+            console.log("Le tableau impacte enseigne", payload.ienseigne[0])
+
+                switch(payload.ienseigne[0].enseigne_id){
+                    case 1:
+                            console.log(this.tabEnseignesFinal.length)
+                        if(this.tabEnseignesFinal.length === 0){
+                            console.log("COSIP Je n'existe pas encore je créer car tableau vide")
+                            this.tabEnseignesFinal.push(payload.ienseigne[0])
+                        }else{
+                            this.tabEnseignesFinal.forEach(el => {
+                                if(el.enseigne_id === 1){
+                                    console.log("COSIP Je suis dans la if donc j'existe go modifcation")
+                                    this.sortEnseigneImpactee(1, payload.ienseigne[0] )
+                                }else{
+                                    console.log("COSIP Je n'existe pas encore je suis créé mais tableau non vide ")
+                                    if(this.tabEnseignesFinal.length <3){
+                                        this.tabEnseignesFinal.push(payload.ienseigne[0])
+                                    }
+                                }
+                            })
+                        }
+                        break;
+                        case 2:
+                            console.log(this.tabEnseignesFinal.length)
+                        if(this.tabEnseignesFinal.length === 0){
+                            console.log(" COSIP Je n'existe pas encore je créer car tableau vide")
+                            this.tabEnseignesFinal.push(payload.ienseigne[0])
+                        }else{
+                            this.tabEnseignesFinal.forEach(el => {
+                                if(el.enseigne_id === 2){
+                                    console.log("COSIP Je suis dans la if donc j'existe go modifcation")
+                                    this.sortEnseigneImpactee(2, payload.ienseigne[0] )
+                                }else{
+                                    console.log("COSIP Je n'existe pas encore je suis créé mais tableau non vide ")
+                                    if(this.tabEnseignesFinal.length <3){
+                                        this.tabEnseignesFinal.push(payload.ienseigne[0])
+                                    }
+                                }
+                            })
+                        }
+                        break;
+                        case 3:
+                            console.log(this.tabEnseignesFinal.length)
+                        if(this.tabEnseignesFinal.length === 0){
+                            console.log("COSIP Je n'existe pas encore je créer car tableau vide")
+                            this.tabEnseignesFinal.push(payload.ienseigne[0])
+                        }else{
+                            this.tabEnseignesFinal.forEach(el => {
+                                if(el.enseigne_id === 3){
+                                    console.log("COSIP Je suis dans la if donc j'existe go modifcation")
+                                    this.sortEnseigneImpactee(3, payload.ienseigne[0] )
+                                }else{
+                                    console.log("COSIP Je n'existe pas encore je suis créé mais tableau non vide ")
+                                    if(this.tabEnseignesFinal.length <3){
+                                        this.tabEnseignesFinal.push(payload.ienseigne[0])
+                                    }
+                                    
+                                }
+                            })
+                        }
+                        break;
+                    }
+                    console.log("Tab final : ", this.tabEnseignesFinal)
+                    this.incident.enseigne_impactee = this.tabEnseignesFinal
+            
+        },
+        sortEnseigneImpactee(ens_id, data){
+            for(let i=0; i <= this.tabEnseignesFinal.length; i++){
+                if(this.tabEnseignesFinal[i].enseigne_id === ens_id){
+                    console.log('COSIP Je suis dnas le if de suppression ')
+                    this.tabEnseignesFinal.splice(i,1)
+                    console.log("Je suprime ",i)
+                    this.tabEnseignesFinal.push(data)
+                    return this.tabEnseignesFinal
+                }
+            }
         }
     }
 }

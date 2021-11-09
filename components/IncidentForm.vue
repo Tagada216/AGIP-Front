@@ -295,6 +295,7 @@ export default {
     GeneralMethod.getFieldsOptions().then(res => {
       // Class permettant de récupérer les données des menu déroulant + applications
       this.datas = res;
+      console.log(this.$route.fullPath)
     });
      this.getIncident(this.incident_id);
   },
@@ -322,6 +323,9 @@ export default {
 
   methods: {
     async submit() {
+      if(this.$route.fullPath ==="/NewIncident"){
+        console.log("Je suis sur la bonne page")
+      }
       console.log("Incident: ", this.incident);
       console.log("Impact Enseigne: ", this.iEnseigne);
       console.log("Cosip: ", this.cosip);

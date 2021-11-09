@@ -145,7 +145,10 @@
                 @change="emitToCosipForm(enseigne)"
             ></el-input>
         </el-form-item>
-        <ApplicationImpactee class="w-full"></ApplicationImpactee>
+        <ApplicationImpactee 
+            @emit-appImpactee="setAppImpactee"
+            class="w-full">
+        </ApplicationImpactee>
         </el-form-item>
 
 </template>
@@ -168,62 +171,99 @@ export default {
             datas: new DataClass(),
             //Gestion des impact reseau et client 
             impactReseau: false,
-            impactClient: false
+            impactClient: false,
+            tabEnseignesTemp:[]
         }
 
 },
     beforeCreate() {
         GeneralMethod.getFieldsOptions().then(res => {
         this.datas = res
+        
         })
     },
     methods:{
         emitToCosipForm(ens){
-            console.log("beforee:", this.incident.enseigne_impactee, " Ens: ",ens)
+            console.log("before:", this.incident.enseigne_impactee, " Ens: ",ens)
 
             switch (ens){
-                case 'BDDF': 
-                    this.iEnseigne.enseigne_id = 1;
-                    for(let i=0; i<= 4; i++ ) {
-                        if(this.incident.enseigne_impactee[i] === undefined){
-                           this.incident.enseigne_impactee.push( this.iEnseigne)
-                        }else{
-                            if(this.incident.enseigne_impactee[i].enseigne_id === 'BDDF'){
-                                this.incident.enseigne_impactee[i] =this.iEnseigne
+                case 'BDDF':
+                    this.iEnseigne.enseigne_id = 1; 
+
+                    if(this.tabEnseignesTemp.length === 0){
+                        console.log("Je n'existe pas encore je suis créé car tableau vide")
+                        this.tabEnseignesTemp.push(this.iEnseigne)
+                    }else{
+                            this.tabEnseignesTemp.forEach(el => {
+                            console.log(el)
+                            if(el.enseigne_id === this.iEnseigne.enseigne_id){
+                                console.log("Je suis dans la if donc j'existe go modifcation")
+                                this.sortEnseigneImpactee(this.iEnseigne.enseigne_id)
+                                
+                            }else{
+                                console.log("Je n'existe pas encore je suis créé mais tableau non vide ")
+                                this.tabEnseignesTemp.push(this.iEnseigne)
                             }
-                            
-                        }
+                        });
                     }
                 break;
                 case 'CDN':
-                    for(let i=0; i<= 4; i++ ) {
-                        if(this.incident.enseigne_impactee[i] === undefined){
-                           this.incident.enseigne_impactee.push( this.iEnseigne)
-                        }else{
-                            if(this.incident.enseigne_impactee[i].enseigne_id === 'BDDF'){
-                                this.incident.enseigne_impactee[i] =this.iEnseigne
+                    this.iEnseigne.enseigne_id = 2;
+                    if(this.tabEnseignesTemp.length === 0){
+                        console.log("Je n'existe pas encore je suis créé car tableau vide")
+                        this.tabEnseignesTemp.push(this.iEnseigne)
+                    }else{
+                            this.tabEnseignesTemp.forEach(el => {
+                            console.log(el)
+                            if(el.enseigne_id === this.iEnseigne.enseigne_id){
+                                console.log("Je suis dans la if donc j'existe go modifcation")
+                                this.sortEnseigneImpactee(this.iEnseigne.enseigne_id)
+                            }else{
+                                console.log("Je n'existe pas encore je suis créé mais tableau non vide ")
+                                this.tabEnseignesTemp.push(this.iEnseigne)
                             }
-                            
-                        }
+                        });
                     }
                 break;
 
                 case 'BPF':
-                    for(let i=0; i<= 4; i++ ) {
-                        if(this.incident.enseigne_impactee[i] === undefined){
-                           this.incident.enseigne_impactee.push( this.iEnseigne)
-                        }else{
-                            if(this.incident.enseigne_impactee[i].enseigne_id === 'BDDF'){
-                                this.incident.enseigne_impactee[i] =this.iEnseigne
+                    this.iEnseigne.enseigne_id = 3;
+                    if(this.tabEnseignesTemp.length === 0){
+                        console.log("Je n'existe pas encore je suis créé car tableau vide")
+                        this.tabEnseignesTemp.push(this.iEnseigne)
+                    }else{
+                            this.tabEnseignesTemp.forEach(el => {
+                            console.log(el)
+                            if(el.enseigne_id === this.iEnseigne.enseigne_id){
+                                console.log("Je suis dans la if donc j'existe go modifcation")
+                                this.sortEnseigneImpactee(this.iEnseigne.enseigne_id)
+                                
+                            }else{
+                                console.log("Je n'existe pas encore je suis créé mais tableau non vide ")
+                                this.tabEnseignesTemp.push(this.iEnseigne)
                             }
-                            
-                        }
+                        });
                     }
-
                 break;
             }
-            console.log("after:", this.incident.enseigne_impactee)
-            this.$emit('emit-impactE', {ens: ens, inc :this.incident, ienseigne: this.iEnseigne})
+            console.log("after:", this.tabEnseignesTemp)
+            this.$emit('emit-impactE', {ens: ens, inc :this.incident, ienseigne: this.tabEnseignesTemp})
+        },
+        setAppImpactee(payload) {
+            console.log("App: ", payload);
+            this.incident.application_impactee = payload.app;
+        },
+        sortEnseigneImpactee(id_enseigne){
+            
+            for( let i =0; i<= this.tabEnseignesTemp.length; i++){
+                if(this.tabEnseignesTemp[i].enseigne_id === id_enseigne){
+                    console.log('Je suis dans le if de suppression ', i)
+                    this.tabEnseignesTemp.splice(i, 1)
+                    this.tabEnseignesTemp.push(this.iEnseigne)
+                    return this.tabEnseignesTemp
+                }
+            }
+
         }
     }
 

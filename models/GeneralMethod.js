@@ -13,6 +13,9 @@ export default {
     datas.statut = await serviceApi.getDatas('incident/statut');
     datas.enseignes = await serviceApi.getDatas('enseigne');
     datas.application_impactee = await serviceApi.getDatas('applications');
+    datas.gravite = await serviceApi.getDatas('gravite');
+    datas.cause_racines = await serviceApi.getDatas('cause-racine');
+    datas.entite_responsable = await serviceApi.getDatas('entite-responsable');
 
     return datas;
   },
