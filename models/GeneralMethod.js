@@ -37,7 +37,7 @@ export default {
 
 
       } else {
-        incident.ref = data[i].incident_references[0].reference
+        incident.ref = data[i].incident_references[0]
       }
 
 

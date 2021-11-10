@@ -14,7 +14,6 @@ export  default {
     })
   },
 
-
   // Appel des datas une par une
 
   getRef() {
@@ -74,4 +73,14 @@ getCosip(){
     })
   },
   
+  //Post 
+
+  //----Création d'un incident 
+  createIncident(data){
+    let responseCreate
+    return axios.post(`${baseURL}incident`, data).then(rep => {
+      responseCreate = rep
+      return responseCreate
+    })
+  }
 }

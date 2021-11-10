@@ -1,6 +1,6 @@
 <template>
 <div>
-    <el-table  :data="incident.application_impactee" border>
+    <el-table  :data="incident.incident_application_impactees" border>
     <el-table-column
         label="Application(s) impactée(s)"
         prop="application_impactee"
@@ -10,7 +10,7 @@
             class="w-2/3"
             placeholder="Application impactée"
             v-model="
-            incident.application_impactee[scope.$index].nom
+            incident.incident_application_impactees[scope.$index].nom
             "
             :fetch-suggestions="getMatchingApplications"
             value-key="nom"
@@ -94,18 +94,18 @@ data(){
     methods:{
         // Les handler pour la table et le modal des applis impactees
     confirmDeleteApp() {
-      this.incident.application_impactee.splice(this.indexRefToDeleteApp, 1);
+      this.incident.incident_application_impactees.splice(this.indexRefToDeleteApp, 1);
       this.delConfirmationModalVisibleApp = false;
     },
     handleDeleteApp(index) {
       this.indexRefToDeleteApp = index;
-      this.refToDeleteApp = this.incident.application_impactee[
+      this.refToDeleteApp = this.incident.incident_application_impactees[
         index
       ].application_impactee;
       this.delConfirmationModalVisibleApp = true;
     },
     handleCreateApp() {
-      this.incident.application_impactee.push({ display_name: "" });
+      this.incident.incident_application_impactees.push({ display_name: "" });
     },
 
     getMatchingApplications(requete, retour) {
@@ -157,14 +157,14 @@ data(){
     // Cette méthode est lancée quand un champ d'appli impacté s'est vu selectionné une appli parmis les propositions
     // Quand tel est le cas, on insere les données de l'appli (CI et trigramme) pour pouvoir la relier en BDD
     appSelected(appSelection) {
-      const appIndex = this.incident.application_impactee
+      const appIndex = this.incident.incident_application_impactees
         .map(el => el.nom)
         .indexOf(appSelection.nom);
-      this.incident.application_impactee[appIndex] = appSelection;
+      this.incident.incident_application_impactees[appIndex] = appSelection;
     },
 
     emitToForm(){
-        this.$emit('emit-appImpactee', {app: this.incident.application_impactee})
+        this.$emit('emit-appImpactee', {app: this.incident.incident_application_impactees})
     }
     }
 }

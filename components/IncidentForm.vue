@@ -18,6 +18,7 @@
               <template slot-scope="scope">
                 <el-input
                   v-model.trim="incident.references[scope.$index].reference"
+                  placeholder="PXXIN-XXXXXXXX"
                 ></el-input>
               </template>
             </el-table-column>
@@ -148,9 +149,9 @@
           <el-form-item
             v-if="pageName == 'NewIncident' || pageName == 'UpdateIncident'"
             label="Enseigne(s) impactée(s)"
-            prop="enseigne_impactee"
+            prop="incident_impact_enseignes"
           >
-            <el-checkbox-group v-model="incident.enseigne_impactee">
+            <el-checkbox-group v-model="incident.enseignes_impactee">
               <el-checkbox
                 v-for="enseigne in datas.enseignes"
                 :label="enseigne.id"
@@ -267,7 +268,7 @@
       <el-button
         class="px-4 py-2 rounded-md text-sm font-medium border-b-2 focus:outline-none focus:ring transition text-white bg-blue-500 border-blue-800 hover:bg-blue-600 active:bg-blue-700 focus:ring-blue-300"
         type="submit"
-        @click="submit()"
+        @click="validateForm()"
         >Sauvegarder</el-button
       >
     </el-form-item>
@@ -322,39 +323,139 @@ export default {
   },
 
   methods: {
+    // Création d'un incident, ou update, ajout au cosip
     async submit() {
       if(this.$route.fullPath ==="/NewIncident"){
-        console.log("Je suis sur la bonne page")
+        
+        for(let i =0; i< this.incident.enseignes_impactee.length; i++){
+          this.incident.incident_impact_enseignes.push( {
+            description_impact : this.incident.description_impact,
+            date_debut : this.incident.date_debut,
+            date_fin : this.incident.date_fin,
+            enseigne_id: this.incident.enseignes_impactee[i]
+          })
+        }
+        const createIncident = await serviceApi.createIncident(this.incident)
+        if(createIncident.status == 201){
+          	this.$message({
+								dangerouslyUseHTMLString: true,
+								message:
+									"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
+								type: 'success',
+							});
+							setTimeout(window.location.reload(), 2500);
+        }
+      }
+
+      if(this.$route.fullPath ==='/cosip'){
+        console.log("Je suis sur la page Cosip")
       }
       console.log("Incident: ", this.incident);
       console.log("Impact Enseigne: ", this.iEnseigne);
       console.log("Cosip: ", this.cosip);
     },
+
+    //Vérification du formulaire 
+
+    // Regex pour valdier le format des réfèrences
+    validateReference(ref){
+      return /^P\d{2,}[IN|PB|CH|RQ]{2,}[-]{1,}\d{7,}$/.test(ref);
+    },
+
+    //Validation des référence et applications impactées
+
+    validateForm(){
+      this.$refs['form'].validate(valid => {
+        if(valid){ 
+          if(this.incident.references == 0){// On vérifie qu'il y a au moins une référence
+            this.$message({
+							dangerouslyUseHTMLString: true,
+							message:
+								"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Au moins une <strong>Référence</strong> doit être renseignée.</p>",
+							type: 'error',
+            });
+            return false;
+          }// On vérifie qu'il y a au moins une application impactée
+          else if (this.incident.incident_application_impactees.length == 0){
+            	this.$message({
+                dangerouslyUseHTMLString: true,
+                message:
+                  "<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Au moins une <strong>Application</strong> doit être renseignée.</p>",
+                type: 'error',
+						});
+						return false;
+          }
+    
+          //On parcourt les champ références pour valider le format
+          for(let i =0; i< this.incident.references.length; i++){
+            
+            if(
+              this.incident.references.length == 1 && 
+              this.incident.references[i].reference == '' &&
+              this.incident.statut_id != 5
+            ){
+              this.incident.references[i].reference = 'A venir';
+            }else if (
+              (this.incident.references.length == 1 && this.incident.references[i].reference == '') ||
+              (this.incident.references.length == 1 && this.incident.references[i].reference ==' A venir')
+            ){
+              this.incident.references[i].reference = 'A venir'
+            }else if (this.incident.references.length >= 1 && this.incident.references[i].reference.length >= 1 && this.validateReference(this.incident.references[i].reference.toUpperCase())){
+              this.incident.references[i].reference.toUpperCase();
+            }else {
+							this.$message({
+								dangerouslyUseHTMLString: true,
+								message:
+									"<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Si il y à plus de deux <strong>Références</strong> </br><strong>ou</strong></br>==> Si le <strong>Statut est Résolu<strong/> veuillez remplir le(s) champs <strong>Référence</strong> au format : \"P00IN-0000000\".</p>",
+								type: 'error',
+							});
+							return false;              
+            }
+            //Vérification du statut de l'incident si résolu date de din obligatoire 
+            if (this.incident.statut_id === 5 && this.incident.date_fin === null){
+              	this.$message({
+                  dangerouslyUseHTMLString: true,
+                  message:
+                    "<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Le Statut de l'incident est en <strong>Résolu</strong> le champs <strong>Fin de l'incident est obligatoire</strong> .</p>",
+                  type: 'error',
+							});
+            }
+            this.submit();
+          }
+        }
+      })
+    },
+
+    //Récupération des champs du composant UpadateIncidentForm
     setUpdateIncident(payload) {
-      console.log("Payload: ", payload);
+      console.log("Payload UpdateIncident: ", payload);
       this.incident = payload.inc;
     },
+    //Récupération des champs du composant CosipForm
     setCosipForm(payload) {
-      console.log("Payload: ", payload);
+      console.log("Payload Cosip: ", payload);
       this.incident = payload.inc;
       this.iEnseigne = payload.ienseigne;
       this.cosip = payload.cosip;
     },
+    //Récupération des champs du composant des ApplicationImpactee
     setAppImpactee(payload) {
-      console.log("App: ", payload);
-      this.incident.application_impactee = payload.app;
+      console.log("Payload des AppImpactee: ", payload);
+      this.incident.incident_application_impactees = payload.app;
     },
-    // Méthode à Généraliser
 
+    // Méthode à Généraliser
     confirmDelete() {
       this.incident.references.splice(this.indexToDelete, 1);
       this.delConfirmationModalVisible = false;
     },
+
     handleDelete(index) {
       this.indexToDelete = index;
       this.refToDelete = this.incident.references[index].reference;
       this.delConfirmationModalVisible = true;
     },
+
     handleCreate() {
       this.incident.references.push({ reference: "" });
     },

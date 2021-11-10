@@ -1,13 +1,14 @@
 export default class IncidentClass {
     references = [];
-    is_faux_incedent = false;
-    date_debut = "";
-    date_fin = "";
+    is_faux_incident = false;
     priorite_id = ""; 
     statut_id = ""; 
-    enseigne_impactee = [];
+    date_debut="";
+    date_fin="";
+    enseignes_impactee=[];
+    incident_impact_enseignes = [];
     description = "";
-    application_impactee = [];
+    incident_application_impactees = [];
     cause = "";
     origine="";
     action_retablissement = "";
