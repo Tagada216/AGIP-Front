@@ -204,7 +204,7 @@
                 @change="
                   rules.description_contournement[0].required =
                     !rules.description_contournement[0].required &&
-                    (this.incident.description_contournement = !this.rules
+                    (incident.description_contournement = !rules
                       .description_contournement[0].required
                       ? 'Aucun contournement'
                       : '')
@@ -289,14 +289,13 @@ export default {
     pageName: String, // PageName Props permetant de moduler le formulaire en fonction de sa page de présence
     incident_id: {
       type: Number
-    }
+    },
   },
   created() {
     GeneralMethod.getFieldsOptions().then(res => {
       // Class permettant de récupérer les données des menu déroulant + applications
       this.datas = res;
     });
-     this.getIncident(this.incident_id);
   },
 
   data() {
@@ -357,7 +356,11 @@ export default {
 
     async getIncident(idIncident) {
       const recupData = await serviceApi.getDatas("incident/" + idIncident);
-      console.log(idIncident);
+
+      this.incident = GeneralMethod.transformDatasForm(recupData, this.incident, this.incident_id);
+
+      console.log(this.incident)
+     
     }
   },
 

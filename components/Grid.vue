@@ -86,7 +86,7 @@ export default {
         this.setHeader = Headers.HeaderMainCourante.head;
       }
 
-      getFormatedDatas = GeneralMethod.transformDatas(data, this.setHeader);
+      getFormatedDatas = GeneralMethod.transformDatasForGrid(data, this.setHeader);
       this.setColDef(Object.keys(getFormatedDatas[0]));
       this.rowData = getFormatedDatas;
     },
