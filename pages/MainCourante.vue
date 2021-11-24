@@ -3,7 +3,7 @@
     <Header title="Main Courante">
       <el-button
         type="primary"
-        class="absolute right-60 mt-4 px-8"
+        class="absolute right-60 mt-4 px-8 bg-black"
         @click="send()"
         >Mail</el-button
       >
@@ -95,7 +95,7 @@ export default {
   methods: {
     updateID(id) {
       this.curID = id;
-	  console.log("L'id est " + this.curID);
+	  // console.log("L'id est " + this.curID);
 	  return this.curID
     },
     async fetchMainCourrante() {
@@ -103,16 +103,16 @@ export default {
       return response.data;
     },
     duplicate() {
-      console.log(this.curID);
+      // console.log(this.curID);
       window.location.href = "/#/new-incident/id=" + this.curID;
       if (this.curID != undefined) {
-        console.log("ID non existant");
+        // console.log("ID non existant");
       }
     },
     cosip() {
       window.location.href = "/#/cosip/id=" + this.curID;
       if (this.incident_id == undefined) {
-        console.log("ID non existant");
+        // console.log("ID non existant");
       } else {
         console.log(this.incident_id);
       }

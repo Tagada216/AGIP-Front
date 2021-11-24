@@ -19,7 +19,7 @@ export default {
 
 
   transformDatasForGrid(data, setHeader) {
-    console.log(data.length)
+    // console.log(data.length)
     let tableData = [];
     let i = 0;
     let incident = IncidentModel.model.incident;
@@ -299,7 +299,6 @@ export default {
   },
 
   transformDatasForm(data, incident, incidentId) {
-    console.log(data)
     incident.incident_id = incidentId;
     incident.description = data.description;
     incident.date_debut = data.incident_impact_enseignes[0].date_debut
@@ -339,7 +338,7 @@ export default {
       let index = 0; index < data.incident_references.length; // récupération de la référence et stop séparation au caractère / 
       index++
     ) {
-      console.log()
+      // console.log()
       const id = data.incident_references[index].id;
       const ref = data.incident_references[index].reference;
       incident.references.push({
@@ -350,20 +349,26 @@ export default {
 
     //Récupération des applications
     for (
-      let index = 0; index < data.incident_application_impactees.length; index++
+      let index = 0; 
+      index < data.incident_application_impactees.length; 
+      index++
     ) {
-      console.log(data.incident_application_impactees[index].Application_code_irt)
+      // console.log(data.incident_application_impactees[index].Application_code_irt)
       const itr = data.incident_application_impactees[index].Application_code_irt;
       const app = data.incident_application_impactees[index].nom_appli;
       const tri = data.incident_application_impactees[index].Application_trigramme;
 
-      incident.application_impactee.push({
-        code_irt: itr,
-        display_name: app,
-        trigramme: tri
-      });
+
+      const appli  = {
+          code_irt: itr,
+          display_name: app,
+          trigramme: tri
+        };
+      //  console.log(app)
+      incident.application_impactee.push(appli);
     }
    
+    // console.log(incident.application_impactee[0])
     //Récupération des enseignes et affichage des cards
     // if ((data.cosip_id !== "") && (data.cosip_id !== null)) {
       for (

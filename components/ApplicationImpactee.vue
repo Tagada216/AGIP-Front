@@ -4,18 +4,19 @@
       <el-table-column
         label="Application(s) impactée(s)"
         prop="application_impactee"
+         :getApps = getApplicationMainCourante(sendApp)
       >
         <template slot-scope="scope">
           <el-autocomplete
             class="w-2/3"
-            placeholder="Application impactée"
-            v-model="incident.application_impactee[scope.$index].nom"
+            placeholder= "Application Impactée"
+            v-model="incident.application_impactee[scope.$index].display_name" 
             :fetch-suggestions="getMatchingApplications"
             value-key="nom"
             @select="appSelected"
             @change="emitToForm"
-
           ></el-autocomplete>
+          
         </template>
       </el-table-column>
       <el-table-column width="60">
@@ -62,6 +63,7 @@
         >
       </span>
     </el-dialog>
+  
   </div>
 </template>
 
@@ -69,7 +71,11 @@
 import IncidentClass from "../Class/IncidentClass";
 import DataClass from "../Class/DataClass";
 import GeneralMethod from "../models/GeneralMethod";
+import IncidentForm from "@/components/IncidentForm.vue";
 export default {
+ props : {
+   sendApp : []
+ },
   created() {
     GeneralMethod.getFieldsOptions().then(res => {
       // Class permettant de récupérer les données des menu déroulant + applications
@@ -103,6 +109,7 @@ export default {
       this.delConfirmationModalVisibleApp = true;
     },
     handleCreateApp() {
+      
       this.incident.application_impactee.push({ display_name: "" });
     },
 
@@ -157,6 +164,14 @@ export default {
       this.$emit("emit-appImpactee", {
         app: this.incident.application_impactee
       });
+    },
+
+   getApplicationMainCourante(param){
+    
+    // console.log(param)
+    this.incident.application_impactee = param
+    console.log(this.incident.application_impactee)
+
     }
   }
 };

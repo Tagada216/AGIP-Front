@@ -235,9 +235,11 @@
           ></UpdateIncidentForm>
 
           <ApplicationImpactee
-            @emit-appImpactee="setAppImpactee"
             v-if="pageName == 'NewIncident' || pageName == 'UpdateIncident'"
+            @emit-appImpactee="setAppImpactee" 
+            :sendApp = appIncident
           ></ApplicationImpactee>
+          
         </el-card>
         <!-- Fin Infos générales incident -->
       </el-col>
@@ -315,7 +317,8 @@ export default {
       ajoutIncidentsAgencesVisible: false,
 
       // Règles de validation pour le formulaire
-      rules: Rule.rules
+      rules: Rule.rules,
+      appIncident : []
     };
   },
 
@@ -351,17 +354,17 @@ export default {
       this.delConfirmationModalVisible = true;
     },
     handleCreate() {
-      this.incident.references.push({ reference: "" });
+      this.incident.references.push({ reference: "" });getIncident
     },
 
     async getIncident(idIncident) {
       const recupData = await serviceApi.getDatas("incident/" + idIncident);
 
       this.incident = GeneralMethod.transformDatasForm(recupData, this.incident, this.incident_id);
-
-      console.log(this.incident)
-     
-    }
+      
+      this.appIncident = this.incident.application_impactee
+      // console.log(this.appIncident)
+    },
   },
 
   watch: {
