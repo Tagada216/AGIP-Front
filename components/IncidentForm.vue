@@ -98,6 +98,7 @@
           <UpdateIncidentForm
             v-if="pageName === 'UpdateIncident'"
             part="horodatage"
+            :sendUpdateFields = sendUpdateFieldsOnSelect
           ></UpdateIncidentForm>
         </el-card>
         <!-- Fin Horodatage -->
@@ -232,6 +233,7 @@
             v-if="pageName === 'UpdateIncident'"
             part="info-generale"
             @emit-updateIncident="setUpdateIncident"
+            :sendUpdateFields = sendUpdateFieldsOnSelect
           ></UpdateIncidentForm>
 
           <ApplicationImpactee
@@ -318,7 +320,8 @@ export default {
 
       // Règles de validation pour le formulaire
       rules: Rule.rules,
-      appIncident : []
+      appIncident : [],
+      sendUpdateFieldsOnSelect : {}
     };
   },
 
@@ -363,7 +366,8 @@ export default {
       this.incident = GeneralMethod.transformDatasForm(recupData, this.incident, this.incident_id);
       
       this.appIncident = this.incident.application_impactee
-      // console.log(this.appIncident)
+      
+      this.sendUpdateFieldsOnSelect = this.incident
     },
   },
 

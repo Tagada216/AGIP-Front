@@ -299,6 +299,7 @@ export default {
   },
 
   transformDatasForm(data, incident, incidentId) {
+    // console.log(data)
     incident.incident_id = incidentId;
     incident.description = data.description;
     incident.date_debut = data.incident_impact_enseignes[0].date_debut
@@ -307,13 +308,13 @@ export default {
       data.incident_impact_enseignes[0].description_impact;
     incident.statut_id = data.statut_id;
     incident.priorite_id = data.priorite_id;
-    incident.date_detection = data.date_detection;
+    incident.date_detection = data.incident_impact_enseignes[0].date_detection;
     incident.date_communication_TDC =
-      data.date_communication_tdc;
+      data.incident_impact_enseignes[0].date_com_tdc;
     incident.date_qualification_p01 =
-      data.date_qualif_p01;
+      data.incident_impact_enseignes[0].date_qualif_p01;
     incident.gravite_id = data.gravite_id;
-    incident.date_premiere_com = data.date_premier_com;
+    incident.date_premiere_com = data.incident_impact_enseignes[0].date_premier_com;
     incident.cause = data.cause;
     incident.action_retablissement = data.action_retablissement;
     incident.origine = data.origine;

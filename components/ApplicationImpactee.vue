@@ -170,7 +170,7 @@ export default {
     
     // console.log(param)
     this.incident.application_impactee = param
-    console.log(this.incident.application_impactee)
+    // console.log(this.incident.application_impactee)
 
     }
   }
