@@ -60,11 +60,12 @@
               placeholder="Selectionnez l'horodatage"
               format="dd/MM/yyyy HH:mm:ss"
               value-format="yyyy-MM-dd HH:mm:ss"
+              @change="sendDateToCOSIP"
             ></el-date-picker>
           </el-form-item>
 
           <!-- Utilisation du Composant COSIP_Form et selection de la partie à afficher Horodatage   -->
-          <CosipForm v-if="pageName == 'Cosip'" part="horodatage" />
+          <CosipForm v-if="pageName == 'Cosip'" part="horodatage" :date="cosip_date"/>
           <!--------------------------------------------------------------------------------------->
 
           <el-form-item
@@ -237,7 +238,7 @@
 
           <ApplicationImpactee
             @emit-appImpactee="setAppImpactee"
-            v-if="pageName == 'NewIncident' || pageName == 'UpdateIncident'"
+            v-if="pageName == 'NewIncident' || pageName == 'UpdateIncident'" 
           ></ApplicationImpactee>
         </el-card>
         <!-- Fin Infos générales incident -->
@@ -296,17 +297,19 @@ export default {
     GeneralMethod.getFieldsOptions().then(res => {
       // Class permettant de récupérer les données des menu déroulant + applications
       this.datas = res;
-      console.log(this.$route.fullPath)
     });
      this.getIncident(this.incident_id);
+     
   },
 
   data() {
     return {
       incident: new IncidentClass(),
+      cosip_incident:  new IncidentClass(),
       datas: new DataClass(),
       iEnseigne: new ImpactEnseigneClass(),
       cosip: new Cosip(),
+      cosip_date:"",
       // Variables à Généraliser
       // Les lignes suivantes sont des variables nécessaires au modal de suppression
       delConfirmationModalVisible: false,
@@ -318,7 +321,7 @@ export default {
       ajoutIncidentsAgencesVisible: false,
 
       // Règles de validation pour le formulaire
-      rules: Rule.rules
+      rules: Rule.rules,
     };
   },
 
@@ -348,11 +351,16 @@ export default {
       }
 
       if(this.$route.fullPath ==='/cosip'){
-        console.log("Je suis sur la page Cosip")
+        // attribution des différents champ à l'incident final pour le post 
+        this.cosip_incident.date_debut = this.incident.date_debut
+        this.cosip_incident.description_contournement = this.incident.description_contournement
+        this.cosip_incident.references = this.incident.references
+        this.cosip_incident.priorite_id = this.incident.priorite_id
+        this.cosip_incident.statut_id = this.incident.statut_id
+
+        console.log("Submit cosip: ", this.cosip_incident)
       }
-      console.log("Incident: ", this.incident);
-      console.log("Impact Enseigne: ", this.iEnseigne);
-      console.log("Cosip: ", this.cosip);
+
     },
 
     //Vérification du formulaire 
@@ -363,7 +371,6 @@ export default {
     },
 
     //Validation des référence et applications impactées
-
     validateForm(){
       this.$refs['form'].validate(valid => {
         if(valid){ 
@@ -376,15 +383,15 @@ export default {
             });
             return false;
           }// On vérifie qu'il y a au moins une application impactée
-          else if (this.incident.incident_application_impactees.length == 0){
-            	this.$message({
-                dangerouslyUseHTMLString: true,
-                message:
-                  "<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Au moins une <strong>Application</strong> doit être renseignée.</p>",
-                type: 'error',
-						});
-						return false;
-          }
+          // else if (this.incident.incident_application_impactees.length == 0){
+          //   	this.$message({
+          //       dangerouslyUseHTMLString: true,
+          //       message:
+          //         "<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Au moins une <strong>Application</strong> doit être renseignée.</p>",
+          //       type: 'error',
+					// 	});
+					// 	return false;
+          // }
     
           //On parcourt les champ références pour valider le format
           for(let i =0; i< this.incident.references.length; i++){
@@ -426,21 +433,45 @@ export default {
       })
     },
 
+    //Complétion automatique des champs Mois et semaine COSIP en fonction de la date de début
+    sendDateToCOSIP(){
+      if(this.$route.fullPath ==='/cosip'){
+        this.cosip_date = this.incident.date_debut
+      }
+    },
+
+
     //Récupération des champs du composant UpadateIncidentForm
     setUpdateIncident(payload) {
-      console.log("Payload UpdateIncident: ", payload);
       this.incident = payload.inc;
     },
     //Récupération des champs du composant CosipForm
     setCosipForm(payload) {
       console.log("Payload Cosip: ", payload);
-      this.incident = payload.inc;
-      this.iEnseigne = payload.ienseigne;
-      this.cosip = payload.cosip;
+      let cosip = new Cosip();
+      cosip = payload.cosip
+      this.cosip_incident.cause_racine_id = cosip.cause_racine_id;
+      this.cosip_incident.semaine_cosip = cosip.semaine_cosip;
+      this.cosip_incident.comment = cosip.comment;
+
+      let incidentEnseigne = new IncidentClass();
+      incidentEnseigne = payload.ienseigne;
+      this.cosip_incident.date_detection = incidentEnseigne.date_detection;
+      this.cosip_incident.date_premier_com = incidentEnseigne.date_premier_com;
+      this.cosip_incident.date_fin = incidentEnseigne.date_fin;
+
+      let incidentTemp = new IncidentClass();
+      incidentTemp = payload.inc;
+      this.cosip_incident.action_retablissement = incidentTemp.action_retablissement;
+      this.cosip_incident.cause = incidentTemp.cause;
+      this.cosip_incident.description = incidentTemp.description;
+      this.cosip_incident.origine = incidentTemp.origine;
+      this.cosip_incident.plan_action = incidentTemp.plan_action;
+      this.cosip_incident.incident_impact_enseignes = payload.impact
+
     },
     //Récupération des champs du composant des ApplicationImpactee
     setAppImpactee(payload) {
-      console.log("Payload des AppImpactee: ", payload);
       this.incident.incident_application_impactees = payload.app;
     },
 

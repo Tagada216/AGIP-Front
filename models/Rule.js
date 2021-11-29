@@ -14,13 +14,6 @@ export default {
                 trigger: 'blur',
             },
         ],
-        description_impact: [
-            {
-                required: true,
-                message: 'Champ non rempli',
-                trigger: 'blur',
-            },
-        ],
         description_contournement: [
             {
                 required: false,
@@ -53,14 +46,6 @@ export default {
             {
                 required: true,
                 message: 'Champ non rempli',
-                trigger: 'change',
-            },
-        ],
-        enseigne_impactee: [
-            {
-                type: 'array',
-                required: true,
-                message: 'Aucune selection',
                 trigger: 'change',
             },
         ],

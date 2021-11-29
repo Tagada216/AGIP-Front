@@ -8,7 +8,7 @@
         <template slot-scope="scope">
         <el-autocomplete 
             class="w-2/3"
-            placeholder="Application impactée"
+            placeholder="Aplication impactée"
             v-model="
             incident.incident_application_impactees[scope.$index].nom
             "
@@ -71,12 +71,13 @@ import IncidentClass from "../Class/IncidentClass";
 import DataClass from "../Class/DataClass";
 import GeneralMethod from "../models/GeneralMethod";
 export default {
+
     created() {
         GeneralMethod.getFieldsOptions().then(res => { // Class permettant de récupérer les données des menu déroulant + applications 
         this.datas = res
         this.apps = this.datas.application_impactee
         })
-
+      
     },
 data(){
     return{
@@ -88,7 +89,7 @@ data(){
         indexRefToDeleteApp: 0,
         refToDelete: "",
         refToDeleteApp: "",
-        apps: []
+        apps: [],
         }
     },
     methods:{
@@ -120,6 +121,7 @@ data(){
         return([{ nom: "" }]);
         }
     },
+
 
     // Crée le filtre nécessaire à matcher les applis
     createAppFilter(queryString) {

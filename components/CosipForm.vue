@@ -3,6 +3,8 @@
         <div v-if="part=='horodatage'">
             <el-form-item label="Mois" >
                 <el-input
+                    disabled
+                    :getStartDate="setMonthAndWeek(date)"
                     id="mois_cosip"
                     placeholder="Mois"
                     v-model="cosipMonth"
@@ -12,9 +14,10 @@
 
                 <el-form-item label="Semaine COSIP" >
                     <el-input
+                        disabled
                         id="semaine_cosip"
                         placeholder="Semaine COSIP"
-                        v-model="cosipWeek"
+                        v-model="cosip.semaine_cosip"
                         @change="emitToParent"
                     ></el-input>
             </el-form-item>
@@ -259,7 +262,8 @@ export default {
     props:{
         part: String,
         enseignes : [],
-        nom:""
+        nom:"",
+        date: ""
     },
 
 
@@ -267,7 +271,6 @@ export default {
     return {
 
         cosipMonth: "",
-        cosipWeek:"",
         cosip: new Cosip(),
         iEnseigne : new ImpactEnseigne(),
         incident: new IncidentClass(),
@@ -299,14 +302,34 @@ export default {
     },
 
     methods:{
+        // Récupération de la date via la props date 
+        setMonthAndWeek(date){
+            const dateDebut = new Date(date)
+            let numeroMois = dateDebut.getMonth()+1
+           
+            
+            //Ajout d'un 0 devant le mois si inférieur a 10
+            if(numeroMois <10){
+                numeroMois="0"+numeroMois
+            }
+            this.cosipMonth = dateDebut.getFullYear()+"/"+numeroMois
+            //Calcul du numéro de la semaine en fonction de la date de début
+            let jour = dateDebut.getDay();
+            dateDebut.setDate(dateDebut.getDate() - (jour + 6) % 7 + 3);
+            let ms = dateDebut.valueOf();
+            dateDebut.setMonth(0)
+            dateDebut.setDate(4)
+            let semaineCosip = Math.round((ms - dateDebut.valueOf()) / (7*864e5))+1
+
+            this.cosip.semaine_cosip = dateDebut.getFullYear()+"/S"+semaineCosip
+        },
+
+        // Vérification des enseigne impacté et update en temp réel lors de la modifcation de l'utilisateur
         verifCheckEnseignesImpactees(){
 
-            
-            
             if(this.iEnseigne.enseigne[0] === 1 || this.iEnseigne.enseigne[1]==1 || this.iEnseigne.enseigne[2] ==1) {
                 this.activeEnseigne = 'BDDF'
                 this.BDDFForm = true
-                console.log("BDDF")
             }else{
                 if(this.tabEnseignesFinal.length > 0){
                     for(let i =0; i < this.tabEnseignesFinal.length; i++){
@@ -321,7 +344,6 @@ export default {
             if(this.iEnseigne.enseigne[0] === 2 || this.iEnseigne.enseigne[1] === 2 || this.iEnseigne.enseigne[2] === 2  ) {
                 this.activeEnseigne = 'CDN'
                 this.CDNForm = true
-                console.log("CDN")
             }else{
                 if(this.tabEnseignesFinal.length > 0){
                     for(let i =0; i < this.tabEnseignesFinal.length; i++){
@@ -336,7 +358,6 @@ export default {
             if(this.iEnseigne.enseigne[0] === 3 || this.iEnseigne.enseigne[1] === 3 || this.iEnseigne.enseigne[2] === 3 ) {
                 this.activeEnseigne = 'BPF'
                 this.BPFForm = true
-                console.log("BPF")
             }else{
                 if(this.tabEnseignesFinal.length > 0){
                     for(let i =0; i < this.tabEnseignesFinal.length; i++){
@@ -349,28 +370,24 @@ export default {
             }
         },
 
+        // Envoi du formulaire COSIP vers sont parent  Incident Form 
         emitToParent(){
-            this.$emit('emitCosip', {inc: this.incident, ienseigne: this.iEnseigne, cosip: this.cosip})
+            this.$emit('emitCosip', {inc: this.incident, ienseigne: this.iEnseigne, cosip: this.cosip, impact: this.incident.inicident_enseigne_impactee})
         },
 
         //Récupération des enseigne impacté et prise en compte des modification sans incrémenté a l'infini
         setImpactE(payload){
             
-            console.log("Le tableau impacte enseigne", payload.ienseigne[0])
-
                 switch(payload.ienseigne[0].enseigne_id){
                     case 1:
                             console.log(this.tabEnseignesFinal.length)
                         if(this.tabEnseignesFinal.length === 0){
-                            console.log("COSIP Je n'existe pas encore je créer car tableau vide")
                             this.tabEnseignesFinal.push(payload.ienseigne[0])
                         }else{
                             this.tabEnseignesFinal.forEach(el => {
                                 if(el.enseigne_id === 1){
-                                    console.log("COSIP Je suis dans la if donc j'existe go modifcation")
                                     this.sortEnseigneImpactee(1, payload.ienseigne[0] )
                                 }else{
-                                    console.log("COSIP Je n'existe pas encore je suis créé mais tableau non vide ")
                                     if(this.tabEnseignesFinal.length <3){
                                         this.tabEnseignesFinal.push(payload.ienseigne[0])
                                     }
@@ -381,15 +398,12 @@ export default {
                         case 2:
                             console.log(this.tabEnseignesFinal.length)
                         if(this.tabEnseignesFinal.length === 0){
-                            console.log(" COSIP Je n'existe pas encore je créer car tableau vide")
                             this.tabEnseignesFinal.push(payload.ienseigne[0])
                         }else{
                             this.tabEnseignesFinal.forEach(el => {
                                 if(el.enseigne_id === 2){
-                                    console.log("COSIP Je suis dans la if donc j'existe go modifcation")
                                     this.sortEnseigneImpactee(2, payload.ienseigne[0] )
                                 }else{
-                                    console.log("COSIP Je n'existe pas encore je suis créé mais tableau non vide ")
                                     if(this.tabEnseignesFinal.length <3){
                                         this.tabEnseignesFinal.push(payload.ienseigne[0])
                                     }
@@ -400,15 +414,12 @@ export default {
                         case 3:
                             console.log(this.tabEnseignesFinal.length)
                         if(this.tabEnseignesFinal.length === 0){
-                            console.log("COSIP Je n'existe pas encore je créer car tableau vide")
                             this.tabEnseignesFinal.push(payload.ienseigne[0])
                         }else{
                             this.tabEnseignesFinal.forEach(el => {
                                 if(el.enseigne_id === 3){
-                                    console.log("COSIP Je suis dans la if donc j'existe go modifcation")
                                     this.sortEnseigneImpactee(3, payload.ienseigne[0] )
                                 }else{
-                                    console.log("COSIP Je n'existe pas encore je suis créé mais tableau non vide ")
                                     if(this.tabEnseignesFinal.length <3){
                                         this.tabEnseignesFinal.push(payload.ienseigne[0])
                                     }
@@ -419,15 +430,15 @@ export default {
                         break;
                     }
                     console.log("Tab final : ", this.tabEnseignesFinal)
-                    this.incident.enseigne_impactee = this.tabEnseignesFinal
+                    this.incident.inicident_enseigne_impactee = this.tabEnseignesFinal
+                    this.emitToParent()
             
         },
+        // Permet le tri du tableau impact enseigne en focntion des modification 
         sortEnseigneImpactee(ens_id, data){
             for(let i=0; i <= this.tabEnseignesFinal.length; i++){
                 if(this.tabEnseignesFinal[i].enseigne_id === ens_id){
-                    console.log('COSIP Je suis dnas le if de suppression ')
                     this.tabEnseignesFinal.splice(i,1)
-                    console.log("Je suprime ",i)
                     this.tabEnseignesFinal.push(data)
                     return this.tabEnseignesFinal
                 }

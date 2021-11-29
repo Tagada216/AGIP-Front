@@ -1,4 +1,5 @@
-<template>
+<template
+>
         <el-form-item class="w-2/3">
             <el-row :gutter="20">
                 <el-col >
@@ -158,6 +159,7 @@ import ImpactEnseigne from "../Class/ImpactEnseigneClass";
 import IncidentClass from "../Class/IncidentClass";
 import GeneralMethod from '../models/GeneralMethod';
 import DataClass from "../Class/DataClass";
+import Rule from "../models/Rule";
 export default {
 
     props:{
@@ -172,7 +174,8 @@ export default {
             //Gestion des impact reseau et client 
             impactReseau: false,
             impactClient: false,
-            tabEnseignesTemp:[]
+            tabEnseignesTemp:[],
+            rules: Rule.rules
         }
 
 },
@@ -184,24 +187,18 @@ export default {
     },
     methods:{
         emitToCosipForm(ens){
-            console.log("before:", this.incident.enseigne_impactee, " Ens: ",ens)
-
             switch (ens){
                 case 'BDDF':
                     this.iEnseigne.enseigne_id = 1; 
-
                     if(this.tabEnseignesTemp.length === 0){
-                        console.log("Je n'existe pas encore je suis créé car tableau vide")
                         this.tabEnseignesTemp.push(this.iEnseigne)
                     }else{
                             this.tabEnseignesTemp.forEach(el => {
                             console.log(el)
                             if(el.enseigne_id === this.iEnseigne.enseigne_id){
-                                console.log("Je suis dans la if donc j'existe go modifcation")
                                 this.sortEnseigneImpactee(this.iEnseigne.enseigne_id)
                                 
                             }else{
-                                console.log("Je n'existe pas encore je suis créé mais tableau non vide ")
                                 this.tabEnseignesTemp.push(this.iEnseigne)
                             }
                         });
@@ -210,16 +207,13 @@ export default {
                 case 'CDN':
                     this.iEnseigne.enseigne_id = 2;
                     if(this.tabEnseignesTemp.length === 0){
-                        console.log("Je n'existe pas encore je suis créé car tableau vide")
                         this.tabEnseignesTemp.push(this.iEnseigne)
                     }else{
                             this.tabEnseignesTemp.forEach(el => {
                             console.log(el)
                             if(el.enseigne_id === this.iEnseigne.enseigne_id){
-                                console.log("Je suis dans la if donc j'existe go modifcation")
                                 this.sortEnseigneImpactee(this.iEnseigne.enseigne_id)
                             }else{
-                                console.log("Je n'existe pas encore je suis créé mais tableau non vide ")
                                 this.tabEnseignesTemp.push(this.iEnseigne)
                             }
                         });
@@ -229,35 +223,30 @@ export default {
                 case 'BPF':
                     this.iEnseigne.enseigne_id = 3;
                     if(this.tabEnseignesTemp.length === 0){
-                        console.log("Je n'existe pas encore je suis créé car tableau vide")
                         this.tabEnseignesTemp.push(this.iEnseigne)
                     }else{
                             this.tabEnseignesTemp.forEach(el => {
                             console.log(el)
                             if(el.enseigne_id === this.iEnseigne.enseigne_id){
-                                console.log("Je suis dans la if donc j'existe go modifcation")
                                 this.sortEnseigneImpactee(this.iEnseigne.enseigne_id)
                                 
                             }else{
-                                console.log("Je n'existe pas encore je suis créé mais tableau non vide ")
                                 this.tabEnseignesTemp.push(this.iEnseigne)
                             }
                         });
                     }
                 break;
             }
-            console.log("after:", this.tabEnseignesTemp)
             this.$emit('emit-impactE', {ens: ens, inc :this.incident, ienseigne: this.tabEnseignesTemp})
         },
         setAppImpactee(payload) {
-            console.log("App: ", payload);
-            this.incident.application_impactee = payload.app;
+            this.incident.incident_application_impactee = payload.app;
+            this.$emit('emit-impactE', { inc :this.incident, ienseigne: this.tabEnseignesTemp})
         },
         sortEnseigneImpactee(id_enseigne){
             
             for( let i =0; i<= this.tabEnseignesTemp.length; i++){
                 if(this.tabEnseignesTemp[i].enseigne_id === id_enseigne){
-                    console.log('Je suis dans le if de suppression ', i)
                     this.tabEnseignesTemp.splice(i, 1)
                     this.tabEnseignesTemp.push(this.iEnseigne)
                     return this.tabEnseignesTemp
