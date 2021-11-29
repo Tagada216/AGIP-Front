@@ -100,6 +100,7 @@
           <UpdateIncidentForm
             v-if="pageName === 'UpdateIncident'"
             part="horodatage"
+            :sendUpdateFields = sendUpdateFieldsOnSelect
           ></UpdateIncidentForm>
         </el-card>
         <!-- Fin Horodatage -->
@@ -206,7 +207,7 @@
                 @change="
                   rules.description_contournement[0].required =
                     !rules.description_contournement[0].required &&
-                    (this.incident.description_contournement = !this.rules
+                    (incident.description_contournement = !rules
                       .description_contournement[0].required
                       ? 'Aucun contournement'
                       : '')
@@ -234,12 +235,15 @@
             v-if="pageName === 'UpdateIncident'"
             part="info-generale"
             @emit-updateIncident="setUpdateIncident"
+            :sendUpdateFields = sendUpdateFieldsOnSelect
           ></UpdateIncidentForm>
 
           <ApplicationImpactee
-            @emit-appImpactee="setAppImpactee"
-            v-if="pageName == 'NewIncident' || pageName == 'UpdateIncident'" 
+            v-if="pageName == 'NewIncident' || pageName == 'UpdateIncident'"
+            @emit-appImpactee="setAppImpactee" 
+            :sendApp = appIncident
           ></ApplicationImpactee>
+          
         </el-card>
         <!-- Fin Infos générales incident -->
       </el-col>
@@ -291,7 +295,7 @@ export default {
     pageName: String, // PageName Props permetant de moduler le formulaire en fonction de sa page de présence
     incident_id: {
       type: Number
-    }
+    },
   },
   created() {
     GeneralMethod.getFieldsOptions().then(res => {
@@ -322,6 +326,8 @@ export default {
 
       // Règles de validation pour le formulaire
       rules: Rule.rules,
+      appIncident : [],
+      sendUpdateFieldsOnSelect : {}
     };
   },
 
@@ -488,13 +494,18 @@ export default {
     },
 
     handleCreate() {
-      this.incident.references.push({ reference: "" });
+      this.incident.references.push({ reference: "" });getIncident
     },
 
     async getIncident(idIncident) {
       const recupData = await serviceApi.getDatas("incident/" + idIncident);
-      console.log(idIncident);
-    }
+
+      this.incident = GeneralMethod.transformDatasForm(recupData, this.incident, this.incident_id);
+      
+      this.appIncident = this.incident.application_impactee
+      
+      this.sendUpdateFieldsOnSelect = this.incident
+    },
   },
 
   watch: {

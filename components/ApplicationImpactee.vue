@@ -4,46 +4,46 @@
     <el-table-column
         label="Application(s) impactée(s)"
         prop="application_impactee"
-    >
+         :getApps = getApplicationMainCourante(sendApp)
+      >
         <template slot-scope="scope">
-        <el-autocomplete 
+          <el-autocomplete
             class="w-2/3"
-            placeholder="Aplication impactée"
-            v-model="
-            incident.incident_application_impactees[scope.$index].nom
-            "
+            placeholder= "Application Impactée"
+            v-model="incident.application_impactee[scope.$index].display_name" 
             :fetch-suggestions="getMatchingApplications"
             value-key="nom"
             @select="appSelected"
             @change="emitToForm"
-        ></el-autocomplete>
+          ></el-autocomplete>
+          
         </template>
-    </el-table-column>
-    <el-table-column width="60">
+      </el-table-column>
+      <el-table-column width="60">
         <template slot="header">
-        <el-button
+          <el-button
             type="primary"
             icon="el-icon-plus"
             circle
             @click="handleCreateApp()"
-        />
+          />
         </template>
 
         <template slot-scope="scope">
-        <el-button
+          <el-button
             type="danger"
             icon="el-icon-delete"
             circle
             @click="handleDeleteApp(scope.$index)"
-        />
+          />
         </template>
-    </el-table-column>
-    <template slot="empty">
+      </el-table-column>
+      <template slot="empty">
         <span class="arrayFormEmpty">Aucune donnée</span>
-    </template>
+      </template>
     </el-table>
 
-        <!-- Modal de confirmation de suppression d'une application impactée -->
+    <!-- Modal de confirmation de suppression d'une application impactée -->
     <el-dialog
       title="Demande de confirmation"
       :visible.sync="delConfirmationModalVisibleApp"
@@ -63,15 +63,19 @@
         >
       </span>
     </el-dialog>
-    </div>
+  
+  </div>
 </template>
 
 <script>
 import IncidentClass from "../Class/IncidentClass";
 import DataClass from "../Class/DataClass";
 import GeneralMethod from "../models/GeneralMethod";
+import IncidentForm from "@/components/IncidentForm.vue";
 export default {
-
+ props : {
+   sendApp : []
+ },
     created() {
         GeneralMethod.getFieldsOptions().then(res => { // Class permettant de récupérer les données des menu déroulant + applications 
         this.datas = res
@@ -110,50 +114,42 @@ data(){
     },
 
     getMatchingApplications(requete, retour) {
-        if (requete.length > 1) {
-        
-        
+      if (requete.length > 1) {
+        let results = requete
+          ? this.apps.filter(this.createAppFilter(requete))
+          : this.apps;
 
-        let results = requete ? this.apps.filter(this.createAppFilter(requete)) :this.apps;
-
-        retour(results)
-        } else {
-        return([{ nom: "" }]);
-        }
+        retour(results);
+      } else {
+        return [{ nom: "" }];
+      }
     },
 
 
     // Crée le filtre nécessaire à matcher les applis
     createAppFilter(queryString) {
-        return apps => {
-            if(apps.libelle_court!==null){
-                return (
-                    apps.code_irt
-                        .toLowerCase()
-                        .indexOf(queryString.toLowerCase()) != -1 ||
-                    apps.trigramme
-                        .toLowerCase()
-                        .indexOf(queryString.toLowerCase()) != -1 ||
-                    apps.nom.toLowerCase().indexOf(queryString.toLowerCase()) !=
-                        -1 ||
-                    apps.libelle_court
-                        .toLowerCase()
-                        .indexOf(queryString.toLowerCase()) != -1
-                );
-            }else{
-                return (
-                    apps.code_irt
-                        .toLowerCase()
-                        .indexOf(queryString.toLowerCase()) != -1 ||
-                    apps.trigramme
-                        .toLowerCase()
-                        .indexOf(queryString.toLowerCase()) != -1 ||
-                    apps.nom.toLowerCase().indexOf(queryString.toLowerCase()) !=
-                        -1 
-                );
-            }
-            
-        };
+      return apps => {
+        if (apps.libelle_court !== null) {
+          return (
+            apps.code_irt.toLowerCase().indexOf(queryString.toLowerCase()) !=
+              -1 ||
+            apps.trigramme.toLowerCase().indexOf(queryString.toLowerCase()) !=
+              -1 ||
+            apps.nom.toLowerCase().indexOf(queryString.toLowerCase()) != -1 ||
+            apps.libelle_court
+              .toLowerCase()
+              .indexOf(queryString.toLowerCase()) != -1
+          );
+        } else {
+          return (
+            apps.code_irt.toLowerCase().indexOf(queryString.toLowerCase()) !=
+              -1 ||
+            apps.trigramme.toLowerCase().indexOf(queryString.toLowerCase()) !=
+              -1 ||
+            apps.nom.toLowerCase().indexOf(queryString.toLowerCase()) != -1
+          );
+        }
+      };
     },
 
     // Cette méthode est lancée quand un champ d'appli impacté s'est vu selectionné une appli parmis les propositions
@@ -165,13 +161,21 @@ data(){
       this.incident.incident_application_impactees[appIndex] = appSelection;
     },
 
-    emitToForm(){
-        this.$emit('emit-appImpactee', {app: this.incident.incident_application_impactees})
+    emitToForm() {
+      this.$emit("emit-appImpactee", {
+        app: this.incident.application_impactee
+      });
+    },
+
+   getApplicationMainCourante(param){
+    
+    // console.log(param)
+    this.incident.application_impactee = param
+    // console.log(this.incident.application_impactee)
+
     }
-    }
-}
+  }
+};
 </script>
 
-<style>
-
-</style>
+<style></style>

@@ -21,7 +21,8 @@ export default {
   },
 
 
-  transformDatas(data, setHeader) {
+  transformDatasForGrid(data, setHeader) {
+    // console.log(data.length)
     let tableData = [];
     let i = 0;
     let incident = IncidentModel.model.incident;
@@ -34,11 +35,10 @@ export default {
         incident.ref = data[i].incident_references.map(function (elem) {
           return elem.reference;
         }).join("/");
-
-
-      } else {
-        incident.ref = data[i].incident_references[0]
       }
+
+      incident.ref = data[i].incident_references[0].reference
+
 
 
       let getDatedeb = data[i].incident_impact_enseignes.map(function (elem) {
@@ -299,6 +299,149 @@ export default {
     incident = JSON.parse(str)
 
     return incident
-  }
+  },
 
+  transformDatasForm(data, incident, incidentId) {
+    // console.log(data)
+    incident.incident_id = incidentId;
+    incident.description = data.description;
+    incident.date_debut = data.incident_impact_enseignes[0].date_debut
+    incident.date_fin = data.incident_impact_enseignes[0].date_fin;
+    incident.description_impact =
+      data.incident_impact_enseignes[0].description_impact;
+    incident.statut_id = data.statut_id;
+    incident.priorite_id = data.priorite_id;
+    incident.date_detection = data.incident_impact_enseignes[0].date_detection;
+    incident.date_communication_TDC =
+      data.incident_impact_enseignes[0].date_com_tdc;
+    incident.date_qualification_p01 =
+      data.incident_impact_enseignes[0].date_qualif_p01;
+    incident.gravite_id = data.gravite_id;
+    incident.date_premiere_com = data.incident_impact_enseignes[0].date_premier_com;
+    incident.cause = data.cause;
+    incident.action_retablissement = data.action_retablissement;
+    incident.origine = data.origine;
+    incident.plan_action = data.plan_action;
+
+    incident.is_faux_incident = data.is_faux_incident ?
+      true :
+      false;
+    incident.is_contournement = data.is_contournement ?
+      true :
+      false;
+    incident.description_contournement =
+      data.description_contournement;
+    incident.enseigne_impactee = [];
+    incident.references = [];
+    incident.application_impactee = [];
+    incident.cosip_id = data.cosip_id
+
+    // console.log("Nb ref ", response.data[0].reference_id.split('/').length)
+    //Gestion pour la récupération des référence 
+    for (
+      let index = 0; index < data.incident_references.length; // récupération de la référence et stop séparation au caractère / 
+      index++
+    ) {
+      // console.log()
+      const id = data.incident_references[index].id;
+      const ref = data.incident_references[index].reference;
+      incident.references.push({
+        id: id,
+        reference: ref,
+      });
+    }
+
+    //Récupération des applications
+    for (
+      let index = 0; 
+      index < data.incident_application_impactees.length; 
+      index++
+    ) {
+      // console.log(data.incident_application_impactees[index].Application_code_irt)
+      const itr = data.incident_application_impactees[index].Application_code_irt;
+      const app = data.incident_application_impactees[index].nom_appli;
+      const tri = data.incident_application_impactees[index].Application_trigramme;
+
+
+      const appli  = {
+          code_irt: itr,
+          display_name: app,
+          trigramme: tri
+        };
+      //  console.log(app)
+      incident.application_impactee.push(appli);
+    }
+   
+    // console.log(incident.application_impactee[0])
+    //Récupération des enseignes et affichage des cards
+    // if ((data.cosip_id !== "") && (data.cosip_id !== null)) {
+      for (
+        let index = 0; index <  data.incident_impact_enseignes.length; index++
+      ) {
+        const idEns =  data.incident_impact_enseignes[index].enseigne_id;
+        incident.enseigne_impactee.push(parseInt(idEns));
+
+    //     const desImpact = data.incident_impact_enseignes[index].description_impact;
+    //     const graviteA = data.incident_impact_enseignes[index].gravite_id;
+    //     const graviteNom = response.data[0].gravite_nom.split('/')[
+    //       index
+    //     ];
+    //     const criticite = response.data[0].classification.split(
+    //       '/'
+    //     )[index];
+    //     this.tab_enseignes.push({
+    //       enseigne_id: idEns,
+    //       desc: desImpact,
+    //       gravite: graviteNom,
+    //       id_grav: graviteA,
+    //       class: criticite,
+    //     }); // Switch case pour récupérer les données qui sont indépendantes en fonction de l'enseigne
+    //     switch (this.tab_enseignes[index].enseigne_id) {
+    //       case '1':
+    //         this.form.description_impactBDDF = this.tab_enseignes[
+    //           index
+    //         ].desc;
+    //         this.form.impact_avereBDDF = this.tab_enseignes[
+    //           index
+    //         ].gravite;
+    //         this.classificationBDDF = this.tab_enseignes[
+    //           index
+    //         ].class;
+    //         this.form.gravite_idBDDF = this.tab_enseignes[
+    //           index
+    //         ].id_grav;
+    //         break;
+    //       case '2':
+    //         this.form.description_impactCDN = this.tab_enseignes[
+    //           index
+    //         ].desc;
+    //         this.form.impact_avereCDN = this.tab_enseignes[
+    //           index
+    //         ].gravite;
+    //         this.classificationCDN = this.tab_enseignes[
+    //           index
+    //         ].class;
+    //         this.form.gravite_idCDN = this.tab_enseignes[
+    //           index
+    //         ].id_grav;
+    //         break;
+    //       case '3':
+    //         this.form.impact_avereBPF = this.tab_enseignes[
+    //           index
+    //         ].gravite;
+    //         this.form.description_impactBPF = this.tab_enseignes[
+    //           index
+    //         ].desc;
+    //         this.classificationBPF = this.tab_enseignes[
+    //           index
+    //         ].class;
+    //         this.form.gravite_idBPF = this.tab_enseignes[
+    //           index
+    //         ].id_grav;
+    //         break;
+    //     }
+    //   }
+    }
+    return incident
+  }
 }

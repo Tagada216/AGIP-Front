@@ -1,10 +1,16 @@
 export default class IncidentClass {
+    incident_id = "";
     references = [];
     is_faux_incident = false;
+    date_debut = "";
+    date_fin = "";
+    date_detection = "";
+    date_communication_TDC = "";
+    date_qualification_p01 = "";
+    gravite_id = "";
+    date_premiere_com = "";
     priorite_id = ""; 
     statut_id = ""; 
-    date_debut="";
-    date_fin="";
     enseignes_impactee=[];
     incident_impact_enseignes = [];
     description = "";
@@ -20,6 +26,9 @@ export default class IncidentClass {
     departement_responsable='';
     changements_id='';
     crise_ITIM='';
+    cosip_id = "";
+
+    
     constructor() {};
 
     //ref,debut,priorite,statut,enseigneImpactee,desc,appImpactee,cause,descImpact
