@@ -341,6 +341,8 @@ export default {
     },
     async save(){
       console.log("save main courante")
+      console.log("Incident: ", this.incident);
+      console.log("id :" , this.incident_id);
     },
     setUpdateIncident(payload) {
       console.log("Payload: ", payload);

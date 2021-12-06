@@ -73,5 +73,12 @@ getCosip(){
       return incidentCosip
     })
   },
+
+  updateIncidentMainCoutante(id){
+    let incidentMainCourante;
+    return axios.patch(`${baseURL}incident/${id}`).then(response =>{
+      incidentMainCourante = response.data
+    })
+  }
   
 }
