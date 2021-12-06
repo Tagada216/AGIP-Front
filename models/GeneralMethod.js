@@ -375,9 +375,9 @@ export default {
       for (
         let index = 0; index <  data.incident_impact_enseignes.length; index++
       ) {
-        const idEns =  data.incident_impact_enseignes[index].enseigne_id;
-        incident.enseigne_impactee.push(parseInt(idEns));
-
+       
+        const enseigne =  data.incident_impact_enseignes;
+        incident.enseigne_impactee.push(enseigne[index].enseigne_id);
     //     const desImpact = data.incident_impact_enseignes[index].description_impact;
     //     const graviteA = data.incident_impact_enseignes[index].gravite_id;
     //     const graviteNom = response.data[0].gravite_nom.split('/')[

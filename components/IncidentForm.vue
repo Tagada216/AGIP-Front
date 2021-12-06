@@ -343,6 +343,7 @@ export default {
       console.log("save main courante")
       console.log("Incident: ", this.incident);
       console.log("id :" , this.incident_id);
+      // serviceApi.updateIncidentMainCoutante(this.incident_id,newIncident)
     },
     setUpdateIncident(payload) {
       console.log("Payload: ", payload);
