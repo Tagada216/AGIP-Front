@@ -1,48 +1,6 @@
 <template>
   <div style="100vh">
-    <Header title="Main Courante">
-      <el-button
-        type="primary"
-        class="absolute right-60 mt-4 px-8 bg-black"
-        @click="send()"
-        >Mail</el-button
-      >
-      <el-tooltip
-        class="item"
-        effect="light"
-        content="Export Excel"
-        placement="bottom-end"
-      >
-        <button class="header-btn">
-          <download-excel
-            :fetch="fetchMainCourrante"
-            :before-generate="startDownload"
-            :name="exportFileName"
-          >
-            <i class="fas fa-file-excel"></i>
-          </download-excel>
-        </button>
-      </el-tooltip>
-      <el-tooltip
-        class="item"
-        effect="light"
-        content="Dupliquer"
-        placement="bottom-end"
-      >
-        <button class="header-btn" @click="duplicate()">
-          <i class="fas fa-file  fa-lg"></i>
-        </button>
-      </el-tooltip>
-      <el-tooltip
-        class="item"
-        effect="light"
-        content="COSIP"
-        placement="bottom-end"
-      >
-        <button class="header-btn" @click="cosip()">
-          C
-        </button>
-      </el-tooltip>
+    <Header title="Main Courante" headerName = 'mainCourante'>
     </Header>
     <splitpanes watch-slots class="default-theme" horizontal>
       <div splitpanes-size="0" splitpanes-max="0"></div>
@@ -54,6 +12,7 @@
         splitpanes-max="100"
         style="height: 100%"
         @incidentSelected="updateID"
+        :rowId = updateID
         dataLink="http://localhost:5000/api/incident"
       />
 
@@ -81,7 +40,7 @@ export default {
   data() {
     return {
       curID: 1,
-      exportFileName: "Main Courante"
+      rowId : 1
     };
   },
   components: {
@@ -95,45 +54,9 @@ export default {
   methods: {
     updateID(id) {
       this.curID = id;
-	  // console.log("L'id est " + this.curID);
+    // console.log("L'id est " + this.curID);
+    this.rowId = this.curID
 	  return this.curID
-    },
-    async fetchMainCourrante() {
-      const response = await serviceApi.serviceApis("incident");
-      return response.data;
-    },
-    duplicate() {
-      // console.log(this.curID);
-      window.location.href = "/#/new-incident/id=" + this.curID;
-      if (this.curID != undefined) {
-        // console.log("ID non existant");
-      }
-    },
-    cosip() {
-      window.location.href = "/#/cosip/id=" + this.curID;
-      if (this.incident_id == undefined) {
-        // console.log("ID non existant");
-      } else {
-        console.log(this.incident_id);
-      }
-    },
-
-    startDownload() {
-      this.exportFileName = this.getExportTitle();
-    },
-    getExportTitle() {
-      const now = new Date();
-      return `Main Courante ${now
-        .toLocaleDateString()
-        .replace(/\//g, "-")} ${now.toLocaleTimeString()}`;
-    },
-    send() {
-      var title = {
-        testTitle: "testMail"
-      };
-      this.$http.post("http://localhost:5000/api/email", title);
-
-      console.log("message send");
     },
   },
 
@@ -162,7 +85,7 @@ div.default-theme.splitpanes--horizontal
             background-color: white
 .header-btn
     line-height: 70px
-    height: 70px
+    height: 80px
     width: 70px
     padding: 0
     margin: 0

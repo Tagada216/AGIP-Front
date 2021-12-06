@@ -267,11 +267,19 @@
     </el-dialog>
     <!-- Fin Modal de confirmation de suppression d'une reférence problème -->
 
-    <el-form-item style="text-align: center">
+    <el-form-item v-if="pageName == 'NewIncident'" style="text-align: center">
       <el-button
         class="px-4 py-2 rounded-md text-sm font-medium border-b-2 focus:outline-none focus:ring transition text-white bg-blue-500 border-blue-800 hover:bg-blue-600 active:bg-blue-700 focus:ring-blue-300"
         type="submit"
         @click="submit()"
+        >Sauvegarder</el-button
+      >
+    </el-form-item>
+     <el-form-item  v-if="pageName === 'UpdateIncident'" style="text-align: center">
+      <el-button
+        class="px-4 py-2 rounded-md text-sm font-medium border-b-2 focus:outline-none focus:ring transition text-white bg-blue-500 border-blue-800 hover:bg-blue-600 active:bg-blue-700 focus:ring-blue-300"
+        type="submit"
+        @click="save()"
         >Sauvegarder</el-button
       >
     </el-form-item>
@@ -330,6 +338,9 @@ export default {
       console.log("Incident: ", this.incident);
       console.log("Impact Enseigne: ", this.iEnseigne);
       console.log("Cosip: ", this.cosip);
+    },
+    async save(){
+      console.log("save main courante")
     },
     setUpdateIncident(payload) {
       console.log("Payload: ", payload);
