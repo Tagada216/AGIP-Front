@@ -32,9 +32,11 @@ export default {
         incident.ref = data[i].incident_references.map(function (elem) {
           return elem.reference;
         }).join("/");
-      }
 
-      incident.ref = data[i].incident_references[0].reference
+
+      } else {
+        incident.ref = data[i].incident_references[0].reference
+      }
 
       console.log(incident.ref)
 
@@ -237,7 +239,7 @@ export default {
       i++
     } while (i < data.length)
 
-
+    console.log(tableData)
     return tableData
   },
 
