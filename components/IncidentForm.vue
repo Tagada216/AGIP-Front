@@ -341,17 +341,10 @@ export default {
     },
     async save(){
       console.log("save main courante")
-      // console.log("Incident: ", this.incident.enseigne_impactee.length);
+      console.log("Incident: ", this.incident);
       // console.log("id :" , this.incident_id);
-       for(let i =0; i< this.incident.enseigne_impactee.length; i++){
-         console.log(this.incident.enseigne_impactee.length)
-        this.incident.enseigne_impactee.push( {
-          description_impact : this.incident.description_impact,
-          date_debut : this.incident.date_debut,
-          date_fin : this.incident.date_fin,
-          enseigne_id: this.incident.enseigne_impactee[i]
-        })
-      }
+      
+      
       serviceApi.updateIncidentMainCoutante(this.incident_id,this.incident)
     },
     setUpdateIncident(payload) {
