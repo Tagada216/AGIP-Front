@@ -505,7 +505,7 @@ export default {
     },
 
     handleCreate() {
-      this.incident.references.push({ reference: "" });getIncident
+      this.incident.references.push({ reference: "" });
     },
 
     async getIncident(idIncident) {
@@ -513,7 +513,7 @@ export default {
 
       this.incident = GeneralMethod.transformDatasForm(recupData, this.incident, this.incident_id);
       
-      this.appIncident = this.incident.application_impactee
+      this.appIncident = this.incident.incident_application_impactees
       
       this.sendUpdateFieldsOnSelect = this.incident
     },

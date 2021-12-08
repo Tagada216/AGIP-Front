@@ -330,7 +330,7 @@ export default {
       data.description_contournement;
     incident.enseigne_impactee = [];
     incident.references = [];
-    incident.application_impactee = [];
+    incident.incident_application_impactees = [];
     incident.cosip_id = data.cosip_id
 
     // console.log("Nb ref ", response.data[0].reference_id.split('/').length)
@@ -366,7 +366,7 @@ export default {
           trigramme: tri
         };
       //  console.log(app)
-      incident.application_impactee.push(appli);
+      incident.incident_application_impactees.push(appli);
     }
    
     // console.log(incident.application_impactee[0])

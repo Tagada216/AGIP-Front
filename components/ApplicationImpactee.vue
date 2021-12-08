@@ -1,22 +1,23 @@
 <template>
   <div>
-    <el-table :data="incident.application_impactee" border>
+    <el-table :data="incident.incident_application_impactees" border>
       <el-table-column
         label="Application(s) impactée(s)"
-        prop="application_impactee"
-        :getApps = getApplicationMainCourante(sendApp)
+        prop="application_impacteeincident_application_impactees"
+        :getApps="getApplicationMainCourante(sendApp)"
       >
         <template slot-scope="scope">
           <el-autocomplete
             class="w-2/3"
-            placeholder= "Application Impactée"
-            v-model="incident.application_impactee[scope.$index].display_name" 
+            placeholder="Application Impactée"
+            v-model="
+              incident.incident_application_impactees[scope.$index].display_name
+            "
             :fetch-suggestions="getMatchingApplications"
             value-key="nom"
             @select="appSelected"
             @change="emitToForm"
           ></el-autocomplete>
-          
         </template>
       </el-table-column>
       <el-table-column width="60">
@@ -63,7 +64,6 @@
         >
       </span>
     </el-dialog>
-  
   </div>
 </template>
 
@@ -73,9 +73,9 @@ import DataClass from "../Class/DataClass";
 import GeneralMethod from "../models/GeneralMethod";
 import IncidentForm from "@/components/IncidentForm.vue";
 export default {
- props : {
-   sendApp : []
- },
+  props: {
+    sendApp: []
+  },
   created() {
     GeneralMethod.getFieldsOptions().then(res => {
       // Class permettant de récupérer les données des menu déroulant + applications
@@ -98,19 +98,21 @@ export default {
   methods: {
     // Les handler pour la table et le modal des applis impactees
     confirmDeleteApp() {
-      this.incident.application_impactee.splice(this.indexRefToDeleteApp, 1);
+      this.incident.incident_application_impactees.splice(
+        this.indexRefToDeleteApp,
+        1
+      );
       this.delConfirmationModalVisibleApp = false;
     },
     handleDeleteApp(index) {
       this.indexRefToDeleteApp = index;
-      this.refToDeleteApp = this.incident.application_impactee[
+      this.refToDeleteApp = this.incident.incident_application_impactees[
         index
       ].application_impactee;
       this.delConfirmationModalVisibleApp = true;
     },
     handleCreateApp() {
-      
-      this.incident.application_impactee.push({ display_name: "" });
+      this.incident.incident_application_impactees.push({ display_name: "" });
     },
 
     getMatchingApplications(requete, retour) {
@@ -154,24 +156,20 @@ export default {
     // Cette méthode est lancée quand un champ d'appli impacté s'est vu selectionné une appli parmis les propositions
     // Quand tel est le cas, on insere les données de l'appli (CI et trigramme) pour pouvoir la relier en BDD
     appSelected(appSelection) {
-      const appIndex = this.incident.application_impactee
+      const appIndex = this.incident.incident_application_impactees
         .map(el => el.nom)
         .indexOf(appSelection.nom);
-      this.incident.application_impactee[appIndex] = appSelection;
+      this.incident.incident_application_impactees[appIndex] = appSelection;
     },
 
     emitToForm() {
       this.$emit("emit-appImpactee", {
-        app: this.incident.application_impactee
+        app: this.incident.incident_application_impactees
       });
     },
 
-   getApplicationMainCourante(param){
-    
-    // console.log(param)
-    this.incident.application_impactee = param
-    console.log(this.incident.application_impactee)
-
+    getApplicationMainCourante(param) {
+      this.incident.incident_application_impactees = param;
     }
   }
 };
