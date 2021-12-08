@@ -310,8 +310,6 @@ export default {
       // Class permettant de récupérer les données des menu déroulant + applications
       this.datas = res;
     });
-     this.getIncident(this.incident_id);
-     
   },
 
   data() {

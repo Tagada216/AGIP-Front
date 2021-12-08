@@ -1,10 +1,10 @@
 <template>
-<div>
-    <el-table  :data="incident.incident_application_impactees" border>
-    <el-table-column
+  <div>
+    <el-table :data="incident.application_impactee" border>
+      <el-table-column
         label="Application(s) impactée(s)"
         prop="application_impactee"
-         :getApps = getApplicationMainCourante(sendApp)
+        :getApps = getApplicationMainCourante(sendApp)
       >
         <template slot-scope="scope">
           <el-autocomplete
@@ -76,41 +76,41 @@ export default {
  props : {
    sendApp : []
  },
-    created() {
-        GeneralMethod.getFieldsOptions().then(res => { // Class permettant de récupérer les données des menu déroulant + applications 
-        this.datas = res
-        this.apps = this.datas.application_impactee
-        })
-      
-    },
-data(){
-    return{
-
-        delConfirmationModalVisibleApp: false,
-        datas: new DataClass(),
-        incident: new IncidentClass(),
-        indexRefToDelete: 0,
-        indexRefToDeleteApp: 0,
-        refToDelete: "",
-        refToDeleteApp: "",
-        apps: [],
-        }
-    },
-    methods:{
-        // Les handler pour la table et le modal des applis impactees
+  created() {
+    GeneralMethod.getFieldsOptions().then(res => {
+      // Class permettant de récupérer les données des menu déroulant + applications
+      this.datas = res;
+      this.apps = this.datas.application_impactee;
+    });
+  },
+  data() {
+    return {
+      delConfirmationModalVisibleApp: false,
+      datas: new DataClass(),
+      incident: new IncidentClass(),
+      indexRefToDelete: 0,
+      indexRefToDeleteApp: 0,
+      refToDelete: "",
+      refToDeleteApp: "",
+      apps: []
+    };
+  },
+  methods: {
+    // Les handler pour la table et le modal des applis impactees
     confirmDeleteApp() {
-      this.incident.incident_application_impactees.splice(this.indexRefToDeleteApp, 1);
+      this.incident.application_impactee.splice(this.indexRefToDeleteApp, 1);
       this.delConfirmationModalVisibleApp = false;
     },
     handleDeleteApp(index) {
       this.indexRefToDeleteApp = index;
-      this.refToDeleteApp = this.incident.incident_application_impactees[
+      this.refToDeleteApp = this.incident.application_impactee[
         index
       ].application_impactee;
       this.delConfirmationModalVisibleApp = true;
     },
     handleCreateApp() {
-      this.incident.incident_application_impactees.push({ display_name: "" });
+      
+      this.incident.application_impactee.push({ display_name: "" });
     },
 
     getMatchingApplications(requete, retour) {
@@ -124,7 +124,6 @@ data(){
         return [{ nom: "" }];
       }
     },
-
 
     // Crée le filtre nécessaire à matcher les applis
     createAppFilter(queryString) {
@@ -155,10 +154,10 @@ data(){
     // Cette méthode est lancée quand un champ d'appli impacté s'est vu selectionné une appli parmis les propositions
     // Quand tel est le cas, on insere les données de l'appli (CI et trigramme) pour pouvoir la relier en BDD
     appSelected(appSelection) {
-      const appIndex = this.incident.incident_application_impactees
+      const appIndex = this.incident.application_impactee
         .map(el => el.nom)
         .indexOf(appSelection.nom);
-      this.incident.incident_application_impactees[appIndex] = appSelection;
+      this.incident.application_impactee[appIndex] = appSelection;
     },
 
     emitToForm() {
@@ -171,7 +170,7 @@ data(){
     
     // console.log(param)
     this.incident.application_impactee = param
-    // console.log(this.incident.application_impactee)
+    console.log(this.incident.application_impactee)
 
     }
   }
