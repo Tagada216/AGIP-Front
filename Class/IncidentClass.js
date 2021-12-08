@@ -27,6 +27,7 @@ export default class IncidentClass {
     changements_id='';
     crise_ITIM='';
     cosip_id = "";
+    incident_impact_enseignes = [];
 
     
     constructor() {};
