@@ -36,7 +36,7 @@ export default {
 
       incident.ref = data[i].incident_references[0].reference
 
-
+      console.log(incident.ref)
 
       let getDatedeb = data[i].incident_impact_enseignes.map(function (elem) {
         return elem.date_debut
@@ -52,7 +52,7 @@ export default {
 
       if (getEnseigne.length == 0) {
 
-        incident.enseigne_impactee = ""
+        incident.enseignes_impactee = ""
 
       } else if (getEnseigne.length > 1) {
         let getEnseigneCell = getEnseigne.map(function (elem) {
@@ -71,17 +71,17 @@ export default {
           return newValue
         });
 
-        incident.enseigne_impactee = getEnseigneCell
+        incident.enseignes_impactee = getEnseigneCell
 
       } else {
         if (getEnseigne == 1) {
-          incident.enseigne_impactee = "BDDF"
+          incident.enseignes_impactee = "BDDF"
         } else if (getEnseigne == 2) {
-          incident.enseigne_impactee = "CDN"
+          incident.enseignes_impactee = "CDN"
         } else if (getEnseigne == 3) {
-          incident.enseigne_impactee = "BPF"
+          incident.enseignes_impactee = "BPF"
         } else if (getEnseigne == 4) {
-          incident.enseigne_impactee = "GTPS"
+          incident.enseignes_impactee = "GTPS"
         }
 
       }
@@ -328,7 +328,7 @@ export default {
       false;
     incident.description_contournement =
       data.description_contournement;
-    incident.enseigne_impactee = [];
+    incident.enseignes_impactee = [];
     incident.references = [];
     incident.incident_application_impactees = [];
     incident.cosip_id = data.cosip_id
@@ -376,7 +376,7 @@ export default {
         let index = 0; index <  data.incident_impact_enseignes.length; index++
       ) {
         const idEns =  data.incident_impact_enseignes[index].enseigne_id;
-        incident.enseigne_impactee.push(parseInt(idEns));
+        incident.enseignes_impactee.push(parseInt(idEns));
 
     //     const desImpact = data.incident_impact_enseignes[index].description_impact;
     //     const graviteA = data.incident_impact_enseignes[index].gravite_id;
