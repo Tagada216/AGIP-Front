@@ -453,11 +453,6 @@ export default {
         this.cosip_date = this.incident.date_debut
       }
     },
-<<<<<<< HEAD
-
-
-    //Récupération des champs du composant UpadateIncidentForm
-=======
     async save(){
       console.log("save main courante")
       console.log("Incident: ", this.incident);
@@ -466,7 +461,6 @@ export default {
       
       serviceApi.updateIncidentMainCoutante(this.incident_id,this.incident)
     },
->>>>>>> iconHeaderMainCourante
     setUpdateIncident(payload) {
       this.incident = payload.inc;
     },
