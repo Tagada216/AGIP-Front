@@ -306,8 +306,7 @@ import Cosip from "../Class/CosipClass";
 import { setContournementRule } from "../models/GeneralMethod";
 import Rule from "../models/Rule";
 import ImpactEnseigneClass from "../Class/ImpactEnseigneClass";
-import serviceApi from "../services/serviceApi";
-
+import GeneralMethod from "../models/GeneralMethod";
 export default {
   props: {
     pageName: String, // PageName Props permetant de moduler le formulaire en fonction de sa page de présence
@@ -359,7 +358,7 @@ export default {
             enseigne_id: this.incident.enseignes_impactee[i]
           })
         }
-        const createIncident = await serviceApi.createIncident(this.incident)
+        const createIncident = await this.$api_agipro.main_courante.createIncident(this.incident);
         if(createIncident.status == 201){
           	this.$message({
 								dangerouslyUseHTMLString: true,
@@ -469,8 +468,8 @@ export default {
       console.log("Incident: ", this.incident);
       // console.log("id :" , this.incident_id);
       
+      const responsePut = this.$$api_agipro.main_courante.updateOneIncident(this.incident, this.incident_id);
       
-      serviceApi.updateIncidentMainCoutante(this.incident_id,this.incident)
     },
     setUpdateIncident(payload) {
       this.incident = payload.inc;
@@ -522,9 +521,10 @@ export default {
     },
 
     async getIncident(idIncident) {
-      const recupData = await serviceApi.getDatas("incident/" + idIncident);
-
-      this.incident = GeneralMethod.transformDatasForm(recupData, this.incident, this.incident_id);
+    
+      const recupData  = await this.$api_agipro.main_courante.getOneIncident(idIncident);
+    
+      this.incident = GeneralMethod.transformDatasForm(recupData.data, this.incident, this.incident_id);
       
       this.appIncident = this.incident.incident_application_impactees
       

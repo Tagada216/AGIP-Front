@@ -389,9 +389,7 @@ import Cosip from "~/Class/CosipClass.js";
 import ImpactEnseigne from "~/Class/ImpactEnseigneClass.js";
 import IncidentClass from "~/Class/IncidentClass";
 import DataClass from "~/Class/DataClass";
-import GeneralMethod from '~/models/GeneralMethod';
 import Rule from "~/models/Rule";
-import serviceApi from "~/services/serviceApi";
 export default {
     beforeCreate() {
         this.$api_agipro.enum_form_fields.getFielsOptions().then((res) =>{

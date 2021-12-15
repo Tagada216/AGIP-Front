@@ -31,7 +31,6 @@
 // @ is an alias to /src
 import Grid from "../components/Grid";
 import Splitpanes from "splitpanes";
-import serviceApi from "../services/serviceApi";
 import "splitpanes/dist/splitpanes.css";
 // import '@fortawesome/fontawesome-free/css/all.css'
 import methods from "../components/UpdateIncidentForm";

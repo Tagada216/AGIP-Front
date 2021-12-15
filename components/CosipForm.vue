@@ -249,7 +249,6 @@ import IncidentClass from "../Class/IncidentClass";
 import Cosip from "../Class/CosipClass";
 import GeneralMethod from '../models/GeneralMethod'
 import DataClass from "../Class/DataClass";
-import serviceApi from "../services/serviceApi";
 import Rule from "../models/Rule";
 import ImpactEnseigne from "../Class/ImpactEnseigneClass";
 export default {

@@ -28,7 +28,20 @@
         placement="bottom-end"
       >
         <button class="header-btn" @click="duplicate()" :idToDuplicate="rowId">
-          <i class="fas fa-file "></i>
+          <i class="fas fa-copy "></i>
+        </button>
+      </el-tooltip>
+      <el-tooltip
+        class="item"
+        effect="light"
+        content="Importer Main Courante"
+        placement="bottom-end"
+      >
+        <button class="header-btn">
+          <div
+          >
+            <i class="fas fa-file-upload"></i>
+          </div>
         </button>
       </el-tooltip>
       <el-tooltip
@@ -47,7 +60,6 @@
 
 <script>
 import JsonExcel from 'vue-json-excel';
-import serviceApi from "../services/serviceApi";
 
 export default {
   name: "Header",
@@ -91,8 +103,8 @@ export default {
         .replace(/\//g, "-")} ${now.toLocaleTimeString()}`;
     },
     async fetchMainCourrante() {
-      const response = await serviceApi.getDatas("incident");
-      console.log(response.data)
+      const response = await this.$api_agipro.main_courante.getMainCourante();
+      console.log("Je suis la log dasn le header ",response.data)
       return response.data;
     },
     send() {
