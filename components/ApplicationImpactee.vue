@@ -11,7 +11,7 @@
             class="w-2/3"
             placeholder="Application Impactée"
             v-model="
-              incident.incident_application_impactees[scope.$index].display_name
+              incident.incident_application_impactees[scope.$index].nom_appli
             "
             :fetch-suggestions="getMatchingApplications"
             value-key="nom"
@@ -77,11 +77,10 @@ export default {
     sendApp: []
   },
   created() {
-    GeneralMethod.getFieldsOptions().then(res => {
-      // Class permettant de récupérer les données des menu déroulant + applications
-      this.datas = res;
-      this.apps = this.datas.application_impactee;
-    });
+        this.$api_agipro.enum_form_fields.getFielsOptions().then((res) =>{
+            this.datas = res
+            this.apps = this.datas.application_impactee.data;
+        })
   },
   data() {
     return {

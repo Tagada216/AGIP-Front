@@ -5,17 +5,7 @@ import IncidentModel from "../models/IncidentModel";
 
 export default {
 
-  // Avec la fonction lambda / Récupération des Options diposnible ( Priorite, status, enseignes etc ) pour les afficher sur le formulaire 
-  async getFieldsOptions() {
-    let datas = new DataClass();
 
-    datas.priorites = await serviceApi.getDatas('incident/priorite');
-    datas.statut = await serviceApi.getDatas('incident/statut');
-    datas.enseignes = await serviceApi.getDatas('enseigne');
-    datas.application_impactee = await serviceApi.getDatas('applications');
-
-    return datas;
-  },
 
 
   transformDatasForGrid(data, setHeader) {
@@ -38,7 +28,7 @@ export default {
         incident.ref = data[i].incident_references[0].reference
       }
 
-      console.log(incident.ref)
+
 
       let getDatedeb = data[i].incident_impact_enseignes.map(function (elem) {
         return elem.date_debut
@@ -239,7 +229,7 @@ export default {
       i++
     } while (i < data.length)
 
-    console.log(tableData)
+
     return tableData
   },
 

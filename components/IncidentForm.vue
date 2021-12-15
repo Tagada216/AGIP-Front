@@ -117,7 +117,7 @@
               <el-form-item label="Priorité" prop="priorite_id">
                 <el-select v-model="incident.priorite_id">
                   <el-option
-                    v-for="item in datas.priorites"
+                    v-for="item in datas.priorites.data"
                     :key="item.id"
                     :label="item.priorite"
                     :value="item.id"
@@ -130,7 +130,7 @@
               <el-form-item label="Statut" prop="statut_id">
                 <el-select v-model="incident.statut_id">
                   <el-option
-                    v-for="item in datas.statut"
+                    v-for="item in datas.statut.data"
                     :key="item.id"
                     :label="item.nom"
                     :value="item.id"
@@ -155,7 +155,7 @@
           >
             <el-checkbox-group v-model="incident.enseignes_impactee">
               <el-checkbox
-                v-for="enseigne in datas.enseignes"
+                v-for="enseigne in datas.enseignes.data"
                 :label="enseigne.id"
                 :key="enseigne.id"
                 v-if="!enseigne.is_deprecated"
@@ -270,21 +270,32 @@
     <!-- Fin Modal de confirmation de suppression d'une reférence problème -->
 
     <el-form-item v-if="pageName == 'NewIncident'" style="text-align: center">
-      <el-button
-        class="px-4 py-2 rounded-md text-sm font-medium border-b-2 focus:outline-none focus:ring transition text-white bg-blue-500 border-blue-800 hover:bg-blue-600 active:bg-blue-700 focus:ring-blue-300"
+      <button
+        class="bg-black text-white pl-4 pr-4 hover:opacity-70 border-2 border-black"
         type="submit"
         @click="validateForm()"
-        >Sauvegarder</el-button
+        >Sauvegarder</button
       >
     </el-form-item>
-     <el-form-item  v-if="pageName === 'UpdateIncident'" style="text-align: center">
-      <el-button
-        class="px-4 py-2 rounded-md text-sm font-medium border-b-2 focus:outline-none focus:ring transition text-white bg-blue-500 border-blue-800 hover:bg-blue-600 active:bg-blue-700 focus:ring-blue-300"
-        type="submit"
-        @click="save()"
-        >Sauvegarder</el-button
-      >
-    </el-form-item>
+    <div class="flex justify-center ">
+      <el-form-item  v-if="pageName === 'UpdateIncident'" style="text-align: center" class="pr-4">
+            <button
+              class="bg-black text-white pl-4 pr-4 hover:opacity-70 border-2 border-black"
+              type="submit"
+              @click="save()"
+              >Sauvegarder</button
+            >
+          </el-form-item>
+          <el-form-item  v-if="pageName === 'UpdateIncident'" style="text-align: center">
+            <button
+              class="border-2 pr-4 pl-4 border-black hover:bg-black hover:text-white transition-colors duration-300 delay-150"
+              type="button"
+              @click="send2Cosip()"
+              >Ajouter au Cosip</button
+            >
+          </el-form-item>
+    </div>
+     
   </el-form>
 </template>
 
@@ -292,7 +303,6 @@
 import IncidentClass from "../Class/IncidentClass";
 import DataClass from "../Class/DataClass";
 import Cosip from "../Class/CosipClass";
-import GeneralMethod from "../models/GeneralMethod";
 import { setContournementRule } from "../models/GeneralMethod";
 import Rule from "../models/Rule";
 import ImpactEnseigneClass from "../Class/ImpactEnseigneClass";
@@ -306,10 +316,9 @@ export default {
     },
   },
   created() {
-    GeneralMethod.getFieldsOptions().then(res => {
-      // Class permettant de récupérer les données des menu déroulant + applications
-      this.datas = res;
-    });
+        this.$api_agipro.enum_form_fields.getFielsOptions().then((res) =>{
+            this.datas = res
+        })
   },
 
   data() {
@@ -444,7 +453,11 @@ export default {
         }
       })
     },
-
+    // Envoyer l'incident de la main courante sélectionné vers le fomulaire COSIP 
+    send2Cosip(){
+      console.log(this.incident_id);
+      this.$router.push(`newcosip/${this.incident_id}`)
+    },
     //Complétion automatique des champs Mois et semaine COSIP en fonction de la date de début
     sendDateToCOSIP(){
       if(this.$route.fullPath ==='/cosip'){

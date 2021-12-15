@@ -4,12 +4,7 @@
       title
     }}</span>
     <span v-if="headerName == 'mainCourante'">
-      <el-button
-        type="primary"
-        class="absolute right-60 mt-4 px-8 bg-black"
-        @click="send()"
-        >Mail</el-button
-      >
+      
       <el-tooltip
         class="item"
         effect="light"
@@ -33,17 +28,17 @@
         placement="bottom-end"
       >
         <button class="header-btn" @click="duplicate()" :idToDuplicate="rowId">
-          <i class="fas fa-file  fa-lg"></i>
+          <i class="fas fa-file "></i>
         </button>
       </el-tooltip>
       <el-tooltip
         class="item"
         effect="light"
-        content="COSIP"
+        content="Envoyer Mail"
         placement="bottom-end"
       >
-        <button class="header-btn" @click="cosip()">
-          C
+        <button class="header-btn" @click="send()">
+         <i class="fas fa-envelope"></i>
         </button>
       </el-tooltip>
     </span>

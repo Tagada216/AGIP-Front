@@ -10,7 +10,7 @@
                             @change="emitToCosipForm(enseigne)"
                         >
                             <el-option
-                                v-for="item in datas.gravite"
+                                v-for="item in datas.gravite.data"
                                 :key="item.id"
                                 :label="item.nom"
                                 :value="item.id"
@@ -142,15 +142,11 @@
                 type="textarea"
                 :autosize="{ minRows: 4, maxRows: 8 }"
                 placeholder="Impact"
-                v-model="iEnseigne.description_impact"
+                v-model="iEnseigne.description_impact"setAppImpactee
                 @change="emitToCosipForm(enseigne)"
             ></el-input>
         </el-form-item>
-        <ApplicationImpactee 
-            @emit-appImpactee="setAppImpactee"
-            class="w-full">
-        </ApplicationImpactee>
-        </el-form-item>
+    </el-form-item>
 
 </template>
 
@@ -179,10 +175,9 @@ export default {
         }
 
 },
-    beforeCreate() {
-        GeneralMethod.getFieldsOptions().then(res => {
-        this.datas = res
-        
+    mounted() {
+        this.$api_agipro.enum_form_fields.getFielsOptions().then((res) =>{
+            this.datas = res
         })
     },
     methods:{
@@ -239,10 +234,7 @@ export default {
             }
             this.$emit('emit-impactE', {ens: ens, inc :this.incident, ienseigne: this.tabEnseignesTemp})
         },
-        setAppImpactee(payload) {
-            this.incident.incident_application_impactee = payload.app;
-            this.$emit('emit-impactE', { inc :this.incident, ienseigne: this.tabEnseignesTemp})
-        },
+
         sortEnseigneImpactee(id_enseigne){
             
             for( let i =0; i<= this.tabEnseignesTemp.length; i++){

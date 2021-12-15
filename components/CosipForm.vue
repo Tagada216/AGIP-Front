@@ -66,7 +66,7 @@
                             @change="emitToParent"
                             >
                             <el-option
-                            v-for="item in datas.cause_racines"
+                            v-for="item in datas.causes_racine.data"
                             :key="item.id"
                             :label="item.nom"
                             :value="item.id"
@@ -181,7 +181,7 @@
                 <el-form-item label="Enseigne(s) impactée(s)" prop="enseigne_impactee" >
                     <el-checkbox-group  @change="verifCheckEnseignesImpactees()" v-model="iEnseigne.enseigne" style="text-align:left; margin-left:5px;">
                         <el-checkbox
-                            v-for="enseigne in datas.enseignes"
+                            v-for="enseigne in datas.enseignes.data"
                             :label="enseigne.id"
                             :key="enseigne.id"
                             v-if="!enseigne.is_deprecated"
@@ -210,7 +210,7 @@
                                 ">
 									<div style="margin-bottom: 10px;">
 										<el-option
-											v-for="item in datas.entite_responsable"
+											v-for="item in datas.entite_responsable.data"
 											:key="item.id"
 											:label="item.nom"
 											:value="item.id" >
@@ -254,8 +254,8 @@ import Rule from "../models/Rule";
 import ImpactEnseigne from "../Class/ImpactEnseigneClass";
 export default {
     beforeCreate() {
-        GeneralMethod.getFieldsOptions().then(res => {
-        this.datas = res
+        this.$api_agipro.enum_form_fields.getFielsOptions().then((res) =>{
+            this.datas = res
         })
         
     },

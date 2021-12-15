@@ -43,7 +43,8 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    '@plugins/vueImport.js'
+    '@plugins/vueImport.js',
+    {src: '~plugins/api_agipro.js'}
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -67,9 +68,22 @@ export default {
 
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: [],
+  modules: [
+    //Add axios like a module 
+    '@nuxtjs/axios'
+  ],
 
-
+  styleResources:{
+    scss:[
+      '~/assets/SCSS/_colors.scss',
+      '~/assets/SCSS/_fonts.scss'
+    ]
+  },
+    //Configuration axios avec la base  url de l'api Agipro 
+    axios :{
+      baseURL :'http://localhost:5000/api/'
+    },
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {}
+
 }
