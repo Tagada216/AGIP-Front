@@ -290,7 +290,7 @@ export default {
   },
 
   transformDatasForm(data, incident, incidentId) {
-    // console.log(data)
+    //console.log("les data ", data)
     incident.incident_id = incidentId;
     incident.description = data.description;
     incident.date_debut = data.incident_impact_enseignes[0].date_debut
@@ -353,7 +353,7 @@ export default {
 
       const appli  = {
           code_irt: itr,
-          display_name: app,
+          nom_appli: app,
           trigramme: tri
         };
       //  console.log(app)

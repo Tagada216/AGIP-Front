@@ -37,7 +37,7 @@
         content="Importer Main Courante"
         placement="bottom-end"
       >
-        <button class="header-btn">
+        <button class="header-btn" @click="importMainCourante()">
           <div
           >
             <i class="fas fa-file-upload"></i>
@@ -55,6 +55,7 @@
         </button>
       </el-tooltip>
     </span>
+     
   </div>
 </template>
 
@@ -66,17 +67,24 @@ export default {
   props: {
     title: String,
     headerName: String,
-    rowId: Number
-  },
+    rowId: Number,
+    slim: { type: Boolean, default: false },
+		title: { type: String, default: '' },
+  },    
   data() {
     return {
-      exportFileName: "Main Courante"
+      exportFileName: "Main Courante",
     };
   },
   components: {
 		'download-excel': JsonExcel,
 	},
   methods: {
+
+    //Import Main Courante
+    importMainCourante(){
+      this.$emit('importMC' , {open : true})
+    },
     duplicate() {
       console.log(this.rowId);
       window.location.href = "/#/NewIncident/id=" + this.curID;

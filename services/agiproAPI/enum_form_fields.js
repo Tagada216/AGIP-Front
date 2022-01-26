@@ -36,4 +36,7 @@ export default axios =>({
     getCausesRacine(){
         return axios.get('cause-racine');
     },
+    getReferences(){
+        return axios.get('reference');
+    }
 })

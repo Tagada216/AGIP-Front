@@ -8,6 +8,7 @@ export default axios =>({
         return axios.get("incident/"+id_incident);
     },
     createIncident(new_incident){
+        console.log("New Incident: ", new_incident)
         return axios.post("incident",new_incident);
     },
     updateOneIncident(incident, id_incident){

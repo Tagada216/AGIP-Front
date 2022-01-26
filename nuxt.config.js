@@ -2,7 +2,7 @@ export default {
 
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
-
+  loading : true, 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'AGIRPO',
@@ -44,7 +44,8 @@ export default {
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     '@plugins/vueImport.js',
-    {src: '~plugins/api_agipro.js'}
+    {src: '~plugins/api_agipro.js'},
+    {src:'~plugins/vue-js-modal.js'}
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components

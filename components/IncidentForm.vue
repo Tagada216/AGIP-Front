@@ -236,6 +236,7 @@
             part="info-generale"
             @emit-updateIncident="setUpdateIncident"
             :sendUpdateFields = sendUpdateFieldsOnSelect
+
           ></UpdateIncidentForm>
 
           <ApplicationImpactee
@@ -272,7 +273,7 @@
     <el-form-item v-if="pageName == 'NewIncident'" style="text-align: center">
       <button
         class="bg-black text-white pl-4 pr-4 hover:opacity-70 border-2 border-black"
-        type="submit"
+        type="button"
         @click="validateForm()"
         >Sauvegarder</button
       >
@@ -281,7 +282,7 @@
       <el-form-item  v-if="pageName === 'UpdateIncident'" style="text-align: center" class="pr-4">
             <button
               class="bg-black text-white pl-4 pr-4 hover:opacity-70 border-2 border-black"
-              type="submit"
+              type="button"
               @click="save()"
               >Sauvegarder</button
             >
@@ -366,8 +367,10 @@ export default {
 									"<h1 style='font-family: arial'>L'enregistrement a bien été effectué.</h1>",
 								type: 'success',
 							});
-							setTimeout(window.location.reload(), 2500);
+							//setTimeout(window.location.reload(), 2500);
         }
+      }else{
+        this.setUpdateIncident()
       }
 
       if(this.$route.fullPath ==='/cosip'){
@@ -440,13 +443,17 @@ export default {
             }
             //Vérification du statut de l'incident si résolu date de din obligatoire 
             if (this.incident.statut_id === 5 && this.incident.date_fin === null){
-              	this.$message({
+                this.$message({
                   dangerouslyUseHTMLString: true,
                   message:
                     "<h2 style='font-family: arial'>Impossible d'inserer l'incident</h2> <p style='font-family: arial'>==> Le Statut de l'incident est en <strong>Résolu</strong> le champs <strong>Fin de l'incident est obligatoire</strong> .</p>",
                   type: 'error',
 							});
             }
+            let tempTab = this.incident.references;
+            this.incident.references = [];
+            this.incident.references.push(tempTab[i].reference)
+            console.log(this.incident.references)
             this.submit();
           }
         }
@@ -468,10 +475,11 @@ export default {
       console.log("Incident: ", this.incident);
       // console.log("id :" , this.incident_id);
       
-      const responsePut = this.$$api_agipro.main_courante.updateOneIncident(this.incident, this.incident_id);
+      const responsePut = this.$api_agipro.main_courante.updateOneIncident(this.incident, this.incident_id);
       
     },
     setUpdateIncident(payload) {
+      console.log("update payload ",payload)
       this.incident = payload.inc;
     },
     //Récupération des champs du composant CosipForm

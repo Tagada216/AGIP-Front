@@ -25,7 +25,7 @@
       </el-form-item>
 
       <el-form-item label="Communication à la Tour De Contrôle"
-      :getHorodatageInfo = getHorodatage(sendUpdateFields)
+
       >
         <el-date-picker
           v-model="incident.date_communication_tdc"
@@ -65,8 +65,7 @@
           id="cause"
           type="textarea"
           :autosize="{ minRows: 4, maxRows: 8 }"
-          placeholder="Cause"
-          v-model="incident.cause"
+          v-model="cause"
           @change="emitToParent"
           :getInfoGeneral = getGeneralInfo(sendUpdateFields)
         ></el-input>
@@ -120,18 +119,20 @@ export default {
     incident_id: {
       type: Number
     },
-    sendUpdateFields : {}
+    sendUpdateFields : {},
+
   },
   data() {
     return {
-      incident: new IncidentClass()
+      incident: new IncidentClass(),
+      cause: " "
     };
   },
+
   methods: {
     emitToParent() {
       this.$emit("emit-updateIncident", { inc: this.incident });
     },
-
     getHorodatage(param){
       this.incident.date_qualif_p01 = param.date_qualification_p01
       this.incident.date_communication_tdc = param.date_communication_TDC
@@ -139,10 +140,20 @@ export default {
       this.incident.description_contournement = param.description_contournement
     },
     getGeneralInfo(param){
-      this.incident.cause = param.cause
+      this.cause = "Proute"
       this.incident.origine = param.origine
       this.incident.action_retablissement = param.action_retablissement
       this.incident.plan_action = param.plan_action
+    }
+  },
+  computed:{
+    cause : {
+      get (){
+        return this.cause
+      },
+      set(value){
+        this.$emit('input', value)
+      }
     }
   }
 };
